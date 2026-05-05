@@ -180,6 +180,9 @@ interface AgentCapabilitiesState {
   features: FeatureState;
   /** ROS 2 environment state: absent (no support), available (board supports, not running), running. */
   ros2State: "absent" | "available" | "running";
+  /** Backend variant the agent process is running. "lite" hides plugin /
+   * peripheral / scripting / ROS surfaces. Defaults to "full" until set. */
+  runtimeMode: "full" | "lite";
   /** True once we've received at least one capabilities payload. */
   loaded: boolean;
 }
@@ -205,6 +208,7 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
   models: DEFAULT_MODELS,
   features: DEFAULT_FEATURES,
   ros2State: "absent",
+  runtimeMode: "full",
   loaded: false,
 
   setCapabilities(caps: AgentCapabilities | Record<string, unknown>) {
@@ -219,6 +223,13 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       ros2State = rawRos.state === "running" ? "running" : "available";
     }
 
+    // Pull runtimeMode out of the raw payload too; agents may send
+    // either snake_case (runtime_mode) or camelCase (runtimeMode).
+    const rawRuntime =
+      (caps as { runtimeMode?: unknown }).runtimeMode ??
+      (caps as { runtime_mode?: unknown }).runtime_mode;
+    const runtimeMode: "full" | "lite" = rawRuntime === "lite" ? "lite" : "full";
+
     set({
       tier: normalized.tier,
       cameras: normalized.cameras,
@@ -227,6 +238,7 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       models: normalized.models,
       features: normalized.features,
       ros2State,
+      runtimeMode,
       loaded: true,
     });
   },
@@ -261,6 +273,7 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       models: DEFAULT_MODELS,
       features: DEFAULT_FEATURES,
       ros2State: "absent",
+      runtimeMode: "full",
       loaded: false,
     });
   },

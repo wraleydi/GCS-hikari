@@ -4,6 +4,50 @@ All notable changes to ADOS Mission Control are recorded here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.10.1] - 2026-05-05
+
+Companion release for the lightweight Rust agent backend. Surfaces a
+"Lite" pill on the fleet card and hides UI surfaces the lite backend
+does not ship.
+
+### Added
+- Fleet card renders a small "Lite" badge next to the drone name when
+  the agent reports `runtimeMode: "lite"`. Visible at a glance so
+  operators know the drone is running the constrained backend.
+- `runtimeMode` field on the `cmd_droneStatus` table and on the
+  `cmd_drones` table. The status push handler propagates the value
+  from heartbeats into the paired-drone row so reactive consumers
+  pick it up without a second query. Schema additions are
+  optional / backward-compatible; existing clients see `undefined`
+  and default to "full".
+- `runtimeMode` field on the `AgentCapabilities` interface and the
+  `agent-capabilities-store`. The capability normalizer accepts
+  either `runtimeMode` or `runtime_mode` from agent payloads.
+- SoC-to-NPU table entries for BCM2710A1 (Pi Zero 2 W), BCM2711
+  (Pi 4B / CM4), BCM2712 (Pi 5), RV1106G3 (Luckfox Pico Zero),
+  and RV1103 (Luckfox Pico) so capability inference does not return
+  null for those targets.
+
+### Changed
+- `useVisibleTabs` excludes the Smart Modes, ROS, and Scripts
+  Command-page sub-tabs when `runtimeMode === "lite"`. The lite
+  backend does not ship the plugin host, peripheral manager,
+  scripting tier, or ROS integration; offering those tabs would lead
+  to broken handlers.
+- `FleetDrone` and `CloudDroneBridge` carry the `runtimeMode`
+  field through to the fleet store so the drone card can read it
+  without subscribing to a per-drone status query.
+- The Calibrate, Parameters, and Configure tabs on the drone-detail
+  panel are intentionally NOT gated. They serve all backend variants
+  including lite (FC connection works on lite) and stay visible.
+
+### Notes
+- The lite Rust agent codebase lives at `agents/lite-rs/` in the
+  ADOSDroneAgent repository. CI publishes prebuilt signed binaries
+  to GitHub Releases. Operators install the lite backend with
+  `ADOS_PROFILE=lite-rs` set as an environment variable on the
+  install.sh invocation.
+
 ## [0.9.11] - 2026-05-04
 
 This release lands universal-setup integration on the GCS side and

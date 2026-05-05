@@ -529,6 +529,9 @@ fullName: v.optional(v.string()),
     lastIp: v.optional(v.string()),
     lastSeen: v.optional(v.number()),
     fcConnected: v.optional(v.boolean()),
+    // Backend variant. Synced from cmd_droneStatus heartbeats so the
+    // fleet view can show a "Lite" pill without an extra query.
+    runtimeMode: v.optional(v.string()),
     pairedAt: v.number(),
   })
     .index("by_userId", ["userId"])
@@ -592,6 +595,10 @@ fullName: v.optional(v.string()),
     peers: v.optional(v.any()),
     telemetry: v.optional(v.any()),
     logs: v.optional(v.any()),
+    // Backend variant the agent process is running. "lite" hides
+    // the plugin host, peripheral manager, scripting, and ROS surfaces
+    // in Mission Control. Absent values default to "full".
+    runtimeMode: v.optional(v.string()),
     updatedAt: v.number(),
   })
     .index("by_deviceId", ["deviceId"]),

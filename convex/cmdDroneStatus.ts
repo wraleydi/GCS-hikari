@@ -71,6 +71,7 @@ export const pushStatus = internalMutation({
     peers: v.optional(v.any()),
     telemetry: v.optional(v.any()),
     logs: v.optional(v.any()),
+    runtimeMode: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -97,6 +98,7 @@ export const pushStatus = internalMutation({
         fcConnected: args.fcConnected,
         lastIp: args.lastIp,
         mdnsHost: args.mdnsHost,
+        ...(args.runtimeMode !== undefined ? { runtimeMode: args.runtimeMode } : {}),
       });
     }
 

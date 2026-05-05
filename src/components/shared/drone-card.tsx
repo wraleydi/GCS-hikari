@@ -54,6 +54,9 @@ export function DroneCard({ drone, selected, onClick }: DroneCardProps) {
           {drone.source === "cloud" && (
             <Cloud size={12} className="text-accent-primary" />
           )}
+          {drone.runtimeMode === "lite" && (
+            <Badge variant="info" className="text-[10px]">Lite</Badge>
+          )}
         </div>
         <div className="flex items-center gap-1.5">
           <Badge variant={drone.armState === "armed" ? "warning" : "neutral"}>

@@ -49,6 +49,10 @@ export interface FleetDrone extends DroneInfo {
   source?: "local" | "cloud";
   /** Cloud device ID for cloud-paired agents */
   cloudDeviceId?: string;
+  /** Backend variant the agent process is running. Absent values
+   * default to "full". The "lite" variant hides plugin / peripheral /
+   * scripting / ROS surfaces in Mission Control. */
+  runtimeMode?: "full" | "lite";
 }
 
 export type AlertSeverity = "info" | "warning" | "critical";

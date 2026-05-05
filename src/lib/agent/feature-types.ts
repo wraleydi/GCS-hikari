@@ -139,6 +139,10 @@ export interface AgentCapabilities {
   vision: VisionState;
   models: ModelCacheInfo;
   features: FeatureState;
+  /** Backend variant the agent process is running. Hides plugin /
+   * peripheral / scripting / ROS surfaces when "lite". Defaults to
+   * "full" when absent. */
+  runtimeMode?: "full" | "lite";
 }
 
 // ── Detection Data (for vision overlay) ──────────────────

@@ -20,15 +20,22 @@ export function useVisibleTabs(): CommandSubTab[] {
   const cameras = useAgentCapabilitiesStore((s) => s.cameras);
   const npuAvailable = useAgentCapabilitiesStore((s) => s.compute.npu_available);
   const ros2State = useAgentCapabilitiesStore((s) => s.ros2State);
+  const runtimeMode = useAgentCapabilitiesStore((s) => s.runtimeMode);
 
   return useMemo(() => {
     const tabs: CommandSubTab[] = ["overview", "features"];
+
+    // Lite-mode agents do not ship the plugin host, peripheral
+    // manager, scripting tier, or ROS integration. Drop the
+    // corresponding sub-tabs so the operator is not offered surfaces
+    // the running backend cannot serve.
+    const isLite = runtimeMode === "lite";
 
     // Show Smart Modes tab when:
     // 1. At least one smart-mode or vision-requiring feature is enabled
     // 2. Camera is detected
     // 3. NPU or sufficient tier exists
-    if (loaded) {
+    if (loaded && !isLite) {
       const hasSmartMode = enabledFeatures.some((id) => {
         const feat = FEATURE_CATALOG[id];
         return feat?.type === "smart-mode" || feat?.visionBehavior;
@@ -42,11 +49,15 @@ export function useVisibleTabs(): CommandSubTab[] {
     }
 
     // Show ROS tab when agent reports ROS support (any state except "absent")
-    if (loaded && ros2State !== "absent") {
+    // and is not the lite backend.
+    if (loaded && !isLite && ros2State !== "absent") {
       tabs.push("ros");
     }
 
-    tabs.push("system", "scripts");
+    tabs.push("system");
+    if (!isLite) {
+      tabs.push("scripts");
+    }
     return tabs;
-  }, [loaded, tier, enabledFeatures, cameras, npuAvailable, ros2State]);
+  }, [loaded, tier, enabledFeatures, cameras, npuAvailable, ros2State, runtimeMode]);
 }

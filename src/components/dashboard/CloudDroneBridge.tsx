@@ -63,6 +63,7 @@ export function CloudDroneBridge() {
         hasAgent: true,
         source: "cloud",
         cloudDeviceId: drone.deviceId,
+        runtimeMode: drone.runtimeMode === "lite" ? "lite" : "full",
       };
 
       if (trackedIds.current.has(fleetId)) {
