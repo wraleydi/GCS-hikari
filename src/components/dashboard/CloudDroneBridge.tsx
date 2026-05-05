@@ -50,6 +50,13 @@ export function CloudDroneBridge() {
         continue;
       }
 
+      const attachedDisplayType: FleetDrone["attachedDisplayType"] =
+        drone.attachedDisplayType === "spi-lcd" ||
+        drone.attachedDisplayType === "hdmi" ||
+        drone.attachedDisplayType === "none"
+          ? drone.attachedDisplayType
+          : undefined;
+
       const fleetDrone: FleetDrone = {
         id: fleetId,
         name: drone.name || `Agent ${drone.deviceId.slice(0, 8)}`,
@@ -64,6 +71,7 @@ export function CloudDroneBridge() {
         source: "cloud",
         cloudDeviceId: drone.deviceId,
         runtimeMode: drone.runtimeMode === "lite" ? "lite" : "full",
+        attachedDisplayType,
       };
 
       if (trackedIds.current.has(fleetId)) {

@@ -57,6 +57,13 @@ export function DroneCard({ drone, selected, onClick }: DroneCardProps) {
           {drone.runtimeMode === "lite" && (
             <Badge variant="info" className="text-[10px]">Lite</Badge>
           )}
+          {drone.attachedDisplayType === "spi-lcd" && (
+            <span title='Local SPI LCD attached (Waveshare 3.5" / ILI9486)'>
+              <Badge variant="neutral" className="text-[10px]">
+                LCD
+              </Badge>
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1.5">
           <Badge variant={drone.armState === "armed" ? "warning" : "neutral"}>

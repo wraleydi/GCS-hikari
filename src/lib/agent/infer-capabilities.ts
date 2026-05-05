@@ -7,7 +7,12 @@
  */
 
 import type { AgentStatus, PeripheralInfo } from "@/lib/agent/types";
-import type { AgentCapabilities, CameraCapability, ComputeCapability } from "./feature-types";
+import type {
+  AgentCapabilities,
+  AttachedDisplay,
+  CameraCapability,
+  ComputeCapability,
+} from "./feature-types";
 
 /** Known NPU specs by SoC name. */
 const NPU_BY_SOC: Record<string, { tops: number; runtime: "rknn" | "tensorrt" }> = {
@@ -73,6 +78,25 @@ export function inferCapabilities(
       streaming: p.status === "ok",
     }));
 
+  // Infer attached display (SPI LCD) from peripherals. The agent
+  // pushes one peripheral with category="display" per /etc/ados/display.conf
+  // entry; phase-1 only ships SPI LCDs but the type field stays open
+  // so a future HDMI / DPI panel reuses the same surface.
+  const displayPeripheral = peripherals.find((p) => p.category === "display");
+  const display: AttachedDisplay | undefined = displayPeripheral
+    ? {
+        type: (displayPeripheral.type as AttachedDisplay["type"]) ?? "spi-lcd",
+        controller:
+          (displayPeripheral.extra?.controller as string | undefined) ?? undefined,
+        hasTouch:
+          (displayPeripheral.extra?.has_touch as boolean | undefined) ?? false,
+        resolution:
+          (displayPeripheral.extra?.resolution as string | undefined) ?? undefined,
+        rotation:
+          (displayPeripheral.extra?.rotation as number | undefined) ?? undefined,
+      }
+    : undefined;
+
   return {
     tier: board.tier,
     cameras,
@@ -101,5 +125,6 @@ export function inferCapabilities(
       enabled: [],
       active: null,
     },
+    display,
   };
 }

@@ -532,6 +532,10 @@ fullName: v.optional(v.string()),
     // Backend variant. Synced from cmd_droneStatus heartbeats so the
     // fleet view can show a "Lite" pill without an extra query.
     runtimeMode: v.optional(v.string()),
+    // Attached panel type derived from cmd_droneStatus.peripherals[].
+    // Drives the "LCD" pill on the fleet drone card without an extra
+    // query. One of "spi-lcd", "hdmi", "none", or undefined.
+    attachedDisplayType: v.optional(v.string()),
     pairedAt: v.number(),
   })
     .index("by_userId", ["userId"])

@@ -132,6 +132,22 @@ export interface FeatureState {
   active: string | null;
 }
 
+/**
+ * Local panel attached to the companion board over the 40-pin
+ * expansion header (e.g. a 3.5" SPI LCD on a Cubie A7Z or Rock 5C
+ * ground station). The agent reports this as a peripheral with
+ * category="display"; infer-capabilities maps it to this shape so
+ * the Hardware tab can render a status card and the drone card can
+ * show an "LCD" pill next to the role badge.
+ */
+export interface AttachedDisplay {
+  type: "spi-lcd" | "hdmi" | "none";
+  controller?: string;
+  hasTouch?: boolean;
+  resolution?: string;
+  rotation?: number;
+}
+
 export interface AgentCapabilities {
   tier: number;
   cameras: CameraCapability[];
@@ -143,6 +159,10 @@ export interface AgentCapabilities {
    * peripheral / scripting / ROS surfaces when "lite". Defaults to
    * "full" when absent. */
   runtimeMode?: "full" | "lite";
+  /** Optional. Present only when an SPI LCD or other companion-board
+   * display is bound on the agent side. Absent on stock drone or
+   * headless ground-station builds. */
+  display?: AttachedDisplay;
 }
 
 // ── Detection Data (for vision overlay) ──────────────────

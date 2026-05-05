@@ -53,6 +53,10 @@ export interface FleetDrone extends DroneInfo {
    * default to "full". The "lite" variant hides plugin / peripheral /
    * scripting / ROS surfaces in Mission Control. */
   runtimeMode?: "full" | "lite";
+  /** Local panel attached to the companion board over the 40-pin
+   * expansion header (e.g. SPI LCD on a Cubie A7Z or Rock 5C
+   * ground-station node). Undefined when no display is bound. */
+  attachedDisplayType?: "spi-lcd" | "hdmi" | "none";
 }
 
 export type AlertSeverity = "info" | "warning" | "critical";

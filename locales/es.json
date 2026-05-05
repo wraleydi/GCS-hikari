@@ -2480,6 +2480,20 @@
       "autoDetectedAs": "Auto-detected as {label}",
       "componentsOk": "{ok} of {total} required components OK",
       "moreItems": " and {count} more"
+    },
+    "localDisplay": {
+      "title": "Local Display",
+      "typeLabel": "Type",
+      "controller": "Controller",
+      "resolution": "Resolution",
+      "rotation": "Rotation",
+      "framebuffer": "Framebuffer",
+      "touchEnabled": "Touch enabled",
+      "touchDisabled": "Touch disabled",
+      "notInstalled": "No local display",
+      "spiLcd": "SPI LCD",
+      "hdmi": "HDMI",
+      "pillLabel": "LCD"
     }
   },
   "toast": {

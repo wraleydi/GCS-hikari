@@ -159,6 +159,15 @@ function normalizeCapabilities(raw: unknown): AgentCapabilities {
     registry_url: registryUrl,
   };
 
+  // Pass-through: pre-inferred display block from infer-capabilities or
+  // a future agent capabilities API field. The Zod raw schema is
+  // forward-permissive, so we read the field directly off the input.
+  const displayCandidate = (raw as { display?: unknown }).display;
+  const display =
+    displayCandidate && typeof displayCandidate === "object"
+      ? (displayCandidate as AgentCapabilities["display"])
+      : undefined;
+
   return {
     tier: Number(data.tier ?? 0),
     cameras,
@@ -166,6 +175,7 @@ function normalizeCapabilities(raw: unknown): AgentCapabilities {
     vision,
     models,
     features: normalizeFeatures(data.features),
+    display,
   };
 }
 
@@ -183,6 +193,9 @@ interface AgentCapabilitiesState {
   /** Backend variant the agent process is running. "lite" hides plugin /
    * peripheral / scripting / ROS surfaces. Defaults to "full" until set. */
   runtimeMode: "full" | "lite";
+  /** Local panel attached to the companion board (e.g. SPI LCD on a
+   * ground-station node). Undefined when no display is bound. */
+  display: AgentCapabilities["display"];
   /** True once we've received at least one capabilities payload. */
   loaded: boolean;
 }
@@ -209,6 +222,7 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
   features: DEFAULT_FEATURES,
   ros2State: "absent",
   runtimeMode: "full",
+  display: undefined,
   loaded: false,
 
   setCapabilities(caps: AgentCapabilities | Record<string, unknown>) {
@@ -239,6 +253,7 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       features: normalized.features,
       ros2State,
       runtimeMode,
+      display: normalized.display,
       loaded: true,
     });
   },
@@ -274,6 +289,7 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       features: DEFAULT_FEATURES,
       ros2State: "absent",
       runtimeMode: "full",
+      display: undefined,
       loaded: false,
     });
   },

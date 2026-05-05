@@ -87,6 +87,21 @@ export const pushStatus = internalMutation({
       await ctx.db.insert("cmd_droneStatus", { ...args, updatedAt: now });
     }
 
+    // Derive attached display type from peripherals[] for the
+    // fleet card pill. The agent reports the SPI LCD as a peripheral
+    // entry with category="display"; we cherry-pick the type so the
+    // drone card can render an "LCD" badge without re-querying the
+    // full status row.
+    let attachedDisplayType: string | undefined;
+    if (Array.isArray(args.peripherals)) {
+      const display = (args.peripherals as Array<Record<string, unknown>>).find(
+        (p) => p && (p as { category?: unknown }).category === "display",
+      );
+      if (display && typeof display.type === "string") {
+        attachedDisplayType = display.type;
+      }
+    }
+
     // Also update the cmd_drones table lastSeen, fcConnected, lastIp
     const drone = await ctx.db
       .query("cmd_drones")
@@ -99,6 +114,9 @@ export const pushStatus = internalMutation({
         lastIp: args.lastIp,
         mdnsHost: args.mdnsHost,
         ...(args.runtimeMode !== undefined ? { runtimeMode: args.runtimeMode } : {}),
+        ...(attachedDisplayType !== undefined
+          ? { attachedDisplayType }
+          : {}),
       });
     }
 

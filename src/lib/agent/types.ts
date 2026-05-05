@@ -98,7 +98,13 @@ export interface CommandResult {
   data?: unknown;
 }
 
-export type PeripheralCategory = "sensor" | "camera" | "video" | "gimbal" | "compute";
+export type PeripheralCategory =
+  | "sensor"
+  | "camera"
+  | "video"
+  | "gimbal"
+  | "compute"
+  | "display";
 
 export interface PeripheralInfo {
   name: string;
@@ -109,6 +115,11 @@ export interface PeripheralInfo {
   rate_hz: number;
   status: "ok" | "warning" | "error" | "offline";
   last_reading: string;
+  /** Free-form per-peripheral metadata that is too sparse or
+   * volatile to deserve a typed field. Inferers cherry-pick keys
+   * they understand (e.g. controller / has_touch / resolution /
+   * rotation for displays) and ignore the rest. */
+  extra?: Record<string, unknown>;
 }
 
 export interface ScriptInfo {

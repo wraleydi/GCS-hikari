@@ -2416,6 +2416,20 @@
       "connected": "Connected",
       "capabilities": "Capabilities"
     },
+    "localDisplay": {
+      "title": "Local Display",
+      "typeLabel": "Type",
+      "controller": "Controller",
+      "resolution": "Resolution",
+      "rotation": "Rotation",
+      "framebuffer": "Framebuffer",
+      "touchEnabled": "Touch enabled",
+      "touchDisabled": "Touch disabled",
+      "notInstalled": "No local display",
+      "spiLcd": "SPI LCD",
+      "hdmi": "HDMI",
+      "pillLabel": "LCD"
+    },
     "androidRc": {
       "title": "ADOS Android RC Controller",
       "stubHeading": "Product in development",
