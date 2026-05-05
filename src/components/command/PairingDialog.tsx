@@ -32,6 +32,9 @@ interface PairingDialogProps {
   open: boolean;
   onClose: () => void;
   onPaired?: (deviceId: string, apiKey: string, url: string) => void;
+  /** Deep-link supplied code. When set, the dialog claims this code
+   *  instead of generating a new one. */
+  initialCode?: string | null;
 }
 
 export function PairingDialog(props: PairingDialogProps) {
@@ -78,6 +81,7 @@ function PairingDialogBase({
   claimCode,
   preGenerate,
   requiresSignIn,
+  initialCode,
 }: BaseProps) {
   const t = useTranslations("command");
   const tCommon = useTranslations("common");
@@ -97,6 +101,7 @@ function PairingDialogBase({
     preGenerate,
     onPaired,
     onCodeReset,
+    initialCode,
   });
 
   const discoveredAgents = usePairingStore((s) => s.discoveredAgents);

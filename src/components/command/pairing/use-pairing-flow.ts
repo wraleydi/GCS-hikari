@@ -48,6 +48,9 @@ interface FlowOptions {
   onPaired?: (deviceId: string, apiKey: string, url: string) => void;
   /** Called by `generateCode` so the parent can reset its own UI flags. */
   onCodeReset?: () => void;
+  /** Pre-filled code from a deep-link entry. Skips the auto-generate path
+   *  and immediately tries to claim the supplied code. */
+  initialCode?: string | null;
 }
 
 export function usePairingFlow({
@@ -57,6 +60,7 @@ export function usePairingFlow({
   preGenerate,
   onPaired,
   onCodeReset,
+  initialCode,
 }: FlowOptions) {
   const [state, setState] = useState<PairingState>("setup");
   const [preGenCode, setPreGenCode] = useState<string | null>(null);
@@ -133,16 +137,24 @@ export function usePairingFlow({
   }, [preGenerate, startCountdown, onCodeReset]);
 
   // Auto-generate code when dialog opens, unless the user still needs to sign in.
+  // When an initialCode is supplied (deep-link entry), skip the auto-generate
+  // path entirely and try to claim the supplied code.
   useEffect(() => {
     if (!open) return;
     if (requiresSignIn) return;
     initialDroneIdsRef.current = new Set(
       pairedDrones.map((drone) => drone._id)
     );
+    if (initialCode && initialCode.length === 6) {
+      // Treat the URL-supplied code as a synthetic discovered agent so the
+      // existing claim path runs, including all the error mapping.
+      claimDiscovered({ pairingCode: initialCode } as DiscoveredAgent);
+      return () => stopCountdown();
+    }
     generateCode();
     return () => stopCountdown();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, requiresSignIn]);
+  }, [open, requiresSignIn, initialCode]);
 
   // Watch for new drones appearing (zero-touch flow)
   useEffect(() => {
