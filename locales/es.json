@@ -2200,11 +2200,11 @@
       "title": "Botones",
       "shortPress": "Pulsación corta",
       "longPress": "Pulsación larga",
-      "phase2Note": "La reasignación llega en la Fase 2"
+      "phase2Note": "Remapping is on the roadmap"
     },
     "screens": {
       "title": "Pantallas",
-      "phase2Note": "Activar y reordenar llegan en la Fase 2"
+      "phase2Note": "Enable and reorder is on the roadmap"
     },
     "pic": {
       "title": "Piloto al mando",
@@ -2295,7 +2295,7 @@
       "title": "Controlador RC Android ADOS",
       "stubHeading": "Producto en desarrollo",
       "stubBody": "El controlador de mano Android RC de ADOS está en desarrollo activo. Este panel se activará cuando se lance el producto.",
-      "stubBadge": "Fase 4 Pista B"
+      "stubBadge": "Roadmap"
     },
     "tabs": {
       "overview": "Overview",

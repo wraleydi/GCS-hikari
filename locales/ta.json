@@ -2200,11 +2200,11 @@
       "title": "பட்டன்கள்",
       "shortPress": "குறுகிய அழுத்தம்",
       "longPress": "நீண்ட அழுத்தம்",
-      "phase2Note": "மறுவரைபடம் Phase 2 இல் வரும்"
+      "phase2Note": "Remapping is on the roadmap"
     },
     "screens": {
       "title": "திரைகள்",
-      "phase2Note": "இயக்கம் மற்றும் மறு வரிசை Phase 2 இல் வரும்"
+      "phase2Note": "Enable and reorder is on the roadmap"
     },
     "pic": {
       "title": "கட்டளையில் உள்ள பைலட்",
@@ -2295,7 +2295,7 @@
       "title": "ADOS Android RC कंट्रोलर",
       "stubHeading": "उत्पाद विकास में",
       "stubBody": "ADOS Android RC கையடக்க கட்டுப்படுத்தி செயலில் உள்ள வளர்ச்சியில் உள்ளது. தயாரிப்பு வெளியீடு செய்யப்படும்போது இந்த பேனல் செயல்படும்.",
-      "stubBadge": "चरण 4 ट्रैक B"
+      "stubBadge": "Roadmap"
     },
     "tabs": {
       "overview": "Overview",

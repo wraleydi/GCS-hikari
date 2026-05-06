@@ -2200,11 +2200,11 @@
       "title": "Tombol",
       "shortPress": "Tekan singkat",
       "longPress": "Tekan lama",
-      "phase2Note": "Pemetaan ulang hadir di Fase 2"
+      "phase2Note": "Remapping is on the roadmap"
     },
     "screens": {
       "title": "Layar",
-      "phase2Note": "Aktifkan dan urutkan ulang hadir di Fase 2"
+      "phase2Note": "Enable and reorder is on the roadmap"
     },
     "pic": {
       "title": "Pilot dalam Komando",
@@ -2295,7 +2295,7 @@
       "title": "Pengontrol RC Android ADOS",
       "stubHeading": "Produk sedang dikembangkan",
       "stubBody": "Pengontrol genggam Android RC ADOS sedang dalam pengembangan aktif. Panel ini akan aktif saat produk dirilis.",
-      "stubBadge": "Fase 4 Jalur B"
+      "stubBadge": "Roadmap"
     },
     "tabs": {
       "overview": "Overview",

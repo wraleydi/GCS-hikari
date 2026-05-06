@@ -2325,11 +2325,11 @@
       "title": "Buttons",
       "shortPress": "Short press",
       "longPress": "Long press",
-      "phase2Note": "Remapping ships in Phase 2"
+      "phase2Note": "Remapping is on the roadmap"
     },
     "screens": {
       "title": "Screens",
-      "phase2Note": "Enable and reorder ships in Phase 2"
+      "phase2Note": "Enable and reorder is on the roadmap"
     },
     "pic": {
       "title": "Pilot in Command",
@@ -2434,7 +2434,7 @@
       "title": "ADOS Android RC Controller",
       "stubHeading": "Product in development",
       "stubBody": "The ADOS Android RC handheld controller is in active development. This panel will light up when the product ships.",
-      "stubBadge": "Phase 4 Track B"
+      "stubBadge": "Roadmap"
     },
     "common": {
       "loading": "Loading...",

@@ -2200,11 +2200,11 @@
       "title": "Botões",
       "shortPress": "Pressão curta",
       "longPress": "Pressão longa",
-      "phase2Note": "Remapeamento vem na Fase 2"
+      "phase2Note": "Remapping is on the roadmap"
     },
     "screens": {
       "title": "Telas",
-      "phase2Note": "Ativar e reordenar vêm na Fase 2"
+      "phase2Note": "Enable and reorder is on the roadmap"
     },
     "pic": {
       "title": "Piloto no comando",
@@ -2295,7 +2295,7 @@
       "title": "Controlador RC Android ADOS",
       "stubHeading": "Produto em desenvolvimento",
       "stubBody": "O controlador portátil Android RC ADOS está em desenvolvimento ativo. Este painel ficará ativo quando o produto for lançado.",
-      "stubBadge": "Fase 4 Trilha B"
+      "stubBadge": "Roadmap"
     },
     "tabs": {
       "overview": "Overview",

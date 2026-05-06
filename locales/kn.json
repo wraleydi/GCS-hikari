@@ -2200,11 +2200,11 @@
       "title": "ಬಟನ್‌ಗಳು",
       "shortPress": "ಸಣ್ಣ ಒತ್ತಿ",
       "longPress": "ದೀರ್ಘ ಒತ್ತಿ",
-      "phase2Note": "ರೀಮ್ಯಾಪಿಂಗ್ Phase 2 ರಲ್ಲಿ ಬರಲಿದೆ"
+      "phase2Note": "Remapping is on the roadmap"
     },
     "screens": {
       "title": "ಪರದೆಗಳು",
-      "phase2Note": "ಸಕ್ರಿಯಗೊಳಿಸಿ ಮತ್ತು ಮರುಕ್ರಮಗೊಳಿಸಿ Phase 2 ರಲ್ಲಿ ಬರಲಿದೆ"
+      "phase2Note": "Enable and reorder is on the roadmap"
     },
     "pic": {
       "title": "ಪೈಲಟ್ ಇನ್ ಕಮಾಂಡ್",
@@ -2295,7 +2295,7 @@
       "title": "ADOS Android RC कंट्रोलर",
       "stubHeading": "उत्पाद विकास में",
       "stubBody": "ADOS Android RC ಹ್ಯಾಂಡ್‌ಹೆಲ್ಡ್ ಕಂಟ್ರೋಲರ್ ಸಕ್ರಿಯ ಅಭಿವೃದ್ಧಿಯಲ್ಲಿದೆ. ಉತ್ಪನ್ನ ಬಿಡುಗಡೆಯಾದಾಗ ಈ ಪ್ಯಾನಲ್ ಸಕ್ರಿಯವಾಗುತ್ತದೆ.",
-      "stubBadge": "चरण 4 ट्रैक B"
+      "stubBadge": "Roadmap"
     },
     "tabs": {
       "overview": "Overview",

@@ -2200,11 +2200,11 @@
       "title": "按钮",
       "shortPress": "短按",
       "longPress": "长按",
-      "phase2Note": "重新映射将在第 2 阶段推出"
+      "phase2Note": "Remapping is on the roadmap"
     },
     "screens": {
       "title": "屏幕",
-      "phase2Note": "启用和重排将在第 2 阶段推出"
+      "phase2Note": "Enable and reorder is on the roadmap"
     },
     "pic": {
       "title": "主控飞行员",
@@ -2295,7 +2295,7 @@
       "title": "ADOS 安卓 RC 控制器",
       "stubHeading": "产品开发中",
       "stubBody": "ADOS 安卓 RC 手持控制器正在积极开发中。产品发布后此面板将可用。",
-      "stubBadge": "第 4 阶段 B 轨道"
+      "stubBadge": "Roadmap"
     },
     "tabs": {
       "overview": "Overview",

@@ -2200,11 +2200,11 @@
       "title": "버튼",
       "shortPress": "짧게 누름",
       "longPress": "길게 누름",
-      "phase2Note": "재매핑은 Phase 2에 제공"
+      "phase2Note": "Remapping is on the roadmap"
     },
     "screens": {
       "title": "화면",
-      "phase2Note": "사용 및 재정렬은 Phase 2에 제공"
+      "phase2Note": "Enable and reorder is on the roadmap"
     },
     "pic": {
       "title": "파일럿 인 커맨드",
@@ -2295,7 +2295,7 @@
       "title": "ADOS Android RC 컨트롤러",
       "stubHeading": "제품 개발 중",
       "stubBody": "ADOS Android RC 핸드헬드 컨트롤러는 활발히 개발 중입니다. 제품이 출시되면 이 패널이 활성화됩니다.",
-      "stubBadge": "4단계 트랙 B"
+      "stubBadge": "Roadmap"
     },
     "tabs": {
       "overview": "Overview",

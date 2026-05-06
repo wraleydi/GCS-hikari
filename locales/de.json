@@ -2200,11 +2200,11 @@
       "title": "Tasten",
       "shortPress": "Kurz drücken",
       "longPress": "Lang drücken",
-      "phase2Note": "Neuzuweisung kommt in Phase 2"
+      "phase2Note": "Remapping is on the roadmap"
     },
     "screens": {
       "title": "Bildschirme",
-      "phase2Note": "Aktivieren und neu ordnen kommt in Phase 2"
+      "phase2Note": "Enable and reorder is on the roadmap"
     },
     "pic": {
       "title": "Pilot in Command",
@@ -2295,7 +2295,7 @@
       "title": "ADOS Android RC-Controller",
       "stubHeading": "Produkt in Entwicklung",
       "stubBody": "Der ADOS Android RC-Handheld-Controller wird aktiv entwickelt. Dieses Panel wird aktiviert, sobald das Produkt verfügbar ist.",
-      "stubBadge": "Phase 4 Track B"
+      "stubBadge": "Roadmap"
     },
     "tabs": {
       "overview": "Overview",

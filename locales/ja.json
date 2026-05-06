@@ -2200,11 +2200,11 @@
       "title": "ボタン",
       "shortPress": "短押し",
       "longPress": "長押し",
-      "phase2Note": "リマップはフェーズ2で提供"
+      "phase2Note": "Remapping is on the roadmap"
     },
     "screens": {
       "title": "画面",
-      "phase2Note": "有効化と並べ替えはフェーズ2で提供"
+      "phase2Note": "Enable and reorder is on the roadmap"
     },
     "pic": {
       "title": "パイロット・イン・コマンド",
@@ -2295,7 +2295,7 @@
       "title": "ADOS Android RC コントローラー",
       "stubHeading": "製品開発中",
       "stubBody": "ADOS Android RC ハンドヘルドコントローラーは活発に開発中です。製品がリリースされるとこのパネルが有効になります。",
-      "stubBadge": "フェーズ 4 トラック B"
+      "stubBadge": "Roadmap"
     },
     "tabs": {
       "overview": "Overview",

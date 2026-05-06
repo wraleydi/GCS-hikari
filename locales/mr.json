@@ -2200,11 +2200,11 @@
       "title": "बटणे",
       "shortPress": "लहान दाब",
       "longPress": "लांब दाब",
-      "phase2Note": "रीमॅपिंग Phase 2 मध्ये येईल"
+      "phase2Note": "Remapping is on the roadmap"
     },
     "screens": {
       "title": "स्क्रीन",
-      "phase2Note": "सक्षम आणि पुनर्क्रम Phase 2 मध्ये येईल"
+      "phase2Note": "Enable and reorder is on the roadmap"
     },
     "pic": {
       "title": "पायलट इन कमांड",
@@ -2295,7 +2295,7 @@
       "title": "ADOS Android RC कंट्रोलर",
       "stubHeading": "उत्पाद विकास में",
       "stubBody": "ADOS Android RC हँडहेल्ड कंट्रोलर सक्रिय विकासात आहे. उत्पादन रिलीझ झाल्यावर हे पॅनेल सक्रिय होईल.",
-      "stubBadge": "चरण 4 ट्रैक B"
+      "stubBadge": "Roadmap"
     },
     "tabs": {
       "overview": "Overview",
