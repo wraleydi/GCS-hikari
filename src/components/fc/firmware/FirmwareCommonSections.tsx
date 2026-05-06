@@ -72,17 +72,26 @@ export function FirmwareStackSelector({
   return (
     <div className="bg-bg-secondary border border-border-default p-4 space-y-3">
       <h2 className="text-xs font-semibold text-text-primary">Firmware Stack</h2>
-      <div className="flex gap-2">
-        {FIRMWARE_STACKS.map(({ id, label, labelKey }) => (
-          <button key={id}
-            onClick={() => { setFirmwareStack(id); setUseCustom(false); }}
-            disabled={isFlashing}
-            className={`flex-1 px-3 py-2 text-xs font-semibold border cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-colors ${
-              firmwareStack === id ? "border-accent-primary text-accent-primary bg-accent-primary/10" : "border-border-default text-text-secondary hover:text-text-primary"
-            }`}>
-            {labelKey ? t(labelKey) : label}
-          </button>
-        ))}
+      <div
+        role="radiogroup"
+        aria-label={t("a11y.stackGroupLabel")}
+        className="flex gap-2"
+      >
+        {FIRMWARE_STACKS.map(({ id, label, labelKey }) => {
+          const isActive = firmwareStack === id;
+          return (
+            <button key={id}
+              role="radio"
+              aria-checked={isActive}
+              onClick={() => { setFirmwareStack(id); setUseCustom(false); }}
+              disabled={isFlashing}
+              className={`flex-1 px-3 py-2 text-xs font-semibold border cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-colors ${
+                isActive ? "border-accent-primary text-accent-primary bg-accent-primary/10" : "border-border-default text-text-secondary hover:text-text-primary"
+              }`}>
+              {labelKey ? t(labelKey) : label}
+            </button>
+          );
+        })}
       </div>
       {droneType && <p className="text-[10px] text-text-tertiary">Auto-detected from connected drone: {droneType}</p>}
     </div>

@@ -152,8 +152,21 @@ const WRITE_CHUNK_LBAS = 256; // 256 * 512 = 128 KiB per op
 /** USB transfer timeout for bulk endpoints, in ms. */
 const BULK_TIMEOUT_MS = 30_000;
 
-/** Time budget for re-enumeration after the maskrom code-download. */
-const REENUMERATE_TIMEOUT_MS = 8_000;
+/**
+ * Control-transfer timeout. Maskrom code-download and execute are short
+ * vendor control requests that should complete in well under a second
+ * even on slow hubs; 10s is a generous ceiling that prevents a wedged
+ * bootrom from freezing the UI indefinitely.
+ */
+const CONTROL_TIMEOUT_MS = 10_000;
+
+/**
+ * Default time budget for re-enumeration after the maskrom code-download.
+ * Bumped from the original 8s after audit feedback that some hubs and
+ * BSPs need 10+ seconds before the loader-stage device shows up. Callers
+ * can override via {@link RockchipPrepareOptions.reenumerateTimeoutMs}.
+ */
+const REENUMERATE_TIMEOUT_MS = 18_000;
 
 // ── Public API types ─────────────────────────────────────────
 
@@ -167,6 +180,17 @@ export interface RockchipPrepareOptions {
   loaderBlob?: Uint8Array;
   /** Address to start execution from after code-download. */
   loaderEntryAddress?: number;
+  /**
+   * Override the re-enumeration timeout (default 18s). Useful on slow
+   * USB hubs where the loader stage takes longer to appear.
+   */
+  reenumerateTimeoutMs?: number;
+  /**
+   * Abort signal honoured during the maskrom code-download and the
+   * re-enumeration wait. When the signal fires, prepare() throws an
+   * AbortError instead of leaving the device half-initialized.
+   */
+  signal?: AbortSignal;
 }
 
 /** Identity returned by READ_FLASH_ID. */
@@ -232,13 +256,28 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
    */
   async prepare(opts: RockchipPrepareOptions = {}): Promise<void> {
     this.aborted = false;
+    if (opts.signal) {
+      // Mirror flash() — the same abort path stops the wait loop and the
+      // bulk-transfer paths. Skipping signal plumbing in prepare leaves
+      // the device orphaned when the user clicks Cancel mid-uplift.
+      opts.signal.addEventListener("abort", () => this.abort(), { once: true });
+      this.checkAbort();
+    }
     await this.openAndClaim();
 
     if (opts.loaderBlob && opts.loaderBlob.byteLength > 0) {
       await this.maskromCodeDownload(opts.loaderBlob);
+      this.checkAbort();
       await this.maskromExecute(opts.loaderEntryAddress ?? 0x00000000);
       await this.releaseClaimed();
-      this.device = await this.waitForLoaderStage(REENUMERATE_TIMEOUT_MS);
+      // Drop the maskrom-stage device reference so waitForLoaderStage
+      // does not skip the re-enumerated successor that often shares the
+      // same vendor id and just swaps interface descriptors.
+      const previousDevice = this.device;
+      this.device = await this.waitForLoaderStage(
+        opts.reenumerateTimeoutMs ?? REENUMERATE_TIMEOUT_MS,
+        previousDevice,
+      );
       await this.openAndClaim();
     }
 
@@ -294,6 +333,10 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
 
     this.checkAbort();
 
+    // Throttle progress callbacks: emit on >=1% delta OR >=250ms elapsed,
+    // plus always emit the first and final tick so the UI starts and
+    // settles cleanly. Without throttling a 50 MB image fires ~1,600
+    // updates and floods React.
     onProgress({
       phase: "flashing",
       percent: 5,
@@ -301,6 +344,8 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
       bytesWritten: 0,
       bytesTotal: totalBytes,
     });
+    let lastReportedPercent = 5;
+    let lastReportedAt = Date.now();
 
     let writtenLbas = 0;
     while (writtenLbas < totalLbas) {
@@ -323,14 +368,22 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
       writtenLbas += lbaCount;
       const bytesWritten = Math.min(writtenLbas * LBA_SIZE, totalBytes);
       const percent = 5 + Math.floor((writtenLbas / totalLbas) * 90);
-      onProgress({
-        phase: "flashing",
-        percent,
-        message: `Wrote ${(bytesWritten / (1024 * 1024)).toFixed(1)} / ${(totalBytes / (1024 * 1024)).toFixed(1)} MB`,
-        bytesWritten,
-        bytesTotal: totalBytes,
-        phasePercent: Math.floor((writtenLbas / totalLbas) * 100),
-      });
+      const now = Date.now();
+      const isFinal = writtenLbas >= totalLbas;
+      const percentDelta = percent - lastReportedPercent;
+      const elapsedMs = now - lastReportedAt;
+      if (isFinal || percentDelta >= 1 || elapsedMs >= 250) {
+        onProgress({
+          phase: "flashing",
+          percent,
+          message: `Wrote ${(bytesWritten / (1024 * 1024)).toFixed(1)} / ${(totalBytes / (1024 * 1024)).toFixed(1)} MB`,
+          bytesWritten,
+          bytesTotal: totalBytes,
+          phasePercent: Math.floor((writtenLbas / totalLbas) * 100),
+        });
+        lastReportedPercent = percent;
+        lastReportedAt = now;
+      }
     }
 
     onProgress({
@@ -447,7 +500,10 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
    * interface descriptor, or it may show up under a different pid; we
    * accept any 0x2207 device that has a bulk-in/bulk-out pair.
    */
-  private async waitForLoaderStage(timeoutMs: number): Promise<USBDevice> {
+  private async waitForLoaderStage(
+    timeoutMs: number,
+    previousDevice: USBDevice | null,
+  ): Promise<USBDevice> {
     const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {
       this.checkAbort();
@@ -455,7 +511,11 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
       const candidates = await navigator.usb.getDevices();
       for (const d of candidates) {
         if (d.vendorId !== ROCKCHIP_USB_VID) continue;
-        if (d === this.device && this.device.opened) continue;
+        // Re-enumeration may keep the same vendor id and swap only the
+        // interface descriptor. We skip the *exact same* USBDevice
+        // instance only when it is still in maskrom mode (no bulk
+        // endpoints); the loader-stage successor is a different
+        // instance and is matched on bulk-pair presence below.
         // Need to peek configuration to see if bulk endpoints exist;
         // open lazily.
         try {
@@ -474,7 +534,16 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
                 ),
             ),
           );
-          if (hasBulk) return d;
+          if (hasBulk) {
+            // If we accidentally rediscovered the maskrom-stage device
+            // (same instance, same descriptor), skip and keep polling —
+            // the loader replacement may still be appearing on the bus.
+            if (d === previousDevice) {
+              await d.close().catch(() => {});
+              continue;
+            }
+            return d;
+          }
           await d.close().catch(() => {});
         } catch {
           // Try next candidate.
@@ -502,15 +571,19 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
     while (offset < blob.byteLength) {
       this.checkAbort();
       const slice = blob.subarray(offset, offset + FRAME);
-      await this.device.controlTransferOut(
-        {
-          requestType: "vendor",
-          recipient: "device",
-          request: MASKROM_REQ_DOWNLOAD,
-          value: 0,
-          index: 0,
-        },
-        slice,
+      await this.withTimeout(
+        this.device.controlTransferOut(
+          {
+            requestType: "vendor",
+            recipient: "device",
+            request: MASKROM_REQ_DOWNLOAD,
+            value: 0,
+            index: 0,
+          },
+          slice,
+        ),
+        CONTROL_TIMEOUT_MS,
+        "Maskrom code-download",
       );
       offset += slice.byteLength;
     }
@@ -522,13 +595,17 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
    * stage device after this returns.
    */
   private async maskromExecute(entry: number): Promise<void> {
-    await this.device.controlTransferOut({
-      requestType: "vendor",
-      recipient: "device",
-      request: MASKROM_REQ_EXECUTE,
-      value: entry & 0xffff,
-      index: (entry >> 16) & 0xffff,
-    });
+    await this.withTimeout(
+      this.device.controlTransferOut({
+        requestType: "vendor",
+        recipient: "device",
+        request: MASKROM_REQ_EXECUTE,
+        value: entry & 0xffff,
+        index: (entry >> 16) & 0xffff,
+      }),
+      CONTROL_TIMEOUT_MS,
+      "Maskrom execute",
+    );
   }
 
   // ── Loader-stage CBW/CSW framing ───────────────────────────
@@ -537,15 +614,29 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
   private buildCbw(args: {
     tag: number;
     transferLength: number;
-    direction: "in" | "out";
+    direction: "in" | "out" | "none";
     opcode: number;
     cb?: Uint8Array;
   }): Uint8Array {
+    if ((args.tag >>> 0) !== args.tag) {
+      throw new Error("CBW tag exceeds u32 range.");
+    }
+    if (args.transferLength < 0 || args.transferLength > 0xffffffff) {
+      throw new Error("CBW transferLength exceeds u32 range.");
+    }
+    if (args.opcode < 0 || args.opcode > 0xff) {
+      throw new Error("CBW opcode out of range (must fit in one byte).");
+    }
     const cbw = new Uint8Array(CBW_LENGTH);
+    // Defensive: Uint8Array() is spec-zeroed but explicit fill guards
+    // against future refactors that pool or reuse the underlying buffer.
+    cbw.fill(0);
     const view = new DataView(cbw.buffer);
     view.setUint32(0, CBW_SIGNATURE, true);
     view.setUint32(4, args.tag, true);
     view.setUint32(8, args.transferLength, true);
+    // Per USB Mass Storage BOT spec, the direction flag is set to OUT
+    // (0x00) when there is no data stage; only IN commands set bit 7.
     cbw[12] = args.direction === "in" ? CBW_FLAG_IN : CBW_FLAG_OUT;
     cbw[13] = 0; // bCBWLUN
     // bCBWCBLength: command block size in bytes. We pack opcode + a
@@ -600,7 +691,7 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
     const cbw = this.buildCbw({
       tag,
       transferLength: args.transferLength,
-      direction: args.direction === "out" ? "out" : "in",
+      direction: args.direction,
       opcode: args.opcode,
       cb: args.cb,
     });
@@ -620,6 +711,15 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
         `rockusb command 0x${args.opcode.toString(16)} failed (CSW status ${csw.status}, residue ${csw.residue}).`,
       );
     }
+    // Non-zero residue on a status-success CSW means the device transferred
+    // fewer bytes than the host requested. For READ/WRITE_LBA this is a
+    // silent partial-IO that would corrupt the flashed image; reject it
+    // here rather than letting the caller treat the command as successful.
+    if (csw.residue !== 0) {
+      throw new Error(
+        `rockusb command 0x${args.opcode.toString(16)} reported ${csw.residue} bytes residue (expected full transfer of ${args.transferLength}).`,
+      );
+    }
     return payload;
   }
 
@@ -628,9 +728,14 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
     // Newer lib.dom revisions narrow Uint8Array to ArrayBufferLike (so
     // SharedArrayBuffer-backed views are excluded); cast through the
     // standard BufferSource alias.
-    const result = await this.withTimeout(
-      this.device.transferOut(this.epOut, data as unknown as BufferSource),
-      BULK_TIMEOUT_MS,
+    const result = await this.runWithRetry(
+      "Bulk OUT",
+      (timeoutMs) =>
+        this.withTimeout(
+          this.device.transferOut(this.epOut, data as unknown as BufferSource),
+          timeoutMs,
+          "Bulk OUT",
+        ),
     );
     if (result.status !== "ok") {
       throw new Error(`Bulk OUT transfer status: ${result.status}`);
@@ -638,9 +743,14 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
   }
 
   private async bulkIn(length: number): Promise<Uint8Array> {
-    const result = await this.withTimeout(
-      this.device.transferIn(this.epIn, length),
-      BULK_TIMEOUT_MS,
+    const result = await this.runWithRetry(
+      "Bulk IN",
+      (timeoutMs) =>
+        this.withTimeout(
+          this.device.transferIn(this.epIn, length),
+          timeoutMs,
+          "Bulk IN",
+        ),
     );
     if (result.status !== "ok" || !result.data) {
       throw new Error(`Bulk IN transfer status: ${result.status}`);
@@ -650,6 +760,48 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
       result.data.byteOffset,
       result.data.byteLength,
     );
+  }
+
+  /**
+   * Drive a bulk transfer with one or two retries on transient timeouts.
+   * Timeout schedule: 30s, 5s, 10s (~45s total budget). NetworkError /
+   * SecurityError / aborts are terminal and propagate immediately.
+   */
+  private async runWithRetry<T>(
+    label: string,
+    op: (timeoutMs: number) => Promise<T>,
+  ): Promise<T> {
+    const schedule = [BULK_TIMEOUT_MS, 5_000, 10_000];
+    let lastErr: unknown;
+    for (let attempt = 0; attempt < schedule.length; attempt++) {
+      this.checkAbort();
+      try {
+        return await op(schedule[attempt]);
+      } catch (err) {
+        lastErr = err;
+        if (!this.isTransientUsbTimeout(err)) {
+          throw err;
+        }
+        this.checkAbort();
+      }
+    }
+    throw lastErr instanceof Error
+      ? lastErr
+      : new Error(`${label} failed after ${schedule.length} attempts.`);
+  }
+
+  private isTransientUsbTimeout(err: unknown): boolean {
+    if (this.aborted) return false;
+    if (err instanceof Error && err.name === "TimeoutError") return true;
+    // DOMException flavoured timeouts surface with name "TimeoutError" too.
+    if (
+      typeof DOMException !== "undefined" &&
+      err instanceof DOMException &&
+      err.name === "TimeoutError"
+    ) {
+      return true;
+    }
+    return false;
   }
 
   // ── rockusb commands ───────────────────────────────────────
@@ -677,7 +829,14 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
         "Bulk endpoints not initialized. Call prepare() before flash().",
       );
     }
+    if (startLba < 0 || startLba > 0xffffffff) {
+      throw new Error("startLba exceeds u32 range.");
+    }
+    if (lbaCount < 0 || lbaCount > 0xffff) {
+      throw new Error("lbaCount exceeds u16 range.");
+    }
     const cb = new Uint8Array(15);
+    cb.fill(0);
     const cbView = new DataView(cb.buffer);
     // Big-endian sector address per the rockusb command block layout.
     cbView.setUint32(1, startLba >>> 0, false);
@@ -699,7 +858,14 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
     startLba: number,
     lbaCount: number,
   ): Promise<Uint8Array> {
+    if (startLba < 0 || startLba > 0xffffffff) {
+      throw new Error("startLba exceeds u32 range.");
+    }
+    if (lbaCount < 0 || lbaCount > 0xffff) {
+      throw new Error("lbaCount exceeds u16 range.");
+    }
     const cb = new Uint8Array(15);
+    cb.fill(0);
     const cbView = new DataView(cb.buffer);
     cbView.setUint32(1, startLba >>> 0, false);
     cbView.setUint16(7, lbaCount & 0xffff, false);
@@ -715,6 +881,7 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
 
   private async resetDevice(): Promise<void> {
     const cb = new Uint8Array(15);
+    cb.fill(0);
     cb[0] = 0x00; // subcommand: full reset
     await this.runCommand({
       opcode: ROCKUSB_OP.RESET_DEVICE,
@@ -733,24 +900,39 @@ export class RockchipBootromFlasher implements SbcImageFlasher {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    return new Promise<void>((resolve) => {
+      timer = setTimeout(() => {
+        timer = undefined;
+        resolve();
+      }, ms);
+    }).finally(() => {
+      if (timer !== undefined) {
+        clearTimeout(timer);
+        timer = undefined;
+      }
+    });
   }
 
-  private withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-    return new Promise((resolve, reject) => {
-      const handle = setTimeout(() => {
-        reject(new Error(`USB transfer timed out after ${ms}ms.`));
+  private withTimeout<T>(
+    promise: Promise<T>,
+    ms: number,
+    label = "USB transfer",
+  ): Promise<T> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        timer = undefined;
+        const err = new Error(`${label} timed out after ${ms}ms.`);
+        err.name = "TimeoutError";
+        reject(err);
       }, ms);
-      promise.then(
-        (value) => {
-          clearTimeout(handle);
-          resolve(value);
-        },
-        (err) => {
-          clearTimeout(handle);
-          reject(err);
-        },
-      );
+    });
+    return Promise.race([promise, timeout]).finally(() => {
+      if (timer !== undefined) {
+        clearTimeout(timer);
+        timer = undefined;
+      }
     });
   }
 }

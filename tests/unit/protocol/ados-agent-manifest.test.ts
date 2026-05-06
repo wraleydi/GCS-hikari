@@ -250,5 +250,48 @@ describe("AdosAgentManifest", () => {
         "manifest not generated yet",
       );
     });
+
+    it("rejects manifests whose schemaVersion is newer than this build supports", async () => {
+      const fromTheFuture = { ...buildManifest(), schemaVersion: 2 };
+      mockFetch.mockResolvedValueOnce(jsonResponse(fromTheFuture));
+      const client = new AdosAgentManifest();
+      await expect(client.getManifest()).rejects.toThrow(
+        /schema version 2 is newer/i,
+      );
+    });
+
+    it("accepts manifests at the current schemaVersion", async () => {
+      mockFetch.mockResolvedValueOnce(jsonResponse(buildManifest()));
+      const client = new AdosAgentManifest();
+      const result = await client.getManifest();
+      expect(result.schemaVersion).toBe(1);
+    });
+  });
+
+  describe("source field", () => {
+    it("exposes the upstream source via getSource() when present", async () => {
+      mockFetch.mockResolvedValueOnce(
+        jsonResponse({ ...buildManifest(), source: "github" }),
+      );
+      const client = new AdosAgentManifest();
+      const source = await client.getSource();
+      expect(source).toBe("github");
+    });
+
+    it("exposes the fallback source via getSource() when present", async () => {
+      mockFetch.mockResolvedValueOnce(
+        jsonResponse({ ...buildManifest(), source: "fallback" }),
+      );
+      const client = new AdosAgentManifest();
+      const source = await client.getSource();
+      expect(source).toBe("fallback");
+    });
+
+    it("returns null from getSource() when the proxy omits the field", async () => {
+      mockFetch.mockResolvedValueOnce(jsonResponse(buildManifest()));
+      const client = new AdosAgentManifest();
+      const source = await client.getSource();
+      expect(source).toBeNull();
+    });
   });
 });

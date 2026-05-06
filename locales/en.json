@@ -2649,7 +2649,15 @@
         "loadingBoards": "Loading boards...",
         "noBoards": "No {stack} boards available",
         "soc": "SoC:",
-        "arch": "Arch:"
+        "arch": "Arch:",
+        "offlineCatalog": "Offline catalog",
+        "offlineCatalogTooltip": "The upstream release catalog was unreachable. Showing the embedded baseline. Image URLs may be missing or stale."
+      },
+      "confirm": {
+        "title": "Confirm flash",
+        "body": "About to flash {board}. This erases the board's storage.",
+        "cancel": "Cancel",
+        "confirm": "Confirm flash"
       },
       "curl": {
         "title": "Install on a board running stock OS",
@@ -2662,7 +2670,51 @@
         "sha256": "SHA256:",
         "noImage": "No image URL published yet for this board. Check the agent repo's releases.",
         "devTitle": "Browser flash is in active development",
-        "devBody": "The in-browser Rockchip bootrom flasher is being built into Mission Control. Once it lands, plug your board into USB-C in bootrom mode and click Flash to write the eMMC from this page directly."
+        "devBody": "The in-browser Rockchip bootrom flasher is being built into Mission Control. Once it lands, plug your board into USB-C in bootrom mode and click Flash to write the eMMC from this page directly.",
+        "flashing": "Flashing...",
+        "checklistHint": "Confirm the safety checklist above to enable the Flash button."
+      },
+      "status": {
+        "boardDetected": "Board detected: {label}",
+        "detectionFailed": "Detection failed: {message}",
+        "preparing": "Preparing...",
+        "downloading": "Downloading image...",
+        "downloadingProgress": "Downloading image... {received} / {total} MB",
+        "verifyingChecksum": "Verifying image checksum...",
+        "verifyingSignature": "Verifying image signature...",
+        "connecting": "Connecting to board..."
+      },
+      "error": {
+        "noBoardSelected": "No board selected. Hold BOOT, plug USB-C, then try again.",
+        "unknown": "Unknown error",
+        "imageDownloadFailed": "Image download failed: HTTP {status}",
+        "noReadableBody": "Image response had no readable body.",
+        "checksumMismatch": "Image checksum mismatch. Expected {expected}, got {actual}.",
+        "missingSignature": "Manifest is missing a minisign signature for this image. Refusing to flash an unsigned artifact.",
+        "webusbBlocked": "WebUSB blocked. Serve Mission Control over HTTPS or localhost.",
+        "usbDisconnected": "USB device disconnected during flash. Hold the BOOT button while plugging USB-C in to re-enter bootrom mode, then retry.",
+        "flashAborted": "Flash aborted."
+      },
+      "toast": {
+        "noImageUrl": "No image URL available for this board.",
+        "connectBoardFirst": "Connect the board in bootrom mode first.",
+        "flashComplete": "Flash complete. Unplug and re-plug the board.",
+        "flashFailed": "Flash failed"
+      },
+      "connection": {
+        "boardConnected": "Board connected",
+        "readyToFlash": "{devices} — ready to flash.",
+        "noBoardConnected": "No board connected",
+        "scanHint": "Hold the BOOT button while plugging USB-C into your computer. The board enumerates as a Rockchip USB device (vendor {vendor}). Click Scan to authorize it.",
+        "scanForBoard": "Scan for board"
+      },
+      "a11y": {
+        "stackGroupLabel": "Firmware stack",
+        "copyButtonCopy": "Copy install command",
+        "copyButtonCopied": "Install command copied",
+        "copyAnnounce": "Copied to clipboard",
+        "flashStatus": "Flash status: {phase}, {percent} percent.",
+        "connectionStatusRegion": "Board connection status"
       }
     }
   }

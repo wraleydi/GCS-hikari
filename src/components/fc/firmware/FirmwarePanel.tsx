@@ -199,6 +199,7 @@ export function FirmwarePanel() {
             loading={fw.adosLoading}
             error={fw.adosError}
             agentVersion={fw.adosAgentVersion}
+            manifestSource={fw.adosManifestSource}
             selectedBoardId={fw.selectedAdosBoardId}
             setSelectedBoardId={fw.setSelectedAdosBoardId}
             onRetry={fw.loadAdosManifestRetry}

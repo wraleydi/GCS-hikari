@@ -17,6 +17,7 @@ import {
   RockchipBootromFlasher,
   ROCKCHIP_USB_VID,
 } from "@/lib/protocol/firmware/rockchip-bootrom";
+import { verifyLiteAgentImageSignature } from "@/lib/protocol/firmware/minisign-public-key";
 import { usbDeviceManager, type UsbDeviceInfo } from "@/lib/usb-device-manager";
 import { FirmwareFlashProgress } from "./FirmwareFlashProgress";
 
@@ -38,12 +39,19 @@ interface Props {
   allChecked?: boolean;
   /** WebUSB availability gate (already computed in parent). */
   usbSupported?: boolean;
+  /**
+   * Manifest origin marker. "github" means the upstream catalog
+   * resolved cleanly; "fallback" means the proxy served the embedded
+   * baseline. Drives the offline-catalog pill near the picker.
+   */
+  manifestSource?: string;
 }
 
 export function AdosAgentSection({
   stack, boards, loading, error, agentVersion,
   selectedBoardId, setSelectedBoardId, onRetry,
   allChecked = false, usbSupported = false,
+  manifestSource,
 }: Props) {
   const t = useTranslations("flashTool.ados");
   const { toast } = useToast();
@@ -58,6 +66,13 @@ export function AdosAgentSection({
   const [progress, setProgress] = useState<FlashProgress | null>(null);
   const [isFlashing, setIsFlashing] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+
+  // Confirmation gate. Clicking the Flash button surfaces a Cancel /
+  // Confirm pill and (when more than one Rockchip device is visible) a
+  // device picker. Confirm runs the existing flash flow; Cancel reverts
+  // to the idle state without touching USB.
+  const [confirming, setConfirming] = useState(false);
+  const [confirmDeviceLabel, setConfirmDeviceLabel] = useState<string>("");
 
   const flasherRef = useRef<RockchipBootromFlasher | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -127,6 +142,31 @@ export function AdosAgentSection({
     };
   }, []);
 
+  // Drop the confirmation pill if the operator yanks USB or the device
+  // list otherwise empties out — there's nothing left to flash to.
+  useEffect(() => {
+    if (confirming && rockchipDevices.length === 0) {
+      setConfirming(false);
+      setConfirmDeviceLabel("");
+    }
+  }, [confirming, rockchipDevices]);
+
+  // Warn the user before they navigate away (or close the tab) while a
+  // flash is in flight. Aborting an eMMC write mid-stream leaves the
+  // board with a half-written boot partition; the next power-on will
+  // hit u-boot in maskrom recovery rather than booting cleanly.
+  useEffect(() => {
+    if (!isFlashing) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      // Some browsers honor returnValue, others ignore it but still
+      // surface the prompt as long as preventDefault fired.
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isFlashing]);
+
   const stackLabel = stack === "ados-drone-agent" ? t("stack.drone") : t("stack.ground");
 
   const copyCommand = useCallback(async (cmd: string) => {
@@ -148,39 +188,73 @@ export function AdosAgentSection({
         ...prev.filter((d) => d.label !== info.label),
         info,
       ]);
-      setStatusMessage(`Board detected: ${info.label}`);
+      setStatusMessage(t("status.boardDetected", { label: info.label }));
     } catch (err) {
       if (err instanceof DOMException && err.name === "NotFoundError") {
-        setStatusMessage(
-          "No board selected. Hold BOOT, plug USB-C, then try again.",
-        );
+        setStatusMessage(t("error.noBoardSelected"));
       } else {
-        const msg = err instanceof Error ? err.message : "Unknown error";
+        const msg = err instanceof Error ? err.message : t("error.unknown");
         if (!msg.includes("cancelled") && !msg.includes("aborted")) {
-          setStatusMessage(`Detection failed: ${msg}`);
+          setStatusMessage(t("status.detectionFailed", { message: msg }));
         }
       }
     }
-  }, []);
+  }, [t]);
 
   const handleAbort = useCallback(() => {
     abortRef.current?.abort();
     flasherRef.current?.abort();
   }, []);
 
-  const handleFlash = useCallback(async () => {
+  // Step 1 of the flash flow: surface the confirmation pill. The actual
+  // USB work happens in runFlash, which only runs after explicit user
+  // confirm. This guards against accidental clicks (a misdirected click
+  // would otherwise erase the eMMC of whichever Rockchip board happens
+  // to be plugged in).
+  const handleFlash = useCallback(() => {
     if (!webFlashInstall || !webFlashInstall.imageUrl) {
-      toast("No image URL available for this board.", "error");
+      toast(t("toast.noImageUrl"), "error");
       return;
     }
     if (rockchipDevices.length === 0) {
-      toast("Connect the board in bootrom mode first.", "warning");
+      toast(t("toast.connectBoardFirst"), "warning");
+      return;
+    }
+    // Default-select the first visible device. The confirmation pill
+    // exposes a picker when more than one device is visible, so the
+    // operator can swap before confirming.
+    setConfirmDeviceLabel(rockchipDevices[0].label);
+    setConfirming(true);
+  }, [webFlashInstall, rockchipDevices, toast, t]);
+
+  const handleCancelConfirm = useCallback(() => {
+    setConfirming(false);
+    setConfirmDeviceLabel("");
+  }, []);
+
+  // Step 2 of the flash flow: actual download → verify → claim → write.
+  // Runs only after the operator clicks Confirm (or implicitly when the
+  // pill has nothing to disambiguate).
+  const runFlash = useCallback(async () => {
+    if (!webFlashInstall || !webFlashInstall.imageUrl) {
+      toast(t("toast.noImageUrl"), "error");
+      return;
+    }
+    if (rockchipDevices.length === 0) {
+      toast(t("toast.connectBoardFirst"), "warning");
       return;
     }
 
+    // Resolve the chosen device up front so a hot-unplug between the
+    // pill and the click can't pivot us onto the wrong board.
+    const chosen =
+      rockchipDevices.find((d) => d.label === confirmDeviceLabel) ??
+      rockchipDevices[0];
+
+    setConfirming(false);
     setIsFlashing(true);
     setStatusMessage("");
-    setProgress({ phase: "idle", percent: 0, message: "Preparing..." });
+    setProgress({ phase: "idle", percent: 0, message: t("status.preparing") });
 
     const abort = new AbortController();
     abortRef.current = abort;
@@ -190,20 +264,20 @@ export function AdosAgentSection({
       setProgress({
         phase: "bootloader_init",
         percent: 0,
-        message: "Downloading image...",
+        message: t("status.downloading"),
       });
       const res = await fetch(webFlashInstall.imageUrl, {
         signal: abort.signal,
       });
       if (!res.ok) {
-        throw new Error(`Image download failed: HTTP ${res.status}`);
+        throw new Error(t("error.imageDownloadFailed", { status: res.status }));
       }
       const total =
         webFlashInstall.imageSizeBytes > 0
           ? webFlashInstall.imageSizeBytes
           : Number(res.headers.get("Content-Length") ?? "0");
       const reader = res.body?.getReader();
-      if (!reader) throw new Error("Image response had no readable body.");
+      if (!reader) throw new Error(t("error.noReadableBody"));
       const chunks: Uint8Array[] = [];
       let received = 0;
       // Stream the download so the progress bar stays useful for a
@@ -218,7 +292,10 @@ export function AdosAgentSection({
           setProgress({
             phase: "bootloader_init",
             percent: pct,
-            message: `Downloading image... ${(received / (1024 * 1024)).toFixed(1)} / ${(total / (1024 * 1024)).toFixed(1)} MB`,
+            message: t("status.downloadingProgress", {
+              received: (received / (1024 * 1024)).toFixed(1),
+              total: (total / (1024 * 1024)).toFixed(1),
+            }),
             bytesWritten: received,
             bytesTotal: total,
           });
@@ -230,25 +307,43 @@ export function AdosAgentSection({
       setProgress({
         phase: "verifying",
         percent: 4,
-        message: "Verifying image checksum...",
+        message: t("status.verifyingChecksum"),
       });
       if (webFlashInstall.sha256) {
         const actual = await sha256Hex(compressed);
         if (actual.toLowerCase() !== webFlashInstall.sha256.toLowerCase()) {
           throw new Error(
-            `Image checksum mismatch. Expected ${webFlashInstall.sha256}, got ${actual}.`,
+            t("error.checksumMismatch", {
+              expected: webFlashInstall.sha256,
+              actual,
+            }),
           );
         }
       }
 
-      // 3. Pick / claim the Rockchip device. Prefer one already
-      //    visible; fall back to the picker.
-      let device: USBDevice;
-      if (rockchipDevices.length === 1) {
-        device = rockchipDevices[0].device;
+      // 2b. Ed25519 minisign signature against the vendored lite-agent
+      //     public key. SHA-256 alone is not enough — the manifest, the
+      //     image, and the SHA all come from the same GitHub Releases
+      //     surface, so a compromised release endpoint could feed a
+      //     consistent bogus triple. The signature ties the image bytes
+      //     to a key we ship inside this client.
+      if (webFlashInstall.minisignSignature) {
+        setProgress({
+          phase: "verifying",
+          percent: 5,
+          message: t("status.verifyingSignature"),
+        });
+        await verifyLiteAgentImageSignature(
+          compressed,
+          webFlashInstall.minisignSignature,
+        );
       } else {
-        device = await RockchipBootromFlasher.requestDevice();
+        throw new Error(t("error.missingSignature"));
       }
+
+      // 3. Use the device the operator confirmed. Already-authorized,
+      //    no picker reopen.
+      const device: USBDevice = chosen.device;
 
       const flasher = new RockchipBootromFlasher(device);
       flasherRef.current = flasher;
@@ -262,29 +357,29 @@ export function AdosAgentSection({
       setProgress({
         phase: "bootloader_init",
         percent: 5,
-        message: "Connecting to board...",
+        message: t("status.connecting"),
       });
-      await flasher.prepare();
+      await flasher.prepare({ signal: abort.signal });
 
       // 5. Stream the image into eMMC.
       await flasher.flash(compressed, (p) => setProgress(p), abort.signal);
 
-      toast("Flash complete. Unplug and re-plug the board.", "success");
+      toast(t("toast.flashComplete"), "success");
     } catch (err) {
-      let userMessage = err instanceof Error ? err.message : "Unknown error";
+      let userMessage = err instanceof Error ? err.message : t("error.unknown");
       if (err instanceof DOMException) {
         if (err.name === "NotFoundError") {
-          userMessage = "No board selected. Hold BOOT, plug USB-C, then try again.";
+          userMessage = t("error.noBoardSelected");
         } else if (err.name === "SecurityError") {
-          userMessage = "WebUSB blocked. Serve Mission Control over HTTPS or localhost.";
+          userMessage = t("error.webusbBlocked");
         } else if (err.name === "NetworkError") {
-          userMessage = "USB device disconnected during flash. Reconnect and retry.";
+          userMessage = t("error.usbDisconnected");
         } else if (err.name === "AbortError") {
-          userMessage = "Flash aborted.";
+          userMessage = t("error.flashAborted");
         }
       }
       if (!userMessage.toLowerCase().includes("aborted")) {
-        toast("Flash failed", "error");
+        toast(t("toast.flashFailed"), "error");
         setProgress({ phase: "error", percent: 0, message: userMessage });
       } else {
         setProgress({ phase: "idle", percent: 0, message: userMessage });
@@ -298,7 +393,7 @@ export function AdosAgentSection({
         f.dispose().catch(() => {});
       }
     }
-  }, [webFlashInstall, rockchipDevices, toast]);
+  }, [webFlashInstall, rockchipDevices, confirmDeviceLabel, toast, t]);
 
   const flashDisabled =
     isFlashing ||
@@ -315,6 +410,15 @@ export function AdosAgentSection({
           <h2 className="text-xs font-semibold text-text-primary flex items-center gap-2">
             <HardDrive size={14} />
             {t("targetBoard.title")}
+            {manifestSource === "fallback" && (
+              <span
+                className="text-[10px] px-1.5 py-0.5 bg-status-warning/10 text-status-warning border border-status-warning/40"
+                aria-label={t("targetBoard.offlineCatalogTooltip")}
+                title={t("targetBoard.offlineCatalogTooltip")}
+              >
+                {t("targetBoard.offlineCatalog")}
+              </span>
+            )}
           </h2>
           <div className="flex items-center gap-3">
             {agentVersion && (
@@ -370,15 +474,20 @@ export function AdosAgentSection({
           )}
 
           <div className="relative">
-            <pre className="bg-bg-tertiary border border-border-default p-3 pr-12 text-[11px] text-text-secondary font-mono overflow-x-auto whitespace-pre-wrap break-all">
+            <pre className="bg-bg-tertiary border border-border-default p-3 pr-12 text-[11px] text-text-secondary font-mono overflow-x-auto whitespace-pre break-words">
               {install.command}
             </pre>
             <button
               onClick={() => copyCommand(install.command)}
+              aria-pressed={copied}
+              aria-label={copied ? t("a11y.copyButtonCopied") : t("a11y.copyButtonCopy")}
               className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 text-[10px] font-semibold border border-border-default text-text-secondary hover:text-text-primary hover:bg-bg-secondary cursor-pointer transition-colors">
               {copied ? <Check size={10} /> : <Copy size={10} />}
               {copied ? t("common.copied") : t("common.copy")}
             </button>
+            <span className="sr-only" aria-live="polite">
+              {copied ? t("a11y.copyAnnounce") : ""}
+            </span>
           </div>
 
           <div className="flex items-start gap-2 text-[10px] text-text-tertiary">
@@ -427,32 +536,75 @@ export function AdosAgentSection({
           )}
 
           {progress && (
-            <FirmwareFlashProgress
-              progress={progress}
-              isFlashing={isFlashing}
-              onAbort={handleAbort}
-            />
+            <div role="status" aria-live="polite" aria-atomic="true">
+              <span className="sr-only">
+                {t("a11y.flashStatus", {
+                  phase: progress.phase,
+                  percent: Math.floor(progress.percent),
+                })}
+              </span>
+              <FirmwareFlashProgress
+                progress={progress}
+                isFlashing={isFlashing}
+                onAbort={handleAbort}
+              />
+            </div>
           )}
 
-          <button
-            onClick={handleFlash}
-            disabled={flashDisabled}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold border border-accent-primary bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
-          >
-            {isFlashing ? (
-              <>
-                <X size={12} /> Flashing...
-              </>
-            ) : (
-              <>
-                <Zap size={12} /> Flash via browser
-              </>
-            )}
-          </button>
+          {confirming && !isFlashing ? (
+            <div className="border border-status-warning/40 bg-status-warning/5 p-3 space-y-2">
+              <p className="text-[11px] text-status-warning font-semibold">
+                {t("confirm.title")}
+              </p>
+              <p className="text-[10px] text-text-secondary">
+                {t("confirm.body", { board: confirmDeviceLabel })}
+              </p>
+              {rockchipDevices.length > 1 && (
+                <Select
+                  value={confirmDeviceLabel}
+                  onChange={setConfirmDeviceLabel}
+                  options={rockchipDevices.map((d) => ({
+                    value: d.label,
+                    label: d.label,
+                  }))}
+                />
+              )}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCancelConfirm}
+                  className="flex-1 px-3 py-1.5 text-[11px] font-semibold border border-border-default text-text-secondary hover:text-text-primary hover:bg-bg-secondary cursor-pointer transition-colors"
+                >
+                  {t("confirm.cancel")}
+                </button>
+                <button
+                  onClick={runFlash}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold border border-accent-primary bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 cursor-pointer transition-colors"
+                >
+                  <Zap size={12} /> {t("confirm.confirm")}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={handleFlash}
+              disabled={flashDisabled}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold border border-accent-primary bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+            >
+              {isFlashing ? (
+                <>
+                  <X size={12} /> {t("webFlash.flashing")}
+                </>
+              ) : (
+                <>
+                  <Zap size={12} /> {t("webFlash.title")}
+                </>
+              )}
+            </button>
+          )}
 
           {!allChecked && webFlashInstall.imageUrl && (
             <p className="text-[10px] text-text-tertiary">
-              Confirm the safety checklist above to enable the Flash button.
+              {t("webFlash.checklistHint")}
             </p>
           )}
         </div>
@@ -471,21 +623,30 @@ function RockchipConnectionPanel({
   isFlashing: boolean;
   onScan: () => void;
 }) {
+  const t = useTranslations("flashTool.ados");
   if (devices.length > 0) {
     return (
-      <div className="border border-status-success/40 bg-status-success/5 p-3 space-y-1">
-        <p className="text-[11px] text-status-success font-semibold">Board connected</p>
+      <div
+        className="border border-status-success/40 bg-status-success/5 p-3 space-y-1"
+        aria-live="polite"
+        aria-label={t("a11y.connectionStatusRegion")}
+      >
+        <p className="text-[11px] text-status-success font-semibold">{t("connection.boardConnected")}</p>
         <p className="text-[10px] text-text-secondary">
-          {devices.map((d) => d.label).join(", ")} — ready to flash.
+          {t("connection.readyToFlash", { devices: devices.map((d) => d.label).join(", ") })}
         </p>
       </div>
     );
   }
   return (
-    <div className="border border-border-default bg-bg-tertiary p-3 space-y-2">
-      <p className="text-[11px] text-text-secondary font-semibold">No board connected</p>
+    <div
+      className="border border-border-default bg-bg-tertiary p-3 space-y-2"
+      aria-live="polite"
+      aria-label={t("a11y.connectionStatusRegion")}
+    >
+      <p className="text-[11px] text-text-secondary font-semibold">{t("connection.noBoardConnected")}</p>
       <p className="text-[10px] text-text-tertiary">
-        Hold the BOOT button while plugging USB-C into your computer. The board enumerates as a Rockchip USB device (vendor {hex(ROCKCHIP_USB_VID)}). Click Scan to authorize it.
+        {t("connection.scanHint", { vendor: hex(ROCKCHIP_USB_VID) })}
       </p>
       {usbSupported && (
         <button
@@ -493,7 +654,7 @@ function RockchipConnectionPanel({
           disabled={isFlashing}
           className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold border border-border-default text-text-secondary hover:text-text-primary hover:bg-bg-secondary disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
         >
-          <Usb size={12} /> Scan for board
+          <Usb size={12} /> {t("connection.scanForBoard")}
         </button>
       )}
     </div>

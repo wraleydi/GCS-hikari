@@ -6,11 +6,20 @@
  * that need a baked image). Mirrors the ArduPilotManifest pattern: server-side
  * proxy at /api/ados-manifest with 1-hour in-memory cache.
  *
+ * Schema versioning policy:
+ * The current schemaVersion is 1. The client rejects manifests with a higher
+ * schemaVersion so a future breaking change in the agent emitter cannot
+ * silently mis-render in an older Mission Control build. New optional fields
+ * that older clients can safely ignore (e.g. the loaderBlob* family on a
+ * web-flash install) are backward-compatible additions and do NOT bump the
+ * schemaVersion. Bump it only when a change actually breaks consumers.
+ *
  * @module protocol/firmware/ados-agent-manifest
  */
 
 const PROXY_URL = "/api/ados-manifest";
 const CACHE_TTL = 60 * 60 * 1000;
+const SUPPORTED_SCHEMA_VERSION = 1;
 
 // ── Schema types ──────────────────────────────────────────
 
@@ -38,6 +47,18 @@ export interface AdosAgentWebFlashInstall {
   imageSizeBytes: number;
   /** Optional pre-flight notes (e.g., bootrom-mode entry instructions). */
   notes?: string[];
+  /**
+   * Optional URL of a downloadable rockusb loader blob. Required for
+   * boards (RK3588 / RK3566 / RK3576 class) that ship with a blank eMMC
+   * and need a loader written to RAM before the image flow can address
+   * eMMC. Absent on boards whose bootrom already exposes a writable
+   * surface. Backward-compatible addition; older clients ignore it.
+   */
+  loaderBlobUrl?: string;
+  /** SHA256 of the loader blob (lowercase hex). Pairs with loaderBlobUrl. */
+  loaderBlobSha256?: string;
+  /** Base64-encoded minisign signature for the loader blob. */
+  loaderBlobMinisignSignature?: string;
 }
 
 export type AdosAgentInstall = AdosAgentCurlInstall | AdosAgentWebFlashInstall;
@@ -68,6 +89,14 @@ export interface AdosAgentManifestData {
   /** ISO 8601 timestamp the manifest was generated. */
   generatedAt: string;
   boards: AdosAgentBoard[];
+  /**
+   * "github" when the proxy successfully resolved the upstream release
+   * manifest, "fallback" when the proxy served the embedded baseline
+   * because GitHub was unreachable, returned non-OK, or returned an
+   * invalid payload. Optional for backward compatibility with older
+   * proxy deployments that don't set the field.
+   */
+  source?: "github" | "fallback";
 }
 
 // ── Client ────────────────────────────────────────────────
@@ -112,6 +141,16 @@ export class AdosAgentManifest {
     return manifest.agentVersion;
   }
 
+  /**
+   * Returns "github" when the most recent fetch resolved the upstream
+   * release manifest and "fallback" when the proxy served the embedded
+   * baseline. Returns null when the manifest hasn't been fetched yet.
+   */
+  async getSource(): Promise<"github" | "fallback" | null> {
+    const manifest = await this.getManifest();
+    return manifest.source ?? null;
+  }
+
   clearCache(): void {
     this.manifest = null;
     this.fetchedAt = 0;
@@ -125,6 +164,14 @@ export class AdosAgentManifest {
     }
     const json = await response.json();
     if (json.error) throw new Error(json.error);
+    if (
+      typeof json.schemaVersion === "number" &&
+      json.schemaVersion > SUPPORTED_SCHEMA_VERSION
+    ) {
+      throw new Error(
+        `Manifest schema version ${json.schemaVersion} is newer than this build of Mission Control supports. Update Mission Control to flash this image.`,
+      );
+    }
     return json as AdosAgentManifestData;
   }
 }

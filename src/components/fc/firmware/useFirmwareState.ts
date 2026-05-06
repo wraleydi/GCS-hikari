@@ -23,6 +23,7 @@ import { parseHexFile } from "@/lib/protocol/firmware/hex-parser";
 import { parsePx4File } from "@/lib/protocol/firmware/px4-parser";
 import { STM32DfuFlasher } from "@/lib/protocol/firmware/stm32-dfu";
 import { usbDeviceManager, type UsbDeviceInfo } from "@/lib/usb-device-manager";
+import { isDemoMode } from "@/lib/utils";
 import {
   AP_FLASH_METHODS, BF_FLASH_METHODS, PX4_FLASH_METHODS,
   CHECKLIST_ITEMS_BY_STACK, FC_CHECKLIST_ITEMS,
@@ -32,6 +33,105 @@ const apManifest = new ArduPilotManifest();
 const bfManifest = new BetaflightManifest();
 const px4Manifest = new PX4Manifest();
 const adosManifest = new AdosAgentManifest();
+
+// Demo-mode catalog. Mirrors a small slice of the embedded fallback in
+// /api/ados-manifest so the Flash Tool stays usable when demo mode is
+// active and the proxy may not be reachable. Kept inline because it is
+// small, self-contained, and only consumed inside the demo-mode branch
+// of loadAdosManifest below (never imported in production code paths).
+const DEMO_ADOS_AGENT_VERSION = "lite-v0.1.3";
+const DEMO_LITE_INSTALL_CMD =
+  "curl -sSL https://github.com/altnautica/ADOSDroneAgent/releases/latest/download/install-lite.sh | sudo bash";
+const DEMO_FULL_INSTALL_CMD =
+  "curl -sSL https://github.com/altnautica/ADOSDroneAgent/releases/latest/download/install.sh | sudo bash";
+const DEMO_FULL_INSTALL_GROUND_CMD =
+  "curl -sSL https://github.com/altnautica/ADOSDroneAgent/releases/latest/download/install.sh | sudo bash -s -- --profile ground-station";
+
+const DEMO_ADOS_BOARDS: AdosAgentBoard[] = [
+  {
+    id: "luckfox-pico-zero",
+    label: "Luckfox Pico Zero",
+    soc: "RV1106G3",
+    arch: "armv7-musl",
+    stacks: ["ados-drone-agent"],
+    description: "256 MB DDR3L, 8 GB eMMC, onboard Wi-Fi 6.",
+    bootrom: { vendorId: 0x2207, productId: 0x110c },
+    installs: {
+      "ados-drone-agent": {
+        method: "web-flash",
+        imageUrl: "",
+        sha256: "",
+        minisignSignature: "",
+        imageSizeBytes: 0,
+        notes: [
+          "Hold the BOOT button while plugging USB-C into your computer to enter bootrom mode.",
+          "Image flash erases the eMMC. Back up any user data first.",
+        ],
+      },
+    },
+  },
+  {
+    id: "pi-zero-2w",
+    label: "Raspberry Pi Zero 2 W",
+    soc: "BCM2710A1",
+    arch: "aarch64-glibc",
+    stacks: ["ados-drone-agent"],
+    description: "512 MB LPDDR2, microSD boot, mainline Wi-Fi.",
+    installs: {
+      "ados-drone-agent": {
+        method: "curl",
+        command: DEMO_LITE_INSTALL_CMD,
+        notes: [
+          "Run on a Pi already booted into Raspberry Pi OS Lite.",
+          "Connect to your Wi-Fi network before running the command.",
+        ],
+      },
+    },
+  },
+  {
+    id: "rpi4b",
+    label: "Raspberry Pi 4B",
+    soc: "BCM2711",
+    arch: "aarch64-glibc",
+    stacks: ["ados-drone-agent", "ados-ground-agent"],
+    description: "1-8 GB RAM, microSD boot.",
+    installs: {
+      "ados-drone-agent": {
+        method: "curl",
+        command: DEMO_FULL_INSTALL_CMD,
+        notes: ["Run on a Pi already booted into Raspberry Pi OS."],
+      },
+      "ados-ground-agent": {
+        method: "curl",
+        command: DEMO_FULL_INSTALL_GROUND_CMD,
+        notes: [
+          "Run on a Pi already booted into Raspberry Pi OS.",
+          "Plug in your RTL8812EU adapter, OLED display, and buttons before running the installer if you want them auto-detected.",
+        ],
+      },
+    },
+  },
+  {
+    id: "rk3566",
+    label: "Radxa CM3 (RK3566)",
+    soc: "RK3566",
+    arch: "aarch64-glibc",
+    stacks: ["ados-drone-agent", "ados-ground-agent"],
+    description: "2-8 GB RAM, eMMC + microSD options.",
+    installs: {
+      "ados-drone-agent": {
+        method: "curl",
+        command: DEMO_FULL_INSTALL_CMD,
+        notes: ["Run on a CM3 booted into Radxa OS."],
+      },
+      "ados-ground-agent": {
+        method: "curl",
+        command: DEMO_FULL_INSTALL_GROUND_CMD,
+        notes: ["Run on a CM3 booted into Radxa OS."],
+      },
+    },
+  },
+];
 
 export function useFirmwareState() {
   const selectedDroneId = useDroneManager((s) => s.selectedDroneId);
@@ -76,6 +176,9 @@ export function useFirmwareState() {
   const [adosError, setAdosError] = useState("");
   const [adosAgentVersion, setAdosAgentVersion] = useState("");
   const [selectedAdosBoardId, setSelectedAdosBoardId] = useState("");
+  // Tracks whether the manifest came from the upstream catalog or the
+  // embedded baseline. Drives the "offline catalog" pill in the picker.
+  const [adosManifestSource, setAdosManifestSource] = useState<string | undefined>(undefined);
 
   // Common state
   const [flashMethod, setFlashMethod] = useState<FlashMethod>("auto");
@@ -242,10 +345,24 @@ export function useFirmwareState() {
 
   async function loadAdosManifest() {
     setAdosLoading(true); setAdosError("");
+    // In demo mode the proxy at /api/ados-manifest may not be reachable
+    // (and adds noise to the demo regardless), so seed the picker with a
+    // small built-in catalog and skip the network call entirely.
+    if (isDemoMode()) {
+      setAdosBoards(DEMO_ADOS_BOARDS);
+      setAdosAgentVersion(DEMO_ADOS_AGENT_VERSION);
+      setAdosManifestSource("fallback");
+      const stackKey = isAdosStack(firmwareStack) ? (firmwareStack as AdosAgentStack) : "ados-drone-agent";
+      const first = DEMO_ADOS_BOARDS.find((b) => b.stacks.includes(stackKey));
+      if (first) setSelectedAdosBoardId(first.id);
+      setAdosLoading(false);
+      return;
+    }
     try {
       const data = await adosManifest.getManifest();
       setAdosBoards(data.boards);
       setAdosAgentVersion(data.agentVersion);
+      setAdosManifestSource(data.source);
       const stackKey = isAdosStack(firmwareStack) ? (firmwareStack as AdosAgentStack) : "ados-drone-agent";
       const first = data.boards.find((b) => b.stacks.includes(stackKey));
       if (first) setSelectedAdosBoardId(first.id);
@@ -390,6 +507,7 @@ export function useFirmwareState() {
     loadPx4ReleasesRetry: () => { px4Manifest.clearCache(); loadPx4Releases(); },
     // ADOS
     adosBoards, adosLoading, adosError, adosAgentVersion,
+    adosManifestSource,
     selectedAdosBoardId, setSelectedAdosBoardId, adosInstallMethod,
     loadAdosManifestRetry: () => { adosManifest.clearCache(); loadAdosManifest(); },
     // Common
