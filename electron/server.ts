@@ -50,7 +50,7 @@ function getStaticDir(): string {
 /** Wait for the server to respond to HTTP requests. */
 async function waitForReady(
   port: number,
-  timeoutMs: number = 30000
+  timeoutMs: number = 15000
 ): Promise<void> {
   const start = Date.now();
   const interval = 200;

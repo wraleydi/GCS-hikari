@@ -69,12 +69,24 @@ export function createMainWindow(port: number): BrowserWindow {
     win.show();
   });
 
-  // Log page load events for diagnostics
+  // Log page load events for diagnostics. Force-show the window on either
+  // outcome so a renderer that loaded but never emitted ready-to-show, or a
+  // page that failed to load, never leaves the user staring at a dock icon
+  // with no window.
   win.webContents.on("did-finish-load", () => {
     console.log("[window] did-finish-load");
+    if (!win.isDestroyed() && !win.isVisible()) {
+      win.show();
+    }
   });
   win.webContents.on("did-fail-load", (_e, code, desc, url) => {
     console.error(`[window] did-fail-load: ${code} ${desc} ${url}`);
+    if (!win.isDestroyed() && !win.isVisible()) {
+      win.show();
+      if (!app.isPackaged) {
+        win.webContents.openDevTools({ mode: "detach" });
+      }
+    }
   });
 
   // Load the Next.js app

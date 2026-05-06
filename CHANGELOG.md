@@ -4,6 +4,89 @@ All notable changes to ADOS Mission Control are recorded here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.10.4] - 2026-05-06
+
+Headline fix: the desktop app no longer hangs as a hidden process when the
+embedded server fails to start. Plus a wide pass on the firmware tab, plugin
+host foundation, fleet overview, and the Hardware tab.
+
+### Fixed
+
+- Desktop app now opens its window reliably on macOS and Windows. Previously,
+  if the embedded Next.js standalone server failed to start within the
+  startup timeout, the window-creation path was never reached and the app
+  sat as a hidden process with no way to recover. Three changes close this:
+  - `app.whenReady()` is wrapped so any startup failure surfaces an error
+    dialog and the app exits cleanly instead of leaving a windowless process.
+  - The window force-shows on `did-finish-load` and `did-fail-load` so a
+    renderer that loads but never emits `ready-to-show`, or a page that
+    fails to load, no longer leaves the user staring at a dock icon.
+  - Server-startup wait reduced from 30s to 15s so genuine failures surface
+    quickly instead of feeling like the app is frozen.
+- Single-instance lock now hard-exits the secondary process instead of
+  letting initialization continue past `app.quit()`.
+- Windows installer events (`--squirrel-install`, `--squirrel-updated`,
+  `--squirrel-uninstall`, `--squirrel-obsolete`) exit the app immediately
+  so installer-spawned processes do not linger as windowless background apps.
+
+### Added
+
+- **ADOS agent stack support in the firmware tab.** Flash the agent
+  software stack alongside flight-controller firmware, with a Rockchip
+  bootrom flasher for ADOS-class companion computers. The agent manifest
+  is signed with minisign and verified at install time; an offline catalog
+  UI lets operators pick a build without a live network connection. Schema
+  versioning on the manifest keeps older clients compatible.
+- **Fleet overview** with live video and telemetry on the Command page.
+  Multiple drones at a glance, with each card pulling its own status,
+  battery, GPS fix, runtime mode, and live preview.
+- **Plugin host foundation** for ADOS plugins. Settings page exposes a
+  Plugins tab with an installed-plugins list and a registry browser. The
+  slot orchestrator mounts each plugin contribution into a sandboxed
+  iframe gated on a `ui.slot.*` capability. Two-stage install dialog
+  parses the manifest and shows the permission set before commit, with
+  partial-grant failure surfaces and pinned required permissions.
+- **Hardware tab** surfaces attached SPI displays at the fleet level and
+  on individual drone cards. The tab populates from the agent's
+  `profile` and `hardware-check` payloads, and `runtimeMode` propagates
+  through the capability inference fallback path so older agents without
+  an explicit field still gate features correctly.
+- **Setup-and-access integration** end-to-end with the agent. The Command
+  page consumes the universal setup contract (status, access URLs,
+  remote-access state) and surfaces it with cloud-relay enhancements.
+- **CLI service-management and production-deployment wizard** for
+  self-hosted Convex backends.
+- `/pair` deep link now accepts a pre-filled pairing code, simplifying
+  field setup from a printed sticker or QR.
+- Camera-trigger toggle on simulation drones, with sync-performance
+  improvements while the toggle runs.
+- Conditional planner UI render based on whether a plan is active, idle,
+  loaded, or dirty.
+
+### Changed
+
+- **Capability inference** now covers BCM2710A1 (Pi Zero 2 W), BCM2711
+  (Pi 4B), BCM2712 (Pi 5), RV1106G3 (Luckfox class), and RV1103 SoCs,
+  with NPU TOPS lookup for each.
+- **Runtime-mode propagation:** `runtimeMode` flows from the agent
+  heartbeat through `cmd_droneStatus` and `cmd_drones` into the
+  capability store. The fleet card renders a small "Lite" pill for
+  drones running the constrained backend; Smart Modes, ROS, and Scripts
+  tabs hide on lite-mode drones.
+- **Cloud-relay HTTP routes** moved behind internal Convex functions,
+  with input validation, response size limits, and safety overrides on
+  every command-path entry.
+- **Cloud-command gating:** the GCS no longer enqueues cloud commands
+  when the user is not authenticated.
+- **Convex skip-guards** added across the Command page so reactive
+  queries no longer crash when auth or runtime context is absent.
+- **Locale-aware number rendering** for currency, percent, and decimal
+  values; telemetry freshness now flags stale data older than 45s.
+- **Zustand store hardening:** added version + migrate handlers across
+  persisted stores; previously `any`-typed surfaces now use Zod schemas
+  for runtime validation.
+- iNav mock protocol corrections and roadmap-copy refresh in locales.
+
 ## [0.10.1] - 2026-05-05
 
 Companion release for the lightweight Rust agent backend. Surfaces a
