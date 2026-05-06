@@ -4,6 +4,19 @@ All notable changes to ADOS Mission Control are recorded here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.10.5] - 2026-05-06
+
+### Fixed
+
+- Desktop release pipeline now builds the macOS DMG. The `@xmldom/xmldom`
+  override pinned the package to `^0.9.10`, whose strict-mode parser
+  rejects `parseFromString(content)` calls without a mime type. That
+  broke `electron-builder`'s plist parser end of `app-builder-lib`,
+  which relies on the older lenient API. Override relaxed to `^0.8.10`
+  so the security-patched `0.8.x` line ships and the build pipeline
+  succeeds. No source code imports `@xmldom/xmldom` directly; this
+  override only affected transitive consumers.
+
 ## [0.10.4] - 2026-05-06
 
 Headline fix: the desktop app no longer hangs as a hidden process when the
