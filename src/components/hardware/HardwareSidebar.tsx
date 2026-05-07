@@ -22,6 +22,7 @@ import {
   MonitorSmartphone,
   Network,
   Plug,
+  Radio,
   Wifi,
   type LucideIcon,
 } from "lucide-react";
@@ -37,6 +38,7 @@ type CategoryKey =
   | "physicalUi"
   | "controllers"
   | "peripherals"
+  | "radio"
   | "distributedRx"
   | "mesh";
 
@@ -87,6 +89,14 @@ const CATEGORIES: Category[] = [
     href: "/hardware/peripherals",
     icon: Plug,
     matchPaths: ["/hardware/peripherals"],
+    requiresAgent: true,
+    requiresMesh: false,
+  },
+  {
+    key: "radio",
+    href: "/hardware/radio",
+    icon: Radio,
+    matchPaths: ["/hardware/radio"],
     requiresAgent: true,
     requiresMesh: false,
   },

@@ -774,6 +774,7 @@
     "calibrate": "ಕ್ಯಾಲಿಬ್ರೇಟ್",
     "parameters": "ಪ್ಯಾರಾಮೀಟರ್‌ಗಳು",
     "configure": "ಕಾನ್ಫಿಗರ್",
+    "radio": "Radio",
     "map": "ಮ್ಯಾಪ್",
     "fly": "ಹಾರಿಸಿ",
     "immersive": "ಇಮ್ಮರ್ಸಿವ್",
@@ -784,6 +785,12 @@
     "deleteConfirm": "Remove this drone from your fleet? Connection data will be lost.",
     "delete": "Delete",
     "backToDashboard": "Back to Dashboard"
+  },
+  "droneRadio": {
+    "airSideBadge": "Air side",
+    "rssiAirNote": "Drone does not receive its own RF; ground station reports the RSSI value.",
+    "txPowerScopeHint": "Adjusts air-side TX power on this drone.",
+    "noAgent": "No agent connection. TX power changes are unavailable until the drone reconnects."
   },
   "command": {
     "overview": "ಅವಲೋಕನ",
@@ -2304,6 +2311,7 @@
       "physicalUi": "Physical UI",
       "controllers": "Controllers",
       "peripherals": "Peripherals",
+      "radio": "ರೇಡಿಯೋ",
       "distributedRx": "Distributed RX",
       "mesh": "Mesh"
     },

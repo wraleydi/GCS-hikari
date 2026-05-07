@@ -789,6 +789,7 @@
     "calibrate": "Kalibrasi",
     "parameters": "Parameter",
     "configure": "Konfigurasi",
+    "radio": "Radio",
     "map": "Peta",
     "fly": "Terbang",
     "immersive": "Imersif",
@@ -799,6 +800,12 @@
     "deleteConfirm": "Hapus drone ini dari armada Anda? Data koneksi akan hilang.",
     "delete": "Hapus",
     "backToDashboard": "Kembali ke Dasbor"
+  },
+  "droneRadio": {
+    "airSideBadge": "Air side",
+    "rssiAirNote": "Drone does not receive its own RF; ground station reports the RSSI value.",
+    "txPowerScopeHint": "Adjusts air-side TX power on this drone.",
+    "noAgent": "No agent connection. TX power changes are unavailable until the drone reconnects."
   },
   "command": {
     "overview": "Ringkasan",
@@ -2304,6 +2311,7 @@
       "physicalUi": "Physical UI",
       "controllers": "Controllers",
       "peripherals": "Peripherals",
+      "radio": "Radio",
       "distributedRx": "Distributed RX",
       "mesh": "Mesh"
     },

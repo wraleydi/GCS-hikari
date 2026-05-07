@@ -774,6 +774,7 @@
     "calibrate": "Kalibrieren",
     "parameters": "Parameter",
     "configure": "Konfigurieren",
+    "radio": "Radio",
     "map": "Karte",
     "fly": "Fliegen",
     "immersive": "Immersiv",
@@ -784,6 +785,12 @@
     "deleteConfirm": "Diese Drohne aus der Flotte entfernen? Verbindungsdaten gehen verloren.",
     "delete": "Löschen",
     "backToDashboard": "Zurück zum Dashboard"
+  },
+  "droneRadio": {
+    "airSideBadge": "Air side",
+    "rssiAirNote": "Drone does not receive its own RF; ground station reports the RSSI value.",
+    "txPowerScopeHint": "Adjusts air-side TX power on this drone.",
+    "noAgent": "No agent connection. TX power changes are unavailable until the drone reconnects."
   },
   "command": {
     "overview": "Überblick",
@@ -2304,6 +2311,7 @@
       "physicalUi": "Physical UI",
       "controllers": "Controllers",
       "peripherals": "Peripherals",
+      "radio": "Funk",
       "distributedRx": "Distributed RX",
       "mesh": "Mesh"
     },

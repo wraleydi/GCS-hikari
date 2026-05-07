@@ -789,6 +789,7 @@
     "calibrate": "કેલિબ્રેટ",
     "parameters": "પેરામીટર્સ",
     "configure": "રૂપરેખાંકન",
+    "radio": "Radio",
     "map": "નકશો",
     "fly": "ઉડાન",
     "immersive": "ઇમર્સિવ",
@@ -799,6 +800,12 @@
     "deleteConfirm": "તમારા ફ્લીટમાંથી આ ડ્રોન દૂર કરવું છે? જોડાણ ડેટા ખોવાઈ જશે.",
     "delete": "કાઢી નાખો",
     "backToDashboard": "ડેશબોર્ડ પર પાછા"
+  },
+  "droneRadio": {
+    "airSideBadge": "Air side",
+    "rssiAirNote": "Drone does not receive its own RF; ground station reports the RSSI value.",
+    "txPowerScopeHint": "Adjusts air-side TX power on this drone.",
+    "noAgent": "No agent connection. TX power changes are unavailable until the drone reconnects."
   },
   "command": {
     "overview": "ઝાંખી",
@@ -2304,6 +2311,7 @@
       "physicalUi": "Physical UI",
       "controllers": "Controllers",
       "peripherals": "Peripherals",
+      "radio": "રેડિયો",
       "distributedRx": "Distributed RX",
       "mesh": "Mesh"
     },

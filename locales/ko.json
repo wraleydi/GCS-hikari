@@ -789,6 +789,7 @@
     "calibrate": "캘리브레이션",
     "parameters": "파라미터",
     "configure": "설정",
+    "radio": "Radio",
     "map": "지도",
     "fly": "비행",
     "immersive": "몰입 모드",
@@ -799,6 +800,12 @@
     "deleteConfirm": "이 드론을 편대에서 제거하시겠습니까? 연결 데이터가 삭제됩니다.",
     "delete": "삭제",
     "backToDashboard": "대시보드로 돌아가기"
+  },
+  "droneRadio": {
+    "airSideBadge": "Air side",
+    "rssiAirNote": "Drone does not receive its own RF; ground station reports the RSSI value.",
+    "txPowerScopeHint": "Adjusts air-side TX power on this drone.",
+    "noAgent": "No agent connection. TX power changes are unavailable until the drone reconnects."
   },
   "command": {
     "overview": "개요",
@@ -2304,6 +2311,7 @@
       "physicalUi": "Physical UI",
       "controllers": "Controllers",
       "peripherals": "Peripherals",
+      "radio": "라디오",
       "distributedRx": "Distributed RX",
       "mesh": "Mesh"
     },

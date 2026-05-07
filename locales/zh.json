@@ -774,6 +774,7 @@
     "calibrate": "校准",
     "parameters": "参数",
     "configure": "配置",
+    "radio": "Radio",
     "map": "地图",
     "fly": "飞行",
     "immersive": "沉浸",
@@ -784,6 +785,12 @@
     "deleteConfirm": "从机队中移除此无人机？连接数据将丢失。",
     "delete": "删除",
     "backToDashboard": "返回仪表盘"
+  },
+  "droneRadio": {
+    "airSideBadge": "Air side",
+    "rssiAirNote": "Drone does not receive its own RF; ground station reports the RSSI value.",
+    "txPowerScopeHint": "Adjusts air-side TX power on this drone.",
+    "noAgent": "No agent connection. TX power changes are unavailable until the drone reconnects."
   },
   "command": {
     "overview": "概览",
@@ -2304,6 +2311,7 @@
       "physicalUi": "Physical UI",
       "controllers": "Controllers",
       "peripherals": "Peripherals",
+      "radio": "无线电",
       "distributedRx": "Distributed RX",
       "mesh": "Mesh"
     },

@@ -774,6 +774,7 @@
     "calibrate": "கேலிப்ரேட்",
     "parameters": "பாராமீட்டர்கள்",
     "configure": "கட்டமை",
+    "radio": "Radio",
     "map": "வரைபடம்",
     "fly": "பற",
     "immersive": "இம்மர்சிவ்",
@@ -784,6 +785,12 @@
     "deleteConfirm": "இந்த ட்ரோனை உங்கள் ஃப்ளீட்டிலிருந்து நீக்கவா? இணைப்பு தரவு அழிந்துவிடும்.",
     "delete": "நீக்கு",
     "backToDashboard": "டாஷ்போர்டுக்குத் திரும்பு"
+  },
+  "droneRadio": {
+    "airSideBadge": "Air side",
+    "rssiAirNote": "Drone does not receive its own RF; ground station reports the RSSI value.",
+    "txPowerScopeHint": "Adjusts air-side TX power on this drone.",
+    "noAgent": "No agent connection. TX power changes are unavailable until the drone reconnects."
   },
   "command": {
     "overview": "மேலோட்டம்",
@@ -2304,6 +2311,7 @@
       "physicalUi": "Physical UI",
       "controllers": "Controllers",
       "peripherals": "Peripherals",
+      "radio": "வானொலி",
       "distributedRx": "Distributed RX",
       "mesh": "Mesh"
     },
