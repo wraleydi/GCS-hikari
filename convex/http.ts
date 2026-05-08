@@ -217,6 +217,7 @@ http.route({
       os: stringField(body, "os"),
       mdnsHost: stringField(body, "mdnsHost"),
       localIp: stringField(body, "localIp"),
+      pairingCodeExpiresAt: numberField(body, "pairingCodeExpiresAt"),
     });
 
     return new Response(JSON.stringify(result), {
@@ -348,8 +349,11 @@ http.route({
       videoState: stringField(body, "videoState"),
       videoWhepPort: numberField(body, "videoWhepPort"),
       videoWhepUrl: stringField(body, "videoWhepUrl"),
+      videoRestartAttempts: numberField(body, "videoRestartAttempts"),
       mavlinkWsPort: numberField(body, "mavlinkWsPort"),
       mavlinkWsUrl: stringField(body, "mavlinkWsUrl"),
+      mavlinkWsUrlPrev: stringField(body, "mavlinkWsUrlPrev"),
+      foxgloveBindFailed: booleanField(body, "foxgloveBindFailed"),
       remoteAccess: body.remoteAccess,
       peripherals: body.peripherals,
       scripts: body.scripts,

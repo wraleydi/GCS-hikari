@@ -226,6 +226,10 @@ export const registerAgent = mutation({
     os: v.optional(v.string()),
     mdnsHost: v.optional(v.string()),
     localIp: v.optional(v.string()),
+    // Agent-authoritative pairing-code expiry (epoch seconds). Mirrors
+    // the timer the agent's local wizard is showing the operator so
+    // the cloud-side UI countdown matches the physical device.
+    pairingCodeExpiresAt: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -256,6 +260,19 @@ export const registerAgent = mutation({
     ) {
       throw new Error("tier out of range");
     }
+    // Validate the agent-side expiry. Reject negatives or absurd values
+    // so a malformed beacon can never poison the row. Epoch seconds
+    // beyond year 2100 are obvious noise.
+    let pairingCodeExpiresAt: number | undefined = args.pairingCodeExpiresAt;
+    if (pairingCodeExpiresAt !== undefined) {
+      if (
+        !Number.isFinite(pairingCodeExpiresAt) ||
+        pairingCodeExpiresAt < 0 ||
+        pairingCodeExpiresAt > 4_102_444_800
+      ) {
+        pairingCodeExpiresAt = undefined;
+      }
+    }
 
     // Re-register the same device/code without letting a mismatched public
     // request delete an active pending pairing window.
@@ -280,6 +297,7 @@ export const registerAgent = mutation({
           mdnsHost,
           localIp,
           expiresAt: now + CODE_TTL_MS,
+          ...(pairingCodeExpiresAt !== undefined ? { pairingCodeExpiresAt } : {}),
         });
         return { registered: true };
       }
@@ -364,6 +382,7 @@ export const registerAgent = mutation({
       mdnsHost,
       localIp,
       expiresAt: now + CODE_TTL_MS,
+      ...(pairingCodeExpiresAt !== undefined ? { pairingCodeExpiresAt } : {}),
     });
 
     return { registered: true };

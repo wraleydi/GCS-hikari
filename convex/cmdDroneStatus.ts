@@ -61,8 +61,10 @@ export const pushStatus = internalMutation({
     videoState: v.optional(v.string()),
     videoWhepPort: v.optional(v.number()),
     videoWhepUrl: v.optional(v.string()),
+    videoRestartAttempts: v.optional(v.number()),
     mavlinkWsPort: v.optional(v.number()),
     mavlinkWsUrl: v.optional(v.string()),
+    mavlinkWsUrlPrev: v.optional(v.string()),
     remoteAccess: v.optional(v.any()),
     peripherals: v.optional(v.any()),
     scripts: v.optional(v.any()),
@@ -72,6 +74,7 @@ export const pushStatus = internalMutation({
     telemetry: v.optional(v.any()),
     logs: v.optional(v.any()),
     runtimeMode: v.optional(v.string()),
+    foxgloveBindFailed: v.optional(v.boolean()),
     setupState: v.optional(v.string()),
     profileSource: v.optional(v.string()),
     radio: v.optional(v.object({

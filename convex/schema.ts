@@ -594,8 +594,20 @@ fullName: v.optional(v.string()),
     videoState: v.optional(v.string()),
     videoWhepPort: v.optional(v.number()),
     videoWhepUrl: v.optional(v.string()),
+    // Count of pipeline restarts since the last healthy interval.
+    // Resets to zero on the agent side once video stays up for the
+    // configured cool-down. The GCS surfaces a banner when the count
+    // crosses an unhealthy threshold so operators can spot a flapping
+    // pipeline without trawling logs.
+    videoRestartAttempts: v.optional(v.number()),
     mavlinkWsPort: v.optional(v.number()),
     mavlinkWsUrl: v.optional(v.string()),
+    // Previous MAVLink WebSocket URL the agent advertised. Populated
+    // when the agent rotates its WebSocket binding (port change,
+    // network move). Lets the GCS retry the prior URL once before
+    // surfacing a connection error so a brief rotation doesn't drop
+    // an in-flight session.
+    mavlinkWsUrlPrev: v.optional(v.string()),
     remoteAccess: v.optional(v.any()),
     peripherals: v.optional(v.any()),
     scripts: v.optional(v.any()),
@@ -608,6 +620,11 @@ fullName: v.optional(v.string()),
     // the plugin host, peripheral manager, scripting, and ROS surfaces
     // in Mission Control. Absent values default to "full".
     runtimeMode: v.optional(v.string()),
+    // True when the agent's foxglove_bridge process failed to bind
+    // its WebSocket port at last restart. Surfaced in the ROS tab so
+    // operators can spot a port collision without opening journal
+    // logs. Undefined for agents that predate the probe.
+    foxgloveBindFailed: v.optional(v.boolean()),
     // Setup wizard state on the agent. Live agents report "configured"
     // once the universal webapp wizard has been completed. Older agents
     // omit this and the GCS treats them as configured by default.
@@ -708,6 +725,12 @@ fullName: v.optional(v.string()),
     mdnsHost: v.optional(v.string()),
     localIp: v.optional(v.string()),
     expiresAt: v.number(),
+    // Agent-authoritative pairing-code expiry (epoch seconds) lifted
+    // from the beacon body. The server-side expiresAt above is the
+    // cloud-relay TTL; this field mirrors what the agent's local
+    // wizard is showing the operator so the GCS countdown matches the
+    // physical device. Optional so legacy beacons keep registering.
+    pairingCodeExpiresAt: v.optional(v.number()),
     createdBy: v.optional(v.string()),
     claimedBy: v.optional(v.string()),
     claimedAt: v.optional(v.number()),
