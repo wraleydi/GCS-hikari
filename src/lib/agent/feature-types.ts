@@ -236,6 +236,27 @@ export interface AgentCapabilities {
    * GCS mirrors this back into the WelcomeModal preference flow so
    * the drone and the desktop stay in sync. */
   uiTheme?: "dark" | "light";
+  /** Optional. Number of pipeline restarts since the last healthy
+   * interval. The agent resets this once video stays up for the
+   * configured cool-down. The GCS surfaces a banner when the count
+   * crosses an unhealthy threshold. Undefined for legacy heartbeats. */
+  videoRestartAttempts?: number;
+  /** Optional. True when the agent's foxglove_bridge process failed
+   * to bind its WebSocket port at last restart. Surfaced inside the
+   * ROS tab so operators can spot a port collision without opening
+   * journal logs. Undefined for agents that predate the probe. */
+  foxgloveBindFailed?: boolean;
+  /** Optional. Agent-authoritative pairing-code expiry (epoch
+   * seconds). Mirrors the timer the agent's local wizard is showing
+   * so the cloud-side countdown matches the physical device. Null
+   * when the agent has no pending code; undefined for legacy
+   * heartbeats. */
+  pairingCodeExpiresAt?: number | null;
+  /** Optional. Previous MAVLink WebSocket URL the agent advertised.
+   * Populated when the agent rotates its WebSocket binding. Lets the
+   * GCS retry the prior URL once before surfacing a connection error
+   * so a brief rotation doesn't drop an in-flight session. */
+  mavlinkWsUrlPrev?: string | null;
 }
 
 // ── Detection Data (for vision overlay) ──────────────────

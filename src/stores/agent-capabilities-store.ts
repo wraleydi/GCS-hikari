@@ -323,6 +323,19 @@ interface AgentCapabilitiesState {
    * a profile without WFB-ng). Populated from the cloud heartbeat or
    * a future /api/capabilities response. */
   radio: RadioState | null;
+  /** Pipeline restarts since the last healthy interval. Resets to
+   * zero once video stays up for the agent's healthy cool-down.
+   * Default 0 until the agent reports otherwise. */
+  videoRestartAttempts: number;
+  /** True when the agent's foxglove_bridge process failed to bind
+   * at last restart. Default false until the agent flips it. */
+  foxgloveBindFailed: boolean;
+  /** Agent-authoritative pairing-code expiry (epoch seconds). Null
+   * when the agent has no pending code or hasn't reported one. */
+  pairingCodeExpiresAt: number | null;
+  /** Previous MAVLink WebSocket URL the agent advertised, if it
+   * rotated its binding. Null when no rotation is in flight. */
+  mavlinkWsUrlPrev: string | null;
   /** True once we've received at least one capabilities payload. */
   loaded: boolean;
 }
@@ -356,6 +369,10 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
   videoRecording: undefined,
   uiTheme: undefined,
   radio: null,
+  videoRestartAttempts: 0,
+  foxgloveBindFailed: false,
+  pairingCodeExpiresAt: null,
+  mavlinkWsUrlPrev: null,
   loaded: false,
 
   setCapabilities(caps: AgentCapabilities | Record<string, unknown>) {
@@ -396,7 +413,49 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
     const rawRadio = (caps as { radio?: unknown }).radio;
     const radio = normalizeRadio(rawRadio);
 
-    set({
+    // Heartbeat health surfaces. Each is forward-permissive: the
+    // store keeps the prior value when the heartbeat omits a field
+    // (so a single sparse capabilities payload can't reset a count
+    // back to zero). The full cloud heartbeat in CloudStatusBridge
+    // always sets all four explicitly, so this branch only matters
+    // when an /api/capabilities call lands without them.
+    const rawVideoRestartAttempts =
+      (caps as { videoRestartAttempts?: unknown }).videoRestartAttempts;
+    const videoRestartAttempts =
+      typeof rawVideoRestartAttempts === "number" &&
+      Number.isFinite(rawVideoRestartAttempts) &&
+      rawVideoRestartAttempts >= 0
+        ? Math.floor(rawVideoRestartAttempts)
+        : undefined;
+
+    const rawFoxgloveBindFailed =
+      (caps as { foxgloveBindFailed?: unknown }).foxgloveBindFailed;
+    const foxgloveBindFailed =
+      typeof rawFoxgloveBindFailed === "boolean"
+        ? rawFoxgloveBindFailed
+        : undefined;
+
+    const rawPairingCodeExpiresAt =
+      (caps as { pairingCodeExpiresAt?: unknown }).pairingCodeExpiresAt;
+    const pairingCodeExpiresAt: number | null | undefined =
+      typeof rawPairingCodeExpiresAt === "number" &&
+      Number.isFinite(rawPairingCodeExpiresAt) &&
+      rawPairingCodeExpiresAt > 0
+        ? rawPairingCodeExpiresAt
+        : rawPairingCodeExpiresAt === null
+          ? null
+          : undefined;
+
+    const rawMavlinkWsUrlPrev =
+      (caps as { mavlinkWsUrlPrev?: unknown }).mavlinkWsUrlPrev;
+    const mavlinkWsUrlPrev: string | null | undefined =
+      typeof rawMavlinkWsUrlPrev === "string" && rawMavlinkWsUrlPrev.length > 0
+        ? rawMavlinkWsUrlPrev
+        : rawMavlinkWsUrlPrev === null
+          ? null
+          : undefined;
+
+    set((state) => ({
       tier: normalized.tier,
       cameras: normalized.cameras,
       compute: normalized.compute,
@@ -412,8 +471,24 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       videoRecording: normalized.videoRecording,
       uiTheme: normalized.uiTheme,
       radio,
+      // Forward-permissive merges: keep the prior value when the
+      // payload omits the field. CloudStatusBridge always sets all
+      // four explicitly, so prior values only carry over when an
+      // /api/capabilities call lands without them.
+      videoRestartAttempts:
+        videoRestartAttempts ?? state.videoRestartAttempts,
+      foxgloveBindFailed:
+        foxgloveBindFailed ?? state.foxgloveBindFailed,
+      pairingCodeExpiresAt:
+        pairingCodeExpiresAt === undefined
+          ? state.pairingCodeExpiresAt
+          : pairingCodeExpiresAt,
+      mavlinkWsUrlPrev:
+        mavlinkWsUrlPrev === undefined
+          ? state.mavlinkWsUrlPrev
+          : mavlinkWsUrlPrev,
       loaded: true,
-    });
+    }));
   },
 
   optimisticEnableFeature(featureId: string) {
@@ -454,6 +529,10 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       videoRecording: undefined,
       uiTheme: undefined,
       radio: null,
+      videoRestartAttempts: 0,
+      foxgloveBindFailed: false,
+      pairingCodeExpiresAt: null,
+      mavlinkWsUrlPrev: null,
       loaded: false,
     });
   },
