@@ -155,6 +155,10 @@
       "continue": "I understand, continue",
       "skip": "Skip for now",
       "releasesNote": "Downloads from GitHub Releases"
+    },
+    "themeSync": {
+      "syncedToCount": "Theme synced to {count} drone(s)",
+      "syncFailedCount": "Could not reach {count} drone(s)"
     }
   },
   "common": {

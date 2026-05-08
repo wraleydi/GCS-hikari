@@ -155,6 +155,10 @@
       "preferences": "Preferences",
       "download": "Desktop App",
       "ready": "Ready"
+    },
+    "themeSync": {
+      "syncedToCount": "Theme synced to {count} drone(s)",
+      "syncFailedCount": "Could not reach {count} drone(s)"
     }
   },
   "common": {

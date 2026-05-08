@@ -13,7 +13,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useSettingsStore } from "@/stores/settings-store";
+import { usePairingStore } from "@/stores/pairing-store";
+import { useToast } from "@/components/ui/toast";
+import { pushThemeToAllAgents } from "@/lib/agent/theme-sync";
 import { isElectron } from "@/lib/utils";
 import {
   computeStepX,
@@ -52,8 +56,12 @@ export function WelcomeModal() {
   const themeMode = useSettingsStore((s) => s.themeMode);
   const setAccentColor = useSettingsStore((s) => s.setAccentColor);
   const accentColor = useSettingsStore((s) => s.accentColor);
+  const pushThemeToAgents = useSettingsStore((s) => s.pushThemeToAgents);
+  const pairedDrones = usePairingStore((s) => s.pairedDrones);
   const requestPermission = useGcsLocationStore((s) => s.requestPermission);
   const isSupported = useGcsLocationStore((s) => s.isSupported);
+  const t = useTranslations("welcome.themeSync");
+  const { toast } = useToast();
 
   // Step state (not persisted -- always starts from 0 if modal shows)
   const [step, setStep] = useState<Step>(0);
@@ -132,6 +140,37 @@ export function WelcomeModal() {
     setAudioEnabledStored(audioEnabled);
     setLocationEnabledStored(locationEnabled);
     setOnboarded(true);
+
+    // Push the chosen theme to every paired agent so the LCD on each
+    // companion board mirrors the desktop palette without a manual
+    // visit to the Display sub-view. "auto" stays agent-local because
+    // the agent has its own default. Failures don't block onboarding.
+    if (
+      pushThemeToAgents
+      && (themeMode === "dark" || themeMode === "light")
+      && pairedDrones.length > 0
+    ) {
+      pushThemeToAllAgents(pairedDrones, themeMode)
+        .then((result) => {
+          if (result.attempted === 0) return;
+          if (result.succeeded > 0) {
+            toast(
+              t("syncedToCount", { count: result.succeeded }),
+              "success",
+            );
+          }
+          if (result.failures.size > 0) {
+            toast(
+              t("syncFailedCount", { count: result.failures.size }),
+              "warning",
+            );
+          }
+        })
+        .catch(() => {
+          /* Per-agent errors are captured inside the helper; this
+           * catch is a belt-and-suspenders backstop. */
+        });
+    }
   };
 
   const handleThemeTileClick = (themeValue: ThemeMode): void => {

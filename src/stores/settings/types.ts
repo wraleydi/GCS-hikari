@@ -80,6 +80,9 @@ export interface SettingsStoreState {
   guidanceTgtHdgEnabled: boolean;
   telemetryDeckActivePage: TelemetryDeckPageId;
   telemetryDeckPages: Record<TelemetryDeckPageId, TelemetryDeckMetricId[]>;
+  /** Whether the onboarding flow pushes the chosen theme to every paired
+   * agent. Default true; users can opt out from advanced settings. */
+  pushThemeToAgents: boolean;
 
   // network preferences
   autoReconnect: boolean;
@@ -169,6 +172,7 @@ export interface SettingsStoreState {
   setLocale: (locale: string) => void;
   setThemeMode: (mode: ThemeMode) => void;
   setAccentColor: (accent: AccentColor) => void;
+  setPushThemeToAgents: (enabled: boolean) => void;
 
   // network actions
   setAutoReconnect: (enabled: boolean) => void;

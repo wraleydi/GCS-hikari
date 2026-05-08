@@ -182,5 +182,9 @@ export function migrateSettings(
     // v32: HDMI kiosk PIC auto-claim flag (default off).
     state.hudAutoClaimPicOnFirstButton = false;
   }
+  if (version < 33) {
+    // v33: theme broadcast at end of onboarding (default on).
+    state.pushThemeToAgents = true;
+  }
   return state as unknown as SettingsStoreState;
 }

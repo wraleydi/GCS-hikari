@@ -71,6 +71,7 @@ export const displayDefaults: Partial<SettingsStoreState> = {
   guidanceTgtHdgEnabled: true,
   telemetryDeckActivePage: "flight",
   telemetryDeckPages: cloneDefaultTelemetryDeckPages(),
+  pushThemeToAgents: true,
 };
 
 export const createDisplayActions: SettingsSliceFactory<
@@ -130,6 +131,7 @@ export const createDisplayActions: SettingsSliceFactory<
     | "setLocale"
     | "setThemeMode"
     | "setAccentColor"
+    | "setPushThemeToAgents"
   >
 > = (set, get) => ({
   setMapTileSource: (mapTileSource) => set({ mapTileSource }),
@@ -273,4 +275,5 @@ export const createDisplayActions: SettingsSliceFactory<
   setLocale: (locale) => set({ locale }),
   setThemeMode: (themeMode) => set({ themeMode }),
   setAccentColor: (accentColor) => set({ accentColor }),
+  setPushThemeToAgents: (pushThemeToAgents) => set({ pushThemeToAgents }),
 });
