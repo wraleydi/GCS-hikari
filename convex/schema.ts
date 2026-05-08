@@ -649,6 +649,28 @@ fullName: v.optional(v.string()),
       publicKeyFingerprint: v.optional(v.union(v.string(), v.null())),
       autoPairEnabled: v.optional(v.union(v.boolean(), v.null())),
     })),
+    // Local SPI LCD surface state. Reported by the agent's OLED/LCD
+    // service when a panel is attached and the renderer is active.
+    // All fields are optional so heartbeats from agents without a
+    // local display (or pre-LCD agent versions) leave them undefined.
+    lcdActivePage: v.optional(v.string()),
+    lcdTouchCalibrated: v.optional(v.boolean()),
+    lcdRotation: v.optional(v.number()),
+    lcdSnapshotUrl: v.optional(v.string()),
+    lcdLastTouchAt: v.optional(v.number()),
+    lcdLastGesture: v.optional(v.string()),
+    // Local on-board video surface (the LCD video page tap). Reports
+    // whether the agent is decoding a stream locally for the panel and
+    // whether a recording is in progress. Independent of the WHEP
+    // browser stream advertised via videoState/videoWhepUrl.
+    videoLocalDecoderActive: v.optional(v.boolean()),
+    videoLocalDecoderType: v.optional(v.string()),
+    videoLocalDecoderFps: v.optional(v.number()),
+    videoRecording: v.optional(v.boolean()),
+    // Operator-selected UI theme on the agent. Mirrored back so the
+    // GCS can reflect the same theme on its own surfaces and the
+    // welcome flow can detect drift.
+    uiTheme: v.optional(v.string()),
     updatedAt: v.number(),
   })
     .index("by_deviceId", ["deviceId"]),
