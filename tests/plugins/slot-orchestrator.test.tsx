@@ -1,6 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, cleanup } from "@testing-library/react";
 
+vi.mock("next-intl", () => ({
+  useTranslations: () => (k: string) => k,
+}));
+
+vi.mock("@/components/ui/toast", () => ({
+  useToast: () => ({ toast: vi.fn() }),
+}));
+
 import {
   PluginHostProvider,
   type PluginSlotContribution,
