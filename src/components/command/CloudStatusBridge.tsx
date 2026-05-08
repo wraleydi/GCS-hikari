@@ -304,6 +304,13 @@ export function CloudStatusBridge() {
       (cloudRecord.mavlinkWsUrlPrev as string).length > 0
         ? (cloudRecord.mavlinkWsUrlPrev as string)
         : null;
+    const wfbFailoverState: "local" | "cloud_relay" | "failed" = [
+      "local",
+      "cloud_relay",
+      "failed",
+    ].includes(cloudRecord.wfbFailoverState as string)
+      ? (cloudRecord.wfbFailoverState as "local" | "cloud_relay" | "failed")
+      : "local";
 
     // Top-level heartbeat extras the agent forwards every tick. These
     // refresh the LCD live state (active page, last touch, snapshot
@@ -358,6 +365,7 @@ export function CloudStatusBridge() {
           foxgloveBindFailed,
           pairingCodeExpiresAt,
           mavlinkWsUrlPrev,
+          wfbFailoverState,
         };
         if (setupState !== undefined) payload.setupState = setupState;
         if (profileSource !== undefined) payload.profileSource = profileSource;
@@ -397,6 +405,7 @@ export function CloudStatusBridge() {
         foxgloveBindFailed,
         pairingCodeExpiresAt,
         mavlinkWsUrlPrev,
+        wfbFailoverState,
         ...(radioFromHeartbeat !== undefined ? { radio: radioFromHeartbeat } : {}),
       } as Record<string, unknown>);
     }
