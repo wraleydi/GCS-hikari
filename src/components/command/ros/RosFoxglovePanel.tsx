@@ -8,8 +8,10 @@
  */
 
 import { useState, useMemo } from "react";
-import { Maximize2, Minimize2, RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { AlertTriangle, Maximize2, Minimize2, RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRosStore } from "@/stores/ros-store";
+import { useAgentCapabilitiesStore } from "@/stores/agent-capabilities-store";
 
 interface RosFoxglovePanelProps {
   /** Compact mode for embedding in Overview. */
@@ -19,6 +21,8 @@ interface RosFoxglovePanelProps {
 export function RosFoxglovePanel({ compact = false }: RosFoxglovePanelProps) {
   const foxgloveUrl = useRosStore((s) => s.foxgloveUrl);
   const rosState = useRosStore((s) => s.rosState);
+  const bindFailed = useAgentCapabilitiesStore((s) => s.foxgloveBindFailed);
+  const t = useTranslations("ros");
   const [fullscreen, setFullscreen] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
 
@@ -28,6 +32,25 @@ export function RosFoxglovePanel({ compact = false }: RosFoxglovePanelProps) {
     // Foxglove Studio web app with data source parameter
     return `https://app.foxglove.dev/?ds=foxglove-websocket&ds.url=${encodeURIComponent(foxgloveUrl)}`;
   }, [foxgloveUrl]);
+
+  // Bind-failure short-circuits the iframe: when foxglove_bridge couldn't
+  // claim its WebSocket port the iframe will just spin, so surface the
+  // error directly.
+  if (bindFailed) {
+    return (
+      <div
+        role="alert"
+        className={`bg-status-error/10 rounded-lg border border-status-error/30 flex items-center justify-center ${compact ? "h-32" : "h-64"}`}
+      >
+        <div className="text-center px-4">
+          <AlertTriangle className="w-5 h-5 text-status-error mx-auto mb-1" />
+          <p className="text-xs text-status-error font-medium">
+            {t("foxgloveBindFailed")}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (rosState !== "running" || !studioUrl) {
     return (

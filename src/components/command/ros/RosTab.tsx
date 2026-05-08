@@ -24,6 +24,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useRosStore, type RosSubView } from "@/stores/ros-store";
 import { useAgentConnectionStore } from "@/stores/agent-connection-store";
+import { useAgentCapabilitiesStore } from "@/stores/agent-capabilities-store";
 import { RosNotInitialized } from "./RosNotInitialized";
 import { RosInitWizard } from "./RosInitWizard";
 import { RosOverview } from "./RosOverview";
@@ -48,6 +49,8 @@ export function RosTab() {
   const activeSubView = useRosStore((s) => s.activeSubView);
   const setActiveSubView = useRosStore((s) => s.setActiveSubView);
   const initInProgress = useRosStore((s) => s.initInProgress);
+  const bindFailed = useAgentCapabilitiesStore((s) => s.foxgloveBindFailed);
+  const tBadge = useTranslations("ros");
 
   const agentUrl = useAgentConnectionStore((s) => s.agentUrl);
   const apiKey = useAgentConnectionStore((s) => s.apiKey);
@@ -147,6 +150,16 @@ export function RosTab() {
     <div className="flex h-full">
       {/* Sub-view sidebar */}
       <div className="w-48 border-r border-border-primary flex flex-col py-2">
+        {bindFailed && (
+          <div
+            role="status"
+            className="mx-2 mb-2 flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium bg-status-error/10 text-status-error border border-status-error/30"
+            title={tBadge("foxgloveBindFailed")}
+          >
+            <AlertTriangle className="w-3 h-3 shrink-0" />
+            <span className="truncate">{tBadge("foxgloveBindFailed")}</span>
+          </div>
+        )}
         {SUB_VIEWS.map(({ id, icon: Icon, label }) => (
           <button
             key={id}
