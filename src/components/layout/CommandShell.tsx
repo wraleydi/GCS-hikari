@@ -9,6 +9,7 @@ import { CommandNav } from "./CommandNav";
 import { DemoProvider } from "./DemoProvider";
 import { CommandPalette } from "@/components/shared/command-palette";
 import { FailsafeAlertBanner } from "@/components/flight/FailsafeAlertBanner";
+import { PluginCrashBanner } from "@/components/plugins/PluginCrashBanner";
 import { useFleetStore } from "@/stores/fleet-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useSettingsStore } from "@/stores/settings-store";
@@ -330,6 +331,7 @@ function CommandShellInner({ children }: { children: React.ReactNode }) {
         <DemoProvider />
         <CommandPalette />
         <FailsafeAlertBanner />
+        {!immersiveMode && <PluginCrashBanner />}
         {children}
         <AgentMavlinkBridge />
         <MeshToastBridge />
