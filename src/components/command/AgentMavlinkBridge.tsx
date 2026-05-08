@@ -18,6 +18,7 @@
 import { useEffect, useRef } from "react";
 import { useAgentConnectionStore } from "@/stores/agent-connection-store";
 import { useAgentSystemStore } from "@/stores/agent-system-store";
+import { useAgentCapabilitiesStore } from "@/stores/agent-capabilities-store";
 import { useDroneManager } from "@/stores/drone-manager";
 import type { Transport } from "@/lib/protocol/types/transport";
 
@@ -28,6 +29,9 @@ export function AgentMavlinkBridge() {
   const connected = useAgentConnectionStore((s) => s.connected);
   const cloudDeviceId = useAgentConnectionStore((s) => s.cloudDeviceId);
   const status = useAgentSystemStore((s) => s.status);
+  const mavlinkWsUrlPrev = useAgentCapabilitiesStore(
+    (s) => s.mavlinkWsUrlPrev,
+  );
   const fcConnected = status?.fc_connected ?? false;
   const connectingRef = useRef(false);
   const connectedDroneIdRef = useRef<string | null>(null);
@@ -72,21 +76,49 @@ export function AgentMavlinkBridge() {
         let transport: Transport | undefined;
         let connType: "websocket" | "mqtt-mavlink" = "websocket";
 
-        // Try 1: Direct WebSocket (LAN, lowest latency)
+        // Try 1: Direct WebSocket (LAN, lowest latency). When the
+        // agent has rotated its WebSocket binding (port change,
+        // network move) the heartbeat carries the prior URL; if the
+        // current URL fails we retry the prior URL once before
+        // falling through to the MQTT relay path so a brief rotation
+        // doesn't drop an in-flight session.
         if (mavlinkUrl) {
-          try {
-            const { WebSocketTransport } = await import("@/lib/protocol/transport/websocket");
+          const { WebSocketTransport } = await import(
+            "@/lib/protocol/transport/websocket"
+          );
+          const tryWs = async (
+            url: string,
+          ): Promise<InstanceType<typeof WebSocketTransport>> => {
             const wsTransport = new WebSocketTransport();
             await Promise.race([
-              wsTransport.connect(mavlinkUrl),
+              wsTransport.connect(url),
               new Promise<never>((_, reject) =>
                 setTimeout(() => reject(new Error("timeout")), WS_TIMEOUT_MS),
               ),
             ]);
-            transport = wsTransport;
+            return wsTransport;
+          };
+          try {
+            transport = await tryWs(mavlinkUrl);
             console.log("[AgentMavlinkBridge] Direct WebSocket connected");
-          } catch {
-            console.log("[AgentMavlinkBridge] Direct WS failed, trying MQTT relay...");
+          } catch (err) {
+            if (mavlinkWsUrlPrev && mavlinkWsUrlPrev !== mavlinkUrl) {
+              try {
+                transport = await tryWs(mavlinkWsUrlPrev);
+                console.log(
+                  "[AgentMavlinkBridge] Direct WebSocket connected via previous URL",
+                );
+              } catch {
+                console.log(
+                  "[AgentMavlinkBridge] Direct WS failed on current and previous URL, trying MQTT relay...",
+                );
+                void err;
+              }
+            } else {
+              console.log(
+                "[AgentMavlinkBridge] Direct WS failed, trying MQTT relay...",
+              );
+            }
           }
         }
 
@@ -158,7 +190,14 @@ export function AgentMavlinkBridge() {
       // Only disconnect if the agent connection itself is dropped (handled by
       // transport "close" event → DroneManager.removeDrone automatically).
     };
-  }, [mavlinkUrl, connected, fcConnected, cloudDeviceId, status?.board?.name]);
+  }, [
+    mavlinkUrl,
+    mavlinkWsUrlPrev,
+    connected,
+    fcConnected,
+    cloudDeviceId,
+    status?.board?.name,
+  ]);
 
   return null;
 }
