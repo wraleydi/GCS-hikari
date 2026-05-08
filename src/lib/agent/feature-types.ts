@@ -257,6 +257,13 @@ export interface AgentCapabilities {
    * GCS retry the prior URL once before surfacing a connection error
    * so a brief rotation doesn't drop an in-flight session. */
   mavlinkWsUrlPrev?: string | null;
+  /** Optional. Tracks how the agent is currently servicing the
+   * pairing/uplink path. "local" is the steady state on the wireless
+   * radio link. "cloud_relay" means the local pairing supervisor
+   * fell over to the cloud heartbeat path; the GCS surfaces a notice
+   * with a retry control. "failed" means both local and cloud paths
+   * are unavailable. Undefined for legacy heartbeats. */
+  wfbFailoverState?: "local" | "cloud_relay" | "failed";
 }
 
 // ── Detection Data (for vision overlay) ──────────────────

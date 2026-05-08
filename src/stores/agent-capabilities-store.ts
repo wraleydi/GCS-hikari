@@ -336,6 +336,12 @@ interface AgentCapabilitiesState {
   /** Previous MAVLink WebSocket URL the agent advertised, if it
    * rotated its binding. Null when no rotation is in flight. */
   mavlinkWsUrlPrev: string | null;
+  /** Current pairing/uplink failover state. "local" is the steady
+   * state on the wireless radio link. "cloud_relay" means the
+   * agent's local pairing supervisor failed over to the cloud
+   * path. "failed" means neither path is up. Defaults to "local"
+   * for legacy heartbeats. */
+  wfbFailoverState: "local" | "cloud_relay" | "failed";
   /** True once we've received at least one capabilities payload. */
   loaded: boolean;
 }
@@ -373,6 +379,7 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
   foxgloveBindFailed: false,
   pairingCodeExpiresAt: null,
   mavlinkWsUrlPrev: null,
+  wfbFailoverState: "local",
   loaded: false,
 
   setCapabilities(caps: AgentCapabilities | Record<string, unknown>) {
@@ -455,6 +462,25 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
           ? null
           : undefined;
 
+    // Forward-permissive: undefined keeps the prior value, a known
+    // string sets it, anything else clamps to "local" so an agent
+    // shipping a future variant can't put the UI into an invalid
+    // state.
+    const rawFailover = (caps as { wfbFailoverState?: unknown })
+      .wfbFailoverState;
+    const wfbFailoverState:
+      | "local"
+      | "cloud_relay"
+      | "failed"
+      | undefined =
+      rawFailover === undefined
+        ? undefined
+        : rawFailover === "local" ||
+            rawFailover === "cloud_relay" ||
+            rawFailover === "failed"
+          ? rawFailover
+          : "local";
+
     set((state) => ({
       tier: normalized.tier,
       cameras: normalized.cameras,
@@ -487,6 +513,10 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
         mavlinkWsUrlPrev === undefined
           ? state.mavlinkWsUrlPrev
           : mavlinkWsUrlPrev,
+      wfbFailoverState:
+        wfbFailoverState === undefined
+          ? state.wfbFailoverState
+          : wfbFailoverState,
       loaded: true,
     }));
   },
@@ -533,6 +563,7 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       foxgloveBindFailed: false,
       pairingCodeExpiresAt: null,
       mavlinkWsUrlPrev: null,
+      wfbFailoverState: "local",
       loaded: false,
     });
   },
