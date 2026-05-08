@@ -11,17 +11,25 @@
  * @license GPL-3.0-only
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Radio as RadioIcon, AlertTriangle } from "lucide-react";
+import { Radio as RadioIcon, AlertTriangle, ShieldCheck, ShieldAlert } from "lucide-react";
 import { useGroundStationStore } from "@/stores/ground-station-store";
 import { useAgentConnectionStore } from "@/stores/agent-connection-store";
 import { groundStationApiFromAgent } from "@/lib/api/ground-station-api";
 import { TxPowerSlider } from "@/components/hardware/TxPowerSlider";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
 import { useConvexSkipQuery } from "@/hooks/use-convex-skip-query";
 import { cmdDroneStatusApi } from "@/lib/community-api-drones";
+import {
+  fetchPairStatus,
+  startLocalBind,
+  unpairRig,
+} from "@/lib/api/radio-pairing";
 import type {
+  LocalBindSession,
+  PairStatusResponse,
   RadioLinkState,
   RadioState,
   RadioTopology,
@@ -104,6 +112,9 @@ function linkStateLabel(t: ReturnType<typeof useTranslations>, state: RadioLinkS
   const map: Record<RadioLinkState, string> = {
     absent: "linkState.absent",
     disconnected: "linkState.disconnected",
+    unpaired: "linkState.unpaired",
+    auto_pairing: "linkState.auto_pairing",
+    binding: "linkState.binding",
     connecting: "linkState.connecting",
     connected: "linkState.connected",
     degraded: "linkState.degraded",
@@ -133,6 +144,12 @@ export function RadioPanel() {
   const [wfbTxPowerDbm, setWfbTxPowerDbm] = useState<number | null>(null);
   const [pollError, setPollError] = useState<string | null>(null);
   const [benchMode, setBenchMode] = useState(false);
+  const [pairStatus, setPairStatus] = useState<PairStatusResponse | null>(null);
+  const [bindSession, setBindSession] = useState<LocalBindSession | null>(null);
+  const [bindBusy, setBindBusy] = useState(false);
+  const [unpairBusy, setUnpairBusy] = useState(false);
+
+  const { toast } = useToast();
 
   const cloudStatuses = useConvexSkipQuery(cmdDroneStatusApi.listMyCloudStatuses, {
     enabled: hasAgent,
@@ -216,6 +233,105 @@ export function RadioPanel() {
       clearInterval(timer);
     };
   }, [agentUrl, apiKey, loadStatus]);
+
+  // Pair-state poller. Cheap (single GET against /api/wfb/pair); the
+  // 2 Hz cadence is fine and matches the link-health poll above.
+  useEffect(() => {
+    if (!agentUrl) return;
+    const ctx = { baseUrl: agentUrl, apiKey };
+    let cancelled = false;
+    const poll = async () => {
+      if (cancelled || (typeof document !== "undefined" && document.hidden)) return;
+      try {
+        const status = await fetchPairStatus(ctx);
+        if (!cancelled) setPairStatus(status);
+      } catch {
+        // Older agents lack the /api/wfb/pair endpoint; treat as
+        // "unpaired, not auto-pairing" without spamming a toast.
+        if (!cancelled) setPairStatus(null);
+      }
+    };
+    void poll();
+    const timer = setInterval(poll, 2000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [agentUrl, apiKey]);
+
+  // Local-bind action. Synchronous: the agent runs the upstream
+  // protocol to completion (≤60s) and returns the terminal session.
+  const handleOpenLocalBind = useCallback(async () => {
+    if (bindBusy) return;
+    if (!agentUrl) return;
+    setBindBusy(true);
+    setBindSession({
+      session_id: "pending",
+      role: "gs",
+      state: "opening_tunnel",
+      started_at: new Date().toISOString(),
+      finished_at: null,
+      error: null,
+      fingerprint: null,
+      peer_device_id: null,
+      source: "operator",
+    });
+    toast(t("pairing.progressOpening"), "info");
+    try {
+      const session = await startLocalBind({ baseUrl: agentUrl, apiKey }, {});
+      setBindSession(session);
+      if (session.state === "paired") {
+        toast(t("pairing.progressDone"), "success");
+        // Force a fresh pair-status read so the UI flips immediately.
+        try {
+          const status = await fetchPairStatus({ baseUrl: agentUrl, apiKey });
+          setPairStatus(status);
+        } catch {
+          /* swallow */
+        }
+      } else {
+        toast(
+          t("pairing.errorAgentError", {
+            message: session.error ?? session.state,
+          }),
+          "error",
+        );
+      }
+    } catch (exc) {
+      const msg = exc instanceof Error ? exc.message : String(exc);
+      setBindSession((prev) =>
+        prev ? { ...prev, state: "failed", error: msg } : null,
+      );
+      toast(t("pairing.errorAgentError", { message: msg }), "error");
+    } finally {
+      setBindBusy(false);
+    }
+  }, [agentUrl, apiKey, bindBusy, toast, t]);
+
+  const handleUnpair = useCallback(async () => {
+    if (unpairBusy) return;
+    if (!agentUrl) return;
+    if (typeof window !== "undefined") {
+      const confirmed = window.confirm(t("pairing.confirmUnpairBody"));
+      if (!confirmed) return;
+    }
+    setUnpairBusy(true);
+    try {
+      await unpairRig({ baseUrl: agentUrl, apiKey });
+      toast(t("pairing.statusUnpaired"), "info");
+      try {
+        const status = await fetchPairStatus({ baseUrl: agentUrl, apiKey });
+        setPairStatus(status);
+      } catch {
+        /* swallow */
+      }
+    } catch (exc) {
+      const msg = exc instanceof Error ? exc.message : String(exc);
+      toast(t("pairing.errorAgentError", { message: msg }), "error");
+    } finally {
+      setUnpairBusy(false);
+    }
+  }, [agentUrl, apiKey, unpairBusy, toast, t]);
 
   if (!hasAgent) {
     return (
@@ -303,6 +419,16 @@ export function RadioPanel() {
         </dl>
       </section>
 
+      <PairingCard
+        t={t}
+        pairStatus={pairStatus}
+        bindSession={bindSession}
+        bindBusy={bindBusy}
+        unpairBusy={unpairBusy}
+        onOpenLocalBind={handleOpenLocalBind}
+        onUnpair={handleUnpair}
+      />
+
       <section className="rounded border border-border-default bg-bg-secondary p-5">
         <h3 className="mb-1 text-sm font-semibold text-text-primary">
           {t("txPower")}
@@ -361,5 +487,153 @@ function StatRow({
         {value}
       </dd>
     </div>
+  );
+}
+
+interface PairingCardProps {
+  t: ReturnType<typeof useTranslations>;
+  pairStatus: PairStatusResponse | null;
+  bindSession: LocalBindSession | null;
+  bindBusy: boolean;
+  unpairBusy: boolean;
+  onOpenLocalBind: () => void;
+  onUnpair: () => void;
+}
+
+function PairingCard({
+  t,
+  pairStatus,
+  bindSession,
+  bindBusy,
+  unpairBusy,
+  onOpenLocalBind,
+  onUnpair,
+}: PairingCardProps) {
+  const paired = pairStatus?.paired === true;
+  const autoArmed =
+    !paired && pairStatus?.auto_pair_enabled === true;
+  const peer = pairStatus?.paired_with_device_id ?? null;
+  const fingerprint = pairStatus?.fingerprint ?? null;
+  const pairedAt = pairStatus?.paired_at ?? null;
+
+  // Render the live bind progress when a session is in flight.
+  const showProgress =
+    bindBusy ||
+    (bindSession != null &&
+      bindSession.state !== "paired" &&
+      bindSession.state !== "failed" &&
+      bindSession.state !== "aborted" &&
+      bindSession.state !== "idle");
+
+  const progressLabel = (() => {
+    if (!bindSession) return t("pairing.progressOpening");
+    switch (bindSession.state) {
+      case "opening_tunnel":
+        return t("pairing.progressOpening");
+      case "waiting_peer":
+        return t("pairing.progressWaiting");
+      case "transferring_keys":
+        return t("pairing.progressTransferring");
+      case "applying_keys":
+        return t("pairing.progressApplying");
+      case "restarting_services":
+        return t("pairing.progressRestarting");
+      default:
+        return t("pairing.progressOpening");
+    }
+  })();
+
+  return (
+    <section className="rounded border border-border-default bg-bg-secondary p-5">
+      <div className="mb-3 flex items-center gap-2">
+        {paired ? (
+          <ShieldCheck size={16} className="text-status-success" />
+        ) : (
+          <ShieldAlert size={16} className="text-status-warning" />
+        )}
+        <h3 className="text-sm font-semibold text-text-primary">
+          {t("pairing.title")}
+        </h3>
+      </div>
+
+      {paired ? (
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded border border-status-success/40 bg-status-success/10 px-2.5 py-1 text-xs text-status-success">
+              {t("pairing.statusPaired", { peer: peer ?? t("pairing.selfDevice") })}
+            </span>
+          </div>
+          {fingerprint ? (
+            <p className="font-mono text-xs text-text-secondary">
+              {t("pairing.fingerprintLabel")}: {fingerprint}
+            </p>
+          ) : null}
+          {pairedAt ? (
+            <p className="text-xs text-text-tertiary">
+              {t("pairing.pairedAtLabel")}: {pairedAt}
+            </p>
+          ) : null}
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onOpenLocalBind}
+              disabled={bindBusy || unpairBusy}
+            >
+              {t("pairing.actionRepair")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onUnpair}
+              disabled={bindBusy || unpairBusy}
+            >
+              {t("pairing.actionUnpair")}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs ${
+                autoArmed
+                  ? "border-accent-primary/40 bg-accent-primary/10 text-accent-primary"
+                  : "border-status-warning/40 bg-status-warning/10 text-status-warning"
+              }`}
+            >
+              {autoArmed
+                ? t("pairing.statusAutoArmed")
+                : t("pairing.statusUnpaired")}
+            </span>
+          </div>
+          {autoArmed ? (
+            <p className="text-xs text-text-secondary">
+              {t("pairing.armedDescription")}
+            </p>
+          ) : null}
+          {showProgress ? (
+            <p className="font-mono text-xs text-accent-primary">
+              {progressLabel}
+            </p>
+          ) : null}
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onOpenLocalBind}
+              disabled={bindBusy || unpairBusy}
+            >
+              {bindBusy ? progressLabel : t("pairing.actionPairLocal")}
+            </Button>
+          </div>
+          {bindSession?.state === "failed" && bindSession.error ? (
+            <p className="text-xs text-status-error">
+              {t("pairing.errorAgentError", { message: bindSession.error })}
+            </p>
+          ) : null}
+        </div>
+      )}
+    </section>
   );
 }

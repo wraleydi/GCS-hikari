@@ -638,6 +638,16 @@ fullName: v.optional(v.string()),
       fecRecovered: v.number(),
       fecLost: v.number(),
       packetsLost: v.number(),
+      // Pair-state surface added in agent v0.16. Old rows from
+      // pre-0.16 heartbeats lack these fields; the cloud relay
+      // remap leaves them undefined and the GCS treats them as
+      // "unpaired". v.optional + v.union(...,v.null()) covers both
+      // shapes the relay may forward (missing key vs explicit null).
+      paired: v.optional(v.boolean()),
+      pairedWithDeviceId: v.optional(v.union(v.string(), v.null())),
+      pairedAt: v.optional(v.union(v.string(), v.null())),
+      publicKeyFingerprint: v.optional(v.union(v.string(), v.null())),
+      autoPairEnabled: v.optional(v.union(v.boolean(), v.null())),
     })),
     updatedAt: v.number(),
   })

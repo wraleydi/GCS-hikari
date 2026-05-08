@@ -33,6 +33,15 @@ export const cmdDroneCommandsApi = {
   listRecentCommands: api.cmdDroneCommands.listRecentCommands,
 };
 
+export const cmdRadioPairingApi = {
+  enqueueWfbPairInit: api.cmdRadioPairing.enqueueWfbPairInit,
+  enqueueWfbPairApply: api.cmdRadioPairing.enqueueWfbPairApply,
+  enqueueWfbPairUnpair: api.cmdRadioPairing.enqueueWfbPairUnpair,
+  getCommandWithData: api.cmdRadioPairing.getCommandWithData,
+  finalizePairing: api.cmdRadioPairing.finalizePairing,
+  cancelCommand: api.cmdRadioPairing.cancelCommand,
+};
+
 export const cmdSigningKeysApi = {
   listMine: api.cmdSigningKeys.listMine,
   getForDrone: api.cmdSigningKeys.getForDrone,

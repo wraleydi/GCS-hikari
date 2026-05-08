@@ -29,6 +29,8 @@ vi.mock("lucide-react", () => {
     X: makeStub("X"),
     ChevronLeft: makeStub("ChevronLeft"),
     ChevronRight: makeStub("ChevronRight"),
+    ShieldCheck: makeStub("ShieldCheck"),
+    ShieldAlert: makeStub("ShieldAlert"),
   };
 });
 
@@ -84,6 +86,11 @@ describe("DroneRadioPanel", () => {
         fecRecovered: 3,
         fecLost: 0,
         packetsLost: 0,
+        paired: true,
+        pairedWithDeviceId: "groundnode",
+        pairedAt: "2026-05-08T12:00:00Z",
+        publicKeyFingerprint: "deadbeefcafefeed",
+        autoPairEnabled: false,
       },
     });
     renderWithIntl(<DroneRadioPanel droneId="drone-1" />);

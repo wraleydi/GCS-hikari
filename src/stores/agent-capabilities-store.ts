@@ -72,6 +72,9 @@ const DEFAULT_FEATURES: FeatureState = {
 const RADIO_LINK_STATES: ReadonlySet<RadioLinkState> = new Set([
   "absent",
   "disconnected",
+  "unpaired",
+  "auto_pairing",
+  "binding",
   "connecting",
   "connected",
   "degraded",
@@ -120,6 +123,19 @@ function normalizeRadio(raw: unknown): RadioState | null {
     fecRecovered: numOrZero(r.fecRecovered),
     fecLost: numOrZero(r.fecLost),
     packetsLost: numOrZero(r.packetsLost),
+    // Pair-state fields are optional on the wire (older agents omit
+    // them). Treat absent / null as "unpaired, auto-pair unknown" so
+    // the UI never confuses a missing field with an explicit false.
+    paired: r.paired === true,
+    pairedWithDeviceId:
+      typeof r.pairedWithDeviceId === "string" ? r.pairedWithDeviceId : null,
+    pairedAt: typeof r.pairedAt === "string" ? r.pairedAt : null,
+    publicKeyFingerprint:
+      typeof r.publicKeyFingerprint === "string" ? r.publicKeyFingerprint : null,
+    // autoPairEnabled defaults to false when absent so the UI does
+    // not show a misleading "armed" badge against an old agent that
+    // doesn't actually run the auto-pair supervisor.
+    autoPairEnabled: r.autoPairEnabled === true,
   };
 }
 

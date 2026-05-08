@@ -21,6 +21,7 @@ import type * as cmdMissions from "../cmdMissions.js";
 import type * as cmdPairing from "../cmdPairing.js";
 import type * as cmdPlugins from "../cmdPlugins.js";
 import type * as cmdPreferences from "../cmdPreferences.js";
+import type * as cmdRadioPairing from "../cmdRadioPairing.js";
 import type * as cmdSigningEvents from "../cmdSigningEvents.js";
 import type * as cmdSigningKeys from "../cmdSigningKeys.js";
 import type * as comments from "../comments.js";
@@ -52,6 +53,7 @@ declare const fullApi: ApiFromModules<{
   cmdPairing: typeof cmdPairing;
   cmdPlugins: typeof cmdPlugins;
   cmdPreferences: typeof cmdPreferences;
+  cmdRadioPairing: typeof cmdRadioPairing;
   cmdSigningEvents: typeof cmdSigningEvents;
   cmdSigningKeys: typeof cmdSigningKeys;
   comments: typeof comments;

@@ -111,6 +111,11 @@ describe("agent-capabilities-store radio", () => {
         fecRecovered: 0,
         fecLost: 0,
         packetsLost: 0,
+        paired: false,
+        pairedWithDeviceId: null,
+        pairedAt: null,
+        publicKeyFingerprint: null,
+        autoPairEnabled: false,
       },
     });
     useAgentCapabilitiesStore.getState().clear();

@@ -23,6 +23,9 @@ export interface GroundStationStatusResponse extends GroundStationStatusState {
 export type RadioLinkState =
   | "absent"
   | "disconnected"
+  | "unpaired"
+  | "auto_pairing"
+  | "binding"
   | "connecting"
   | "connected"
   | "degraded";
@@ -44,6 +47,14 @@ export interface RadioState {
   fecRecovered: number;
   fecLost: number;
   packetsLost: number;
+  // Pair-state surface added in agent v0.16. Older agents omit
+  // these fields; the normalizer falls back to safe defaults so
+  // older heartbeats render as "unpaired" without crashes.
+  paired: boolean;
+  pairedWithDeviceId: string | null;
+  pairedAt: string | null;
+  publicKeyFingerprint: string | null;
+  autoPairEnabled: boolean;
 }
 
 /** Response shape from PUT /api/wfb/tx-power. */
@@ -243,6 +254,52 @@ export interface PairResult {
 export interface UnpairResult {
   unpaired: boolean;
   previous_drone_id: string | null;
+}
+
+// New shapes for the v0.16 pairing surface (local-radio bind protocol
+// + cloud-relay path). These match the agent's REST responses verbatim
+// (snake_case where the agent emits snake_case).
+
+export type LocalBindState =
+  | "idle"
+  | "opening_tunnel"
+  | "waiting_peer"
+  | "transferring_keys"
+  | "applying_keys"
+  | "restarting_services"
+  | "paired"
+  | "failed"
+  | "aborted";
+
+export interface LocalBindSession {
+  session_id: string;
+  role: "drone" | "gs";
+  state: LocalBindState;
+  started_at: string;
+  finished_at: string | null;
+  error: string | null;
+  fingerprint: string | null;
+  peer_device_id: string | null;
+  source: "operator" | "auto";
+}
+
+export interface PairStatusResponse {
+  paired: boolean;
+  paired_with_device_id: string | null;
+  paired_at: string | null;
+  fingerprint: string | null;
+  auto_pair_enabled: boolean;
+  role: "drone" | "gs";
+}
+
+export interface AutoPairToggleResponse {
+  paired: boolean;
+  paired_with_device_id: string | null;
+  paired_at: string | null;
+  fingerprint: string | null;
+  auto_pair_enabled: boolean;
+  role: "drone" | "gs";
+  rearm_blocked?: boolean;
 }
 
 // UI types

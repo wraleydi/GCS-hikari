@@ -11,13 +11,19 @@
  */
 
 import { useTranslations } from "next-intl";
-import { Radio as RadioIcon, AlertTriangle } from "lucide-react";
+import {
+  Radio as RadioIcon,
+  AlertTriangle,
+  ShieldCheck,
+  ShieldAlert,
+} from "lucide-react";
 import { useAgentCapabilitiesStore } from "@/stores/agent-capabilities-store";
 import { useAgentConnectionStore } from "@/stores/agent-connection-store";
 import { groundStationApiFromAgent } from "@/lib/api/ground-station-api";
 import { TxPowerSlider } from "@/components/hardware/TxPowerSlider";
 import type {
   RadioLinkState,
+  RadioState,
   RadioTopology,
   SetTxPowerResult,
 } from "@/lib/api/ground-station/types";
@@ -69,6 +75,9 @@ function linkStateLabel(
   const map: Record<RadioLinkState, string> = {
     absent: "linkState.absent",
     disconnected: "linkState.disconnected",
+    unpaired: "linkState.unpaired",
+    auto_pairing: "linkState.auto_pairing",
+    binding: "linkState.binding",
     connecting: "linkState.connecting",
     connected: "linkState.connected",
     degraded: "linkState.degraded",
@@ -214,6 +223,8 @@ export function DroneRadioPanel({ droneId }: DroneRadioPanelProps) {
         </dl>
       </section>
 
+      <DronePairingTile t={t} radio={radio} />
+
       <section className="rounded border border-border-default bg-bg-secondary p-5">
         <h3 className="mb-1 text-sm font-semibold text-text-primary">
           {t("txPower")}
@@ -266,5 +277,69 @@ function StatRow({ label, value, valueClass, hint }: StatRowProps) {
         <p className="text-[10px] text-text-tertiary">{hint}</p>
       ) : null}
     </div>
+  );
+}
+
+interface DronePairingTileProps {
+  t: ReturnType<typeof useTranslations>;
+  radio: RadioState;
+}
+
+function DronePairingTile({ t, radio }: DronePairingTileProps) {
+  // Read-only mirror of the GS-side card. The drone-side panel does
+  // not initiate bind sessions because the drone runs the bind
+  // server; the GS is the conductor. Operators trigger pairing from
+  // the GS card or by long-pressing B3 on the LCD.
+  const paired = radio.paired === true;
+  const autoArmed = !paired && radio.autoPairEnabled === true;
+  const peer = radio.pairedWithDeviceId ?? null;
+  const fingerprint = radio.publicKeyFingerprint ?? null;
+  const pairedAt = radio.pairedAt ?? null;
+
+  return (
+    <section className="rounded border border-border-default bg-bg-secondary p-5">
+      <div className="mb-3 flex items-center gap-2">
+        {paired ? (
+          <ShieldCheck size={16} className="text-status-success" />
+        ) : (
+          <ShieldAlert size={16} className="text-status-warning" />
+        )}
+        <h3 className="text-sm font-semibold text-text-primary">
+          {t("pairing.title")}
+        </h3>
+      </div>
+      <div className="flex flex-col gap-2">
+        <span
+          className={`inline-flex w-fit items-center gap-1.5 rounded border px-2.5 py-1 text-xs ${
+            paired
+              ? "border-status-success/40 bg-status-success/10 text-status-success"
+              : autoArmed
+                ? "border-accent-primary/40 bg-accent-primary/10 text-accent-primary"
+                : "border-status-warning/40 bg-status-warning/10 text-status-warning"
+          }`}
+        >
+          {paired
+            ? t("pairing.statusPaired", { peer: peer ?? t("pairing.selfDevice") })
+            : autoArmed
+              ? t("pairing.statusAutoArmed")
+              : t("pairing.statusUnpaired")}
+        </span>
+        {fingerprint ? (
+          <p className="font-mono text-xs text-text-secondary">
+            {t("pairing.fingerprintLabel")}: {fingerprint}
+          </p>
+        ) : null}
+        {pairedAt ? (
+          <p className="text-xs text-text-tertiary">
+            {t("pairing.pairedAtLabel")}: {pairedAt}
+          </p>
+        ) : null}
+        {!paired && autoArmed ? (
+          <p className="text-xs text-text-secondary">
+            {t("pairing.armedDescription")}
+          </p>
+        ) : null}
+      </div>
+    </section>
   );
 }
