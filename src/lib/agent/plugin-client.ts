@@ -146,6 +146,32 @@ export class PluginAgentClient {
     await this.parse(res);
   }
 
+  /**
+   * Revoke a previously-granted permission on the agent. Returns the
+   * remaining granted-permission set so callers can reconcile UI state
+   * without a follow-up GET. The agent's `requires_restart` flag is
+   * dropped here; the GCS treats every revoke as a soft hint and
+   * surfaces a restart toast separately when the operator chooses.
+   */
+  async revoke(
+    pluginId: string,
+    permissionId: string,
+  ): Promise<{ granted: string[] }> {
+    const res = await fetch(
+      `${this.baseUrl}/api/plugins/${encodeURIComponent(pluginId)}/perms/${encodeURIComponent(
+        permissionId,
+      )}`,
+      { method: "DELETE", headers: this.authHeader() },
+    );
+    const body = await this.parse<{
+      ok: true;
+      plugin_id: string;
+      granted: string[];
+      requires_restart?: boolean;
+    }>(res);
+    return { granted: Array.isArray(body.granted) ? body.granted : [] };
+  }
+
   async enable(pluginId: string): Promise<void> {
     const res = await fetch(
       `${this.baseUrl}/api/plugins/${encodeURIComponent(pluginId)}/enable`,
