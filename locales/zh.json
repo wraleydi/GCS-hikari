@@ -2560,7 +2560,17 @@
         "errorRearmBlocked": "Cannot re-arm auto-pair while paired. Unpair first.",
         "armedDescription": "Looking for an unpaired peer on the radio. Will pair on first contact, then disarm.",
         "manualSubheading": "Or pair manually:",
-        "remoteSubheading": "Remote pairing (peer in the field)"
+        "remoteSubheading": "Remote pairing (peer in the field)",
+        "failover": {
+          "cloudRelay": {
+            "title": "Pairing via cloud relay",
+            "message": "Local radio retry is available."
+          },
+          "retryButton": "Retry local pairing",
+          "retrying": "Retrying...",
+          "retrySuccess": "Local pairing re-armed",
+          "failed": "Pairing failed"
+        }
       }
     },
     "setupAccess": {
