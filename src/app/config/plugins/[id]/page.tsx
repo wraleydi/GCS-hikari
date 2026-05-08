@@ -4,11 +4,14 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useMutation } from "convex/react";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useToast } from "@/components/ui/toast";
 import { RiskBadge } from "@/components/plugins/RiskBadge";
-import { PluginAgentClient } from "@/lib/agent/plugin-client";
+import { PluginAgentClient, PluginAgentError } from "@/lib/agent/plugin-client";
 import { communityApi } from "@/lib/community-api";
 import { useConvexSkipQuery } from "@/hooks/use-convex-skip-query";
 import { useAgentConnectionStore } from "@/stores/agent-connection-store";
@@ -21,6 +24,11 @@ export default function PluginDetailPage() {
   const params = useParams<{ id: string }>();
   const installId = params?.id as Id<"cmd_pluginInstalls"> | undefined;
   const [tab, setTab] = useState<Tab>("overview");
+  const [pendingRevoke, setPendingRevoke] = useState<{
+    permissionId: string;
+  } | null>(null);
+  const t = useTranslations("plugins");
+  const { toast } = useToast();
 
   const agentUrl = useAgentConnectionStore((s) => s.agentUrl);
   const apiKey = useAgentConnectionStore((s) => s.apiKey);
@@ -167,7 +175,7 @@ export default function PluginDetailPage() {
                   onClick={async () => {
                     if (!installId) return;
                     if (perm.granted) {
-                      await revoke({ installId, permissionId: perm.permissionId });
+                      setPendingRevoke({ permissionId: perm.permissionId });
                     } else {
                       if (agentClient) {
                         await agentClient.grant(
@@ -179,13 +187,45 @@ export default function PluginDetailPage() {
                     }
                   }}
                 >
-                  {perm.granted ? "Revoke" : "Grant"}
+                  {perm.granted ? t("revokePermission") : "Grant"}
                 </Button>
               </li>
             ))
           )}
         </ul>
       )}
+
+      <ConfirmDialog
+        open={!!pendingRevoke}
+        title={t("revokeConfirmTitle")}
+        message={t("revokeConfirmMessage", {
+          permission: pendingRevoke?.permissionId ?? "",
+        })}
+        variant="danger"
+        confirmLabel={t("revokePermission")}
+        onConfirm={async () => {
+          if (!installId || !pendingRevoke) return;
+          const { permissionId } = pendingRevoke;
+          try {
+            if (agentClient) {
+              await agentClient.revoke(install.pluginId, permissionId);
+            }
+            await revoke({ installId, permissionId });
+            toast(t("revokeSuccess"), "success");
+          } catch (err) {
+            const message =
+              err instanceof PluginAgentError
+                ? err.message
+                : err instanceof Error
+                  ? err.message
+                  : String(err);
+            toast(message, "error");
+          } finally {
+            setPendingRevoke(null);
+          }
+        }}
+        onCancel={() => setPendingRevoke(null)}
+      />
 
       {tab === "events" && (
         <ul className="space-y-1 text-xs">
