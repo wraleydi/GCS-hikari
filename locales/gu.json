@@ -2699,6 +2699,13 @@
     }
   },
   "plugins": {
+    "revokePermission": "Revoke permission",
+    "revokeConfirmTitle": "Revoke this permission?",
+    "revokeConfirmMessage": "The plugin will lose access to {permission}. Continue?",
+    "revokeSuccess": "Permission revoked",
+    "crashBannerTitle": "Plugin crashed",
+    "crashBannerMessage": "{name} crashed. View logs.",
+    "slotDroppedToast": "{name} cannot render in {slot} (missing permission)",
     "browse": {
       "title": "Browse plugins",
       "subtitle": "Discover signed extensions for the ADOS platform.",
