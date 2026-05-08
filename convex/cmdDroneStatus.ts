@@ -90,6 +90,20 @@ export const pushStatus = internalMutation({
       fecLost: v.number(),
       packetsLost: v.number(),
     })),
+    // Local SPI LCD surface state (matches schema.ts cmd_droneStatus).
+    lcdActivePage: v.optional(v.string()),
+    lcdTouchCalibrated: v.optional(v.boolean()),
+    lcdRotation: v.optional(v.number()),
+    lcdSnapshotUrl: v.optional(v.string()),
+    lcdLastTouchAt: v.optional(v.number()),
+    lcdLastGesture: v.optional(v.string()),
+    // Local on-board video surface (LCD video page tap + recording).
+    videoLocalDecoderActive: v.optional(v.boolean()),
+    videoLocalDecoderType: v.optional(v.string()),
+    videoLocalDecoderFps: v.optional(v.number()),
+    videoRecording: v.optional(v.boolean()),
+    // Operator-selected UI theme on the agent.
+    uiTheme: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -99,10 +113,35 @@ export const pushStatus = internalMutation({
 
     const now = Date.now();
 
+    // Local display + theme fields are forwarded through the same args
+    // spread, but pinned here explicitly so a future refactor that
+    // narrows the spread cannot silently drop the LCD/theme surface.
+    const localSurfaceFields = {
+      lcdActivePage: args.lcdActivePage,
+      lcdTouchCalibrated: args.lcdTouchCalibrated,
+      lcdRotation: args.lcdRotation,
+      lcdSnapshotUrl: args.lcdSnapshotUrl,
+      lcdLastTouchAt: args.lcdLastTouchAt,
+      lcdLastGesture: args.lcdLastGesture,
+      videoLocalDecoderActive: args.videoLocalDecoderActive,
+      videoLocalDecoderType: args.videoLocalDecoderType,
+      videoLocalDecoderFps: args.videoLocalDecoderFps,
+      videoRecording: args.videoRecording,
+      uiTheme: args.uiTheme,
+    };
+
     if (existing) {
-      await ctx.db.patch(existing._id, { ...args, updatedAt: now });
+      await ctx.db.patch(existing._id, {
+        ...args,
+        ...localSurfaceFields,
+        updatedAt: now,
+      });
     } else {
-      await ctx.db.insert("cmd_droneStatus", { ...args, updatedAt: now });
+      await ctx.db.insert("cmd_droneStatus", {
+        ...args,
+        ...localSurfaceFields,
+        updatedAt: now,
+      });
     }
 
     // Derive attached display type from peripherals[] for the
