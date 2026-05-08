@@ -190,7 +190,10 @@
     "offline": "오프라인",
     "armed": "시동 걸림",
     "disarmed": "시동 꺼짐",
-    "online": "온라인"
+    "online": "온라인",
+    "runtimeMode": {
+      "lite": "Lite"
+    }
   },
   "auth": {
     "signIn": "로그인",
@@ -482,7 +485,11 @@
     "bitrate8Mbps": "8 Mbps",
     "bitrate12Mbps": "12 Mbps",
     "codecH264": "H.264",
-    "codecH265": "H.265"
+    "codecH265": "H.265",
+    "restartBanner": {
+      "title": "Video pipeline restarting",
+      "message": "Video has restarted {count} times. Check the agent."
+    }
   },
   "inputDevices": {
     "title": "입력 장치",
@@ -2903,5 +2910,12 @@
         "connectionStatusRegion": "Board connection status"
       }
     }
+  },
+  "pairing": {
+    "codeExpiresIn": "Code expires in {time}",
+    "codeExpired": "Code expired"
+  },
+  "ros": {
+    "foxgloveBindFailed": "Foxglove bridge failed to bind"
   }
 }

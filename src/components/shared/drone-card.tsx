@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { BatteryBar } from "./battery-bar";
 import { StatusDot } from "@/components/ui/status-dot";
 import { Cloud } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useDroneMetadataStore } from "@/stores/drone-metadata-store";
 import type { FleetDrone, DroneStatus } from "@/lib/types";
@@ -41,6 +42,7 @@ const gpsFixLabel: Record<number, string> = {
 
 export function DroneCard({ drone, selected, onClick }: DroneCardProps) {
   const displayName = useDroneMetadataStore((s) => s.profiles[drone.id]?.displayName) ?? drone.name;
+  const tStatus = useTranslations("status");
   const sats = drone.gps?.satellites ?? 0;
   const fixType = drone.gps?.fixType ?? 0;
   const lowSats = sats < 6 && fixType > 0;
@@ -55,7 +57,9 @@ export function DroneCard({ drone, selected, onClick }: DroneCardProps) {
             <Cloud size={12} className="text-accent-primary" />
           )}
           {drone.runtimeMode === "lite" && (
-            <Badge variant="info" className="text-[10px]">Lite</Badge>
+            <Badge variant="info" className="text-[10px]">
+              {tStatus("runtimeMode.lite")}
+            </Badge>
           )}
           {drone.attachedDisplayType === "spi-lcd" && (
             <span title='Local SPI LCD attached (Waveshare 3.5" / ILI9486)'>

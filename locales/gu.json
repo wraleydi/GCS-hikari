@@ -190,7 +190,10 @@
     "offline": "ઑફલાઇન",
     "armed": "સક્રિય",
     "disarmed": "નિષ્ક્રિય",
-    "online": "ઑનલાઇન"
+    "online": "ઑનલાઇન",
+    "runtimeMode": {
+      "lite": "Lite"
+    }
   },
   "auth": {
     "signIn": "સાઇન ઇન",
@@ -482,7 +485,11 @@
     "bitrate8Mbps": "8 Mbps",
     "bitrate12Mbps": "12 Mbps",
     "codecH264": "H.264",
-    "codecH265": "H.265"
+    "codecH265": "H.265",
+    "restartBanner": {
+      "title": "Video pipeline restarting",
+      "message": "Video has restarted {count} times. Check the agent."
+    }
   },
   "inputDevices": {
     "title": "ઇનપુટ ઉપકરણો",
@@ -2903,5 +2910,12 @@
         "connectionStatusRegion": "Board connection status"
       }
     }
+  },
+  "pairing": {
+    "codeExpiresIn": "Code expires in {time}",
+    "codeExpired": "Code expired"
+  },
+  "ros": {
+    "foxgloveBindFailed": "Foxglove bridge failed to bind"
   }
 }
