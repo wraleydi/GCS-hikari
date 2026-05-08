@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Gamepad2,
   LayoutDashboard,
+  Monitor,
   MonitorSmartphone,
   Network,
   Plug,
@@ -36,6 +37,7 @@ type CategoryKey =
   | "overview"
   | "network"
   | "physicalUi"
+  | "display"
   | "controllers"
   | "peripherals"
   | "radio"
@@ -73,6 +75,14 @@ const CATEGORIES: Category[] = [
     href: "/hardware/ui",
     icon: MonitorSmartphone,
     matchPaths: ["/hardware/ui"],
+    requiresAgent: true,
+    requiresMesh: false,
+  },
+  {
+    key: "display",
+    href: "/hardware/display",
+    icon: Monitor,
+    matchPaths: ["/hardware/display"],
     requiresAgent: true,
     requiresMesh: false,
   },
