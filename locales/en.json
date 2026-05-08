@@ -2498,6 +2498,31 @@
       "title": "Display",
       "description": "Manage the SPI LCD attached to the companion board: live preview, page switcher, calibration, and theme."
     },
+    "lcdCameraSwitch": {
+      "title": "Cameras",
+      "refresh": "Refresh",
+      "loading": "Detecting cameras...",
+      "emptyDescription": "No cameras detected. Plug a CSI or USB camera into the companion board and refresh.",
+      "primaryBadge": "Primary",
+      "switchLabel": "Switch primary camera",
+      "restarting": "Restarting encoder...",
+      "loadError": "Could not load cameras",
+      "switchError": "Could not switch camera"
+    },
+    "lcdRecordingMonitor": {
+      "title": "Recording",
+      "refresh": "Refresh",
+      "loading": "Loading recordings...",
+      "badgeRecording": "Recording",
+      "badgeIdle": "Idle",
+      "startRecording": "Start recording",
+      "stopRecording": "Stop recording",
+      "streamIdleHint": "Start the video stream before recording.",
+      "emptyDescription": "No recordings on disk yet.",
+      "listError": "Could not list recordings",
+      "startError": "Could not start recording",
+      "stopError": "Could not stop recording"
+    },
     "androidRc": {
       "title": "ADOS Android RC Controller",
       "stubHeading": "Product in development",

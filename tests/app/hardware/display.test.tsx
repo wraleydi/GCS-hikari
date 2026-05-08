@@ -49,6 +49,11 @@ vi.mock("lucide-react", () => {
     Loader2: makeStub("Loader2"),
     ImageOff: makeStub("ImageOff"),
     X: makeStub("X"),
+    Camera: makeStub("Camera"),
+    Disc: makeStub("Disc"),
+    ChevronDown: makeStub("ChevronDown"),
+    Check: makeStub("Check"),
+    Search: makeStub("Search"),
   };
 });
 
@@ -60,6 +65,32 @@ const mockClient = {
     .fn()
     .mockResolvedValue({ current_step: 1, complete: false, skipped: false }),
   skipDisplayCalibration: vi.fn().mockResolvedValue({ ok: true }),
+  listCameras: vi.fn().mockResolvedValue({
+    cameras: [
+      {
+        name: "CSI 0",
+        type: "csi",
+        device_path: "/dev/video0",
+        hardware_role: "primary",
+      },
+    ],
+    assignments: { primary: "/dev/video0" },
+  }),
+  switchCamera: vi.fn().mockResolvedValue({ ok: true }),
+  listRecordings: vi.fn().mockResolvedValue({
+    recording: false,
+    current_filename: null,
+    items: [],
+  }),
+  startRecording: vi.fn().mockResolvedValue({ status: "recording" }),
+  stopRecording: vi.fn().mockResolvedValue({ status: "stopped" }),
+  getVideoStatus: vi.fn().mockResolvedValue({
+    state: "stopped",
+    whep_url: null,
+    encoder: null,
+    cameras: { cameras: [], assignments: {} },
+    mediamtx: { running: false, webrtc_port: 8889 },
+  }),
 };
 
 vi.mock("@/stores/agent-connection-store", () => ({
@@ -114,7 +145,7 @@ describe("HardwareDisplayPage", () => {
     expect(screen.getByText("Display")).toBeDefined();
   });
 
-  it("composes all four LCD cards", () => {
+  it("composes all five LCD cards", () => {
     renderWithIntl(<HardwareDisplayPage />);
     // LocalDisplayCard
     expect(screen.getByText("Local Display")).toBeDefined();
@@ -124,5 +155,9 @@ describe("HardwareDisplayPage", () => {
     expect(screen.getByText("Remote control")).toBeDefined();
     // LcdThemeToggle
     expect(screen.getAllByText("Theme").length).toBeGreaterThan(0);
+    // LcdCameraSwitch
+    expect(screen.getByText("Cameras")).toBeDefined();
+    // LcdRecordingMonitor
+    expect(screen.getByText("Recording")).toBeDefined();
   });
 });

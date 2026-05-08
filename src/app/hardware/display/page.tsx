@@ -18,6 +18,8 @@ import { LcdPagePreview } from "@/components/hardware/LcdPagePreview";
 import { LcdRemoteControl } from "@/components/hardware/LcdRemoteControl";
 import { LcdThemeToggle } from "@/components/hardware/LcdThemeToggle";
 import { LcdCalibrationDialog } from "@/components/hardware/LcdCalibrationDialog";
+import { LcdCameraSwitch } from "@/components/hardware/LcdCameraSwitch";
+import { LcdRecordingMonitor } from "@/components/hardware/LcdRecordingMonitor";
 import { PageIntro } from "@/components/hardware/PageIntro";
 import { useAgentConnectionStore } from "@/stores/agent-connection-store";
 
@@ -67,6 +69,15 @@ export default function HardwareDisplayPage() {
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <LcdThemeToggle />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <LcdCameraSwitch />
+          </div>
+          <div>
+            <LcdRecordingMonitor />
+          </div>
         </div>
       </div>
 

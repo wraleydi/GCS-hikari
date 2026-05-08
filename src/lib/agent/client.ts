@@ -479,6 +479,59 @@ export class AgentClient {
     }
   }
 
+  /** Enumerate cameras the agent has detected, plus the current
+   * primary/secondary role assignments. Returns an empty list shape
+   * when the agent has no video pipeline yet. */
+  async listCameras(): Promise<CameraListResponse> {
+    return this.request<CameraListResponse>("/api/video/cameras");
+  }
+
+  /** Reassign a camera role (primary or secondary) to a specific
+   * device path. The agent restarts the encoder before returning, so
+   * callers should expect a brief gap in the live stream. */
+  async switchCamera(
+    role: "primary" | "secondary",
+    devicePath: string,
+  ): Promise<{ ok?: boolean; restarting?: boolean }> {
+    return this.request<{ ok?: boolean; restarting?: boolean }>(
+      "/api/video/camera/switch",
+      {
+        method: "POST",
+        body: JSON.stringify({ role, device_path: devicePath }),
+      },
+    );
+  }
+
+  /** Start recording on the agent. Drone profile uses `/api/video/record/start`;
+   * ground-station profile uses the same shape under `/api/v1/ground-station/`.
+   * The drone-profile route is picked here as the default; callers can branch
+   * on the agent's profile when a ground-station-only deployment is in use. */
+  async startRecording(): Promise<RecordingControlResponse> {
+    return this.request<RecordingControlResponse>("/api/video/record/start", {
+      method: "POST",
+    });
+  }
+
+  async stopRecording(): Promise<RecordingControlResponse> {
+    return this.request<RecordingControlResponse>("/api/video/record/stop", {
+      method: "POST",
+    });
+  }
+
+  /** List recording files written to disk. The drone-profile video
+   * pipeline does not currently expose a list endpoint, so this hits
+   * the ground-station listing route. Falls back to an empty list
+   * shape when the agent isn't running the ground-station profile. */
+  async listRecordings(): Promise<RecordingListResponse> {
+    try {
+      return await this.request<RecordingListResponse>(
+        "/api/v1/ground-station/recording/list",
+      );
+    } catch {
+      return { recording: false, current_filename: null, items: [] };
+    }
+  }
+
   // ── Pairing ──────────────────────────────────────────────
 
   async getPairingInfo(): Promise<PairingInfo> {
@@ -570,4 +623,50 @@ export interface SigningCounters {
   tx_signed_count: number;
   rx_signed_count: number;
   last_signed_rx_at: number | null;
+}
+
+// ──────────────────────────────────────────────────────────────
+// Video camera + recording response shapes
+// ──────────────────────────────────────────────────────────────
+
+export interface CameraEntry {
+  name: string;
+  type: string;
+  device_path: string;
+  hardware_role: string;
+  /** Optional resolution string ("1920x1080"). Surfaced when the
+   * agent's HAL probe could read it; absent on opaque vendor cameras. */
+  resolution?: string | null;
+  /** Optional friendly label for the camera; falls back to `name`. */
+  label?: string | null;
+}
+
+export interface CameraListResponse {
+  cameras: CameraEntry[];
+  /** Role -> device path bindings. Keys are typically "primary" and
+   * "secondary"; values are device paths or null when unbound. */
+  assignments: Record<string, string | null | unknown>;
+}
+
+export interface RecordingControlResponse {
+  path?: string;
+  status?: string;
+  error?: string;
+  recording?: boolean;
+  recording_filename?: string | null;
+  recording_started_at?: string | null;
+}
+
+export interface RecordingFileEntry {
+  filename: string;
+  size_bytes: number;
+  mtime: number;
+  duration_sec?: number | null;
+  started_at?: number | null;
+}
+
+export interface RecordingListResponse {
+  recording: boolean;
+  current_filename: string | null;
+  items: RecordingFileEntry[];
 }
