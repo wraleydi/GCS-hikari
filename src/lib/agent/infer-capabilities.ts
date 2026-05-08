@@ -12,7 +12,38 @@ import type {
   AttachedDisplay,
   CameraCapability,
   ComputeCapability,
+  LcdGesture,
+  VideoLocalTap,
 } from "./feature-types";
+
+/**
+ * Top-level heartbeat fields the cloud bridge passes through when
+ * inferring capabilities. These are flat keys on the cloud row, not
+ * nested under a peripheral, so they refresh every heartbeat without
+ * waiting for a peripheral re-enumeration. All keys optional —
+ * legacy agents that predate any one of them simply omit the field
+ * and the inferred capability stays undefined.
+ */
+export interface InferHeartbeatExtras {
+  lcdActivePage?: string | null;
+  lcdTouchCalibrated?: boolean | null;
+  lcdRotation?: number | null;
+  lcdSnapshotUrl?: string | null;
+  lcdLastTouchAt?: number | null;
+  lcdLastGesture?: string | null;
+  videoLocalDecoderActive?: boolean | null;
+  videoLocalDecoderType?: string | null;
+  videoLocalDecoderFps?: number | null;
+  videoRecording?: boolean | null;
+  uiTheme?: string | null;
+}
+
+const KNOWN_GESTURES: ReadonlySet<LcdGesture> = new Set([
+  "tap",
+  "long_press",
+  "swipe",
+  "drag",
+]);
 
 /** Known NPU specs by SoC name. */
 const NPU_BY_SOC: Record<string, { tops: number; runtime: "rknn" | "tensorrt" }> = {
@@ -45,10 +76,17 @@ const NPU_BY_SOC: Record<string, { tops: number; runtime: "rknn" | "tensorrt" }>
 /**
  * Infer capabilities from existing agent status + peripherals.
  * Used as a fallback when the agent doesn't have the /api/capabilities endpoint.
+ *
+ * The optional `heartbeatExtras` argument carries top-level fields
+ * the cloud relay forwards on every heartbeat (LCD live state,
+ * local video tap, recording flag, UI theme). Inference reads them
+ * defensively: each field is independent and any one being absent
+ * leaves the matching capability undefined.
  */
 export function inferCapabilities(
   status: AgentStatus | null,
-  peripherals: PeripheralInfo[]
+  peripherals: PeripheralInfo[],
+  heartbeatExtras?: InferHeartbeatExtras,
 ): AgentCapabilities | null {
   if (!status) return null;
 
@@ -82,6 +120,22 @@ export function inferCapabilities(
   // pushes one peripheral with category="display" per /etc/ados/display.conf
   // entry; phase-1 only ships SPI LCDs but the type field stays open
   // so a future HDMI / DPI panel reuses the same surface.
+  // Live-state fields (touchCalibrated, activePage, lastTouchAt,
+  // lastGesture, snapshotUrl) come from the heartbeat top-level keys
+  // so they refresh every tick. Rotation can come from either source;
+  // the heartbeat wins because it's authoritative for the current
+  // running state (peripheral.extra.rotation reflects only what
+  // /etc/ados/display.conf had at boot).
+  const extras = heartbeatExtras ?? {};
+  const heartbeatGestureRaw =
+    typeof extras.lcdLastGesture === "string"
+      ? extras.lcdLastGesture
+      : undefined;
+  const lastGesture: LcdGesture | undefined =
+    heartbeatGestureRaw && KNOWN_GESTURES.has(heartbeatGestureRaw as LcdGesture)
+      ? (heartbeatGestureRaw as LcdGesture)
+      : undefined;
+
   const displayPeripheral = peripherals.find((p) => p.category === "display");
   const display: AttachedDisplay | undefined = displayPeripheral
     ? {
@@ -93,9 +147,62 @@ export function inferCapabilities(
         resolution:
           (displayPeripheral.extra?.resolution as string | undefined) ?? undefined,
         rotation:
-          (displayPeripheral.extra?.rotation as number | undefined) ?? undefined,
+          typeof extras.lcdRotation === "number"
+            ? extras.lcdRotation
+            : (displayPeripheral.extra?.rotation as number | undefined) ?? undefined,
+        touchCalibrated:
+          typeof extras.lcdTouchCalibrated === "boolean"
+            ? extras.lcdTouchCalibrated
+            : undefined,
+        activePage:
+          typeof extras.lcdActivePage === "string"
+            ? extras.lcdActivePage
+            : undefined,
+        lastTouchAt:
+          typeof extras.lcdLastTouchAt === "number"
+            ? extras.lcdLastTouchAt
+            : undefined,
+        lastGesture,
+        snapshotUrl:
+          typeof extras.lcdSnapshotUrl === "string"
+            ? extras.lcdSnapshotUrl
+            : undefined,
       }
     : undefined;
+
+  // Local video tap snapshot. The agent toggles `active` independent
+  // of the decoder type and fps fields, so we surface the block as a
+  // whole whenever any of the three keys is present (including
+  // `active=false` so the GCS can render "tap paused" instead of
+  // disappearing the card).
+  const hasVideoLocalTap =
+    typeof extras.videoLocalDecoderActive === "boolean" ||
+    typeof extras.videoLocalDecoderType === "string" ||
+    typeof extras.videoLocalDecoderFps === "number";
+  const videoLocalTap: VideoLocalTap | undefined = hasVideoLocalTap
+    ? {
+        active:
+          typeof extras.videoLocalDecoderActive === "boolean"
+            ? extras.videoLocalDecoderActive
+            : undefined,
+        decoderType:
+          typeof extras.videoLocalDecoderType === "string"
+            ? extras.videoLocalDecoderType
+            : undefined,
+        fps:
+          typeof extras.videoLocalDecoderFps === "number"
+            ? extras.videoLocalDecoderFps
+            : undefined,
+      }
+    : undefined;
+
+  const videoRecording =
+    typeof extras.videoRecording === "boolean" ? extras.videoRecording : undefined;
+
+  const uiTheme: "dark" | "light" | undefined =
+    extras.uiTheme === "dark" || extras.uiTheme === "light"
+      ? extras.uiTheme
+      : undefined;
 
   return {
     tier: board.tier,
@@ -126,5 +233,8 @@ export function inferCapabilities(
       active: null,
     },
     display,
+    videoLocalTap,
+    videoRecording,
+    uiTheme,
   };
 }

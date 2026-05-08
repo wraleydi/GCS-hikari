@@ -139,13 +139,63 @@ export interface FeatureState {
  * category="display"; infer-capabilities maps it to this shape so
  * the Hardware tab can render a status card and the drone card can
  * show an "LCD" pill next to the role badge.
+ *
+ * The live-state fields (touchCalibrated, activePage, lastTouchAt,
+ * lastGesture, snapshotUrl) are populated from top-level heartbeat
+ * keys, not from the peripheral's extra blob, so they refresh every
+ * heartbeat without depending on a peripheral re-enumeration.
  */
+export type LcdGesture = "tap" | "long_press" | "swipe" | "drag";
+
 export interface AttachedDisplay {
   type: "spi-lcd" | "hdmi" | "none";
   controller?: string;
   hasTouch?: boolean;
   resolution?: string;
   rotation?: number;
+  /** True once the touch panel has been calibrated against the
+   * current rotation. Reflected in the agent's persistent display
+   * config. Undefined for legacy heartbeats. */
+  touchCalibrated?: boolean;
+  /** Currently rendered page on the local LCD. Free-form string so
+   * a future agent can add new pages without a GCS-side enum bump.
+   * Examples: "dashboard" | "video" | "settings" | "more" |
+   * "details.radio_link". */
+  activePage?: string;
+  /** Epoch milliseconds of the most recent touch event the agent
+   * processed. Used by the Display sub-view to surface "last touch
+   * Xs ago" without polling a separate endpoint. */
+  lastTouchAt?: number;
+  /** Most recent gesture the agent's touch input bridge classified.
+   * "tap" / "long_press" / "swipe" / "drag" matches the agent
+   * gesture taxonomy; anything else falls through as undefined. */
+  lastGesture?: LcdGesture;
+  /** Absolute URL to the agent's display snapshot endpoint. Returns
+   * a PNG of the current framebuffer when polled. Lets the GCS show
+   * a thumbnail without holding a video stream open. */
+  snapshotUrl?: string;
+}
+
+/**
+ * Snapshot of the agent's local-display video appsink tap. When the
+ * companion board is rendering video to a bound LCD, the agent's
+ * GStreamer pipeline forks a low-FPS appsink whose state we surface
+ * here so the GCS can show "decoding via mppvideodec at 30 fps" in
+ * the Hardware tab and the Video sub-view.
+ */
+export interface VideoLocalTap {
+  /** True when the local appsink is producing frames. False when
+   * the pipeline has paused the local tap (e.g. video recording is
+   * the only active sink, or the LCD is off). Undefined for legacy
+   * heartbeats that predate the local tap. */
+  active?: boolean;
+  /** Hardware decoder element name in the agent's pipeline.
+   * Examples: "mppvideodec" (Rockchip), "v4l2h264dec" (Pi),
+   * "avdec_h264" (software fallback). */
+  decoderType?: string;
+  /** Frames per second the local appsink is emitting. Used as the
+   * refresh metric in the Hardware tab. */
+  fps?: number;
 }
 
 export interface AgentCapabilities {
@@ -174,6 +224,18 @@ export interface AgentCapabilities {
    * display is bound on the agent side. Absent on stock drone or
    * headless ground-station builds. */
   display?: AttachedDisplay;
+  /** Optional. State of the agent's local-LCD video appsink tap.
+   * Undefined when the agent does not bind a local display or has
+   * not yet shipped local-tap support. */
+  videoLocalTap?: VideoLocalTap;
+  /** Optional. True when the agent is currently recording the main
+   * video stream to disk. Drives the "REC" badge on the drone card
+   * and the recording status pill in the Video sub-view. */
+  videoRecording?: boolean;
+  /** Optional. Theme the operator picked for the local LCD UI. The
+   * GCS mirrors this back into the WelcomeModal preference flow so
+   * the drone and the desktop stay in sync. */
+  uiTheme?: "dark" | "light";
 }
 
 // ── Detection Data (for vision overlay) ──────────────────

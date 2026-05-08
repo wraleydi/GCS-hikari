@@ -279,10 +279,44 @@ export function CloudStatusBridge() {
     // /api/capabilities (notably the lightweight Rust backend at v0.1) would
     // silently fall back to runtimeMode="full".
     const capState = useAgentCapabilitiesStore.getState();
-    const radioFromHeartbeat = (cloudStatus as { radio?: unknown }).radio;
+    const cloudRecord = cloudStatus as Record<string, unknown>;
+    const radioFromHeartbeat = cloudRecord.radio;
+
+    // Top-level heartbeat extras the agent forwards every tick. These
+    // refresh the LCD live state (active page, last touch, snapshot
+    // URL) and the local video tap snapshot independent of any
+    // peripheral re-enumeration. Pull them once and reuse on both
+    // the first-load and steady-state paths so the store always
+    // mirrors the latest heartbeat.
+    const heartbeatExtras: Parameters<typeof inferCapabilities>[2] = {
+      lcdActivePage: cloudRecord.lcdActivePage as string | null | undefined,
+      lcdTouchCalibrated: cloudRecord.lcdTouchCalibrated as
+        | boolean
+        | null
+        | undefined,
+      lcdRotation: cloudRecord.lcdRotation as number | null | undefined,
+      lcdSnapshotUrl: cloudRecord.lcdSnapshotUrl as string | null | undefined,
+      lcdLastTouchAt: cloudRecord.lcdLastTouchAt as number | null | undefined,
+      lcdLastGesture: cloudRecord.lcdLastGesture as string | null | undefined,
+      videoLocalDecoderActive: cloudRecord.videoLocalDecoderActive as
+        | boolean
+        | null
+        | undefined,
+      videoLocalDecoderType: cloudRecord.videoLocalDecoderType as
+        | string
+        | null
+        | undefined,
+      videoLocalDecoderFps: cloudRecord.videoLocalDecoderFps as
+        | number
+        | null
+        | undefined,
+      videoRecording: cloudRecord.videoRecording as boolean | null | undefined,
+      uiTheme: cloudRecord.uiTheme as string | null | undefined,
+    };
+
     if (!capState.loaded || capState.cameras.length === 0) {
       const peripherals = useAgentPeripheralsStore.getState().peripherals;
-      const inferred = inferCapabilities(mapped, peripherals);
+      const inferred = inferCapabilities(mapped, peripherals, heartbeatExtras);
       if (inferred) {
         const runtimeMode: "full" | "lite" =
           cloudStatus.runtimeMode === "lite" ? "lite" : "full";
@@ -303,11 +337,21 @@ export function CloudStatusBridge() {
         if (radioFromHeartbeat !== undefined) payload.radio = radioFromHeartbeat;
         useAgentCapabilitiesStore.getState().setCapabilities(payload);
       }
-    } else if (radioFromHeartbeat !== undefined) {
-      // Capabilities are already loaded but the radio block can change
-      // every heartbeat (TX power adjustments, RSSI ticks, FEC counters).
-      // Re-run setCapabilities with the existing capability snapshot so
-      // the radio normalizer fires without losing other fields.
+    } else {
+      // Capabilities are already loaded but several heartbeat-derived
+      // fields change every tick: the radio block (TX power, RSSI,
+      // FEC counters), the LCD live state (active page, last touch,
+      // snapshot URL), and the local video tap (decoder fps,
+      // recording flag). Re-merge the heartbeat-derived view of
+      // those fields into the existing capability snapshot so the
+      // normalizer fires without losing the deeper fields the agent
+      // doesn't repeat every tick (cameras, compute, models).
+      const peripherals = useAgentPeripheralsStore.getState().peripherals;
+      const reInferred = inferCapabilities(mapped, peripherals, heartbeatExtras);
+      const reInferredDisplay = reInferred?.display;
+      const mergedDisplay = reInferredDisplay
+        ? reInferredDisplay
+        : capState.display;
       useAgentCapabilitiesStore.getState().setCapabilities({
         tier: capState.tier,
         cameras: capState.cameras,
@@ -318,8 +362,11 @@ export function CloudStatusBridge() {
         runtimeMode: capState.runtimeMode,
         setupState: capState.setupState,
         profileSource: capState.profileSource,
-        display: capState.display,
-        radio: radioFromHeartbeat,
+        display: mergedDisplay,
+        videoLocalTap: reInferred?.videoLocalTap ?? capState.videoLocalTap,
+        videoRecording: reInferred?.videoRecording ?? capState.videoRecording,
+        uiTheme: reInferred?.uiTheme ?? capState.uiTheme,
+        ...(radioFromHeartbeat !== undefined ? { radio: radioFromHeartbeat } : {}),
       } as Record<string, unknown>);
     }
 

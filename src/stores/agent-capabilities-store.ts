@@ -246,6 +246,30 @@ function normalizeCapabilities(raw: unknown): AgentCapabilities {
       ? (displayCandidate as AgentCapabilities["display"])
       : undefined;
 
+  // Pass-through: local video tap state. infer-capabilities builds
+  // this block from the heartbeat top-level keys; an agent that
+  // ships a /api/capabilities surface in the future can also
+  // populate it directly.
+  const videoLocalTapCandidate = (raw as { videoLocalTap?: unknown })
+    .videoLocalTap;
+  const videoLocalTap =
+    videoLocalTapCandidate && typeof videoLocalTapCandidate === "object"
+      ? (videoLocalTapCandidate as AgentCapabilities["videoLocalTap"])
+      : undefined;
+
+  const videoRecordingCandidate = (raw as { videoRecording?: unknown })
+    .videoRecording;
+  const videoRecording =
+    typeof videoRecordingCandidate === "boolean"
+      ? videoRecordingCandidate
+      : undefined;
+
+  const uiThemeCandidate = (raw as { uiTheme?: unknown }).uiTheme;
+  const uiTheme: AgentCapabilities["uiTheme"] =
+    uiThemeCandidate === "dark" || uiThemeCandidate === "light"
+      ? uiThemeCandidate
+      : undefined;
+
   return {
     tier: Number(data.tier ?? 0),
     cameras,
@@ -254,6 +278,9 @@ function normalizeCapabilities(raw: unknown): AgentCapabilities {
     models,
     features: normalizeFeatures(data.features),
     display,
+    videoLocalTap,
+    videoRecording,
+    uiTheme,
   };
 }
 
@@ -279,6 +306,18 @@ interface AgentCapabilitiesState {
   /** Local panel attached to the companion board (e.g. SPI LCD on a
    * ground-station node). Undefined when no display is bound. */
   display: AgentCapabilities["display"];
+  /** Snapshot of the agent's local-LCD video appsink tap. Undefined
+   * when the agent hasn't shipped local-tap support, or no display
+   * is bound. Stays defined with active=false when the tap is
+   * explicitly paused. */
+  videoLocalTap: AgentCapabilities["videoLocalTap"];
+  /** True when the agent is currently recording the main video
+   * stream to disk. Undefined for agents that predate the recording
+   * surface. */
+  videoRecording: AgentCapabilities["videoRecording"];
+  /** Theme the operator picked for the local LCD UI. Undefined when
+   * the agent has no LCD or hasn't reported a theme yet. */
+  uiTheme: AgentCapabilities["uiTheme"];
   /** Air-side WFB-ng radio snapshot. Null when the agent does not
    * advertise a radio service (drone has no air-side adapter, or runs
    * a profile without WFB-ng). Populated from the cloud heartbeat or
@@ -313,6 +352,9 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
   setupState: undefined,
   profileSource: undefined,
   display: undefined,
+  videoLocalTap: undefined,
+  videoRecording: undefined,
+  uiTheme: undefined,
   radio: null,
   loaded: false,
 
@@ -366,6 +408,9 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       setupState,
       profileSource,
       display: normalized.display,
+      videoLocalTap: normalized.videoLocalTap,
+      videoRecording: normalized.videoRecording,
+      uiTheme: normalized.uiTheme,
       radio,
       loaded: true,
     });
@@ -405,6 +450,9 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       setupState: undefined,
       profileSource: undefined,
       display: undefined,
+      videoLocalTap: undefined,
+      videoRecording: undefined,
+      uiTheme: undefined,
       radio: null,
       loaded: false,
     });
