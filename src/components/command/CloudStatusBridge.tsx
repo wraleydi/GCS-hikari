@@ -282,6 +282,29 @@ export function CloudStatusBridge() {
     const cloudRecord = cloudStatus as Record<string, unknown>;
     const radioFromHeartbeat = cloudRecord.radio;
 
+    // Heartbeat health surfaces forwarded into the capability store so
+    // panels can react without re-querying. Each is forward-permissive:
+    // if the agent omits the field on a given heartbeat, the store
+    // keeps the prior value (the underlying setter handles the merge).
+    const videoRestartAttempts =
+      typeof cloudRecord.videoRestartAttempts === "number" &&
+      Number.isFinite(cloudRecord.videoRestartAttempts as number) &&
+      (cloudRecord.videoRestartAttempts as number) >= 0
+        ? Math.floor(cloudRecord.videoRestartAttempts as number)
+        : 0;
+    const foxgloveBindFailed = cloudRecord.foxgloveBindFailed === true;
+    const pairingCodeExpiresAt =
+      typeof cloudRecord.pairingCodeExpiresAt === "number" &&
+      Number.isFinite(cloudRecord.pairingCodeExpiresAt as number) &&
+      (cloudRecord.pairingCodeExpiresAt as number) > 0
+        ? (cloudRecord.pairingCodeExpiresAt as number)
+        : null;
+    const mavlinkWsUrlPrev =
+      typeof cloudRecord.mavlinkWsUrlPrev === "string" &&
+      (cloudRecord.mavlinkWsUrlPrev as string).length > 0
+        ? (cloudRecord.mavlinkWsUrlPrev as string)
+        : null;
+
     // Top-level heartbeat extras the agent forwards every tick. These
     // refresh the LCD live state (active page, last touch, snapshot
     // URL) and the local video tap snapshot independent of any
@@ -331,6 +354,10 @@ export function CloudStatusBridge() {
         const payload: Record<string, unknown> = {
           ...inferred,
           runtimeMode,
+          videoRestartAttempts,
+          foxgloveBindFailed,
+          pairingCodeExpiresAt,
+          mavlinkWsUrlPrev,
         };
         if (setupState !== undefined) payload.setupState = setupState;
         if (profileSource !== undefined) payload.profileSource = profileSource;
@@ -366,6 +393,10 @@ export function CloudStatusBridge() {
         videoLocalTap: reInferred?.videoLocalTap ?? capState.videoLocalTap,
         videoRecording: reInferred?.videoRecording ?? capState.videoRecording,
         uiTheme: reInferred?.uiTheme ?? capState.uiTheme,
+        videoRestartAttempts,
+        foxgloveBindFailed,
+        pairingCodeExpiresAt,
+        mavlinkWsUrlPrev,
         ...(radioFromHeartbeat !== undefined ? { radio: radioFromHeartbeat } : {}),
       } as Record<string, unknown>);
     }
