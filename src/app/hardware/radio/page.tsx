@@ -13,17 +13,19 @@ import { useTranslations } from "next-intl";
 import { PageIntro } from "@/components/hardware/PageIntro";
 import { HintChip } from "@/components/hardware/HintChip";
 import { RadioPanel } from "@/components/hardware/RadioPanel";
+import { VideoLinkPanel } from "@/components/hardware/VideoLinkPanel";
 
 export default function HardwareRadioPage() {
   const t = useTranslations("hardware.radio");
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-3">
       <PageIntro
         title={t("title")}
         description={t("description")}
         trailing={<HintChip>{t("topology.label")}</HintChip>}
       />
       <RadioPanel />
+      <VideoLinkPanel />
     </div>
   );
 }

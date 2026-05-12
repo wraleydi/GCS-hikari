@@ -502,6 +502,57 @@ export class AgentClient {
     );
   }
 
+  /** Live snapshot of the adaptive bitrate / FEC / radio config.
+   *
+   * Drives the GCS Video Link panel and the closed-loop adaptation
+   * surface. Returns a stable shape with three blocks (radio,
+   * encoder, adaptive) so the UI can render without a schema
+   * migration when an additional metric is added. Returns null on
+   * older agents that lack the endpoint. */
+  async getVideoConfig(): Promise<unknown | null> {
+    try {
+      return await this.request<unknown>("/api/video/config");
+    } catch {
+      return null;
+    }
+  }
+
+  /** Apply zero or more video / radio tuning knobs. Each field is
+   * optional; the agent applies them independently. Returns the
+   * same shape as getVideoConfig() so callers can refresh state
+   * from a single response. */
+  async setVideoConfig(
+    body: Partial<{
+      bitrate_kbps: number;
+      fec_k: number;
+      fec_n: number;
+      mcs: number;
+      auto: boolean;
+      tier_idx: number;
+    }>,
+  ): Promise<unknown | null> {
+    try {
+      return await this.request<unknown>("/api/video/config", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  /** Glass-to-glass video latency reading sourced from the SEI
+   * probe on the drone-side LocalVideoTap. Returns null when the
+   * probe is disabled (WfbConfig.sei_latency = false) or no
+   * samples have arrived yet. */
+  async getVideoLatency(): Promise<unknown | null> {
+    try {
+      return await this.request<unknown>("/api/video/latency");
+    } catch {
+      return null;
+    }
+  }
+
   /** Start recording on the agent. Drone profile uses `/api/video/record/start`;
    * ground-station profile uses the same shape under `/api/v1/ground-station/`.
    * The drone-profile route is picked here as the default; callers can branch
