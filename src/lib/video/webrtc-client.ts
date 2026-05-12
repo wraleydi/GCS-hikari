@@ -196,8 +196,53 @@ export async function startStream(
       }
     };
 
-    // Receive-only transceiver
-    localPc.addTransceiver("video", { direction: "recvonly" });
+    // Receive-only transceiver. Capture the video transceiver so the
+    // receiver-side playout hints can be set before negotiation begins.
+    //
+    // playoutDelayHint=0: chrome.webrtc-internals shows that the
+    // default RTCRtpReceiver targets a playout buffer in the 100-200 ms
+    // range for live streams. With a healthy LAN link this is pure
+    // latency tax; the value is treated as a hint (not a hard
+    // ceiling) so the stack still grows the buffer if jitter
+    // demands it. Browsers that don't implement the property ignore
+    // the assignment (silent no-op via property check).
+    //
+    // jitterBufferTarget=50: Chrome-only and experimental, sets a
+    // preferred lower bound on the jitter buffer in ms. 50 ms is the
+    // FPV-grade default; on a flaky link the buffer still expands
+    // automatically. Strictly additive to playoutDelayHint.
+    //
+    // Distinct from the previously-removed mungeForLowLatency() SDP
+    // hack (lines below). That mechanism pinned Chrome's MINIMUM
+    // jitter buffer via the conference flag and caused decoder
+    // stalls on WiFi reordering. These are *receiver-side runtime
+    // properties* — they suggest a target without forcing a hard
+    // floor — so the failure mode of the prior approach does not
+    // apply.
+    const videoTransceiver = localPc.addTransceiver("video", {
+      direction: "recvonly",
+    });
+    try {
+      const recv = videoTransceiver.receiver as RTCRtpReceiver & {
+        playoutDelayHint?: number;
+        jitterBufferTarget?: number;
+      };
+      if ("playoutDelayHint" in recv) {
+        recv.playoutDelayHint = 0;
+      }
+      if ("jitterBufferTarget" in recv) {
+        recv.jitterBufferTarget = 50;
+      }
+    } catch (err) {
+      // Browser without the receiver-side hint API — log once and
+      // continue. Default Chrome / Edge / Opera support it; older
+      // Firefox and Safari builds fall back to their internal
+      // defaults.
+      console.debug(
+        "[webrtc-client] receiver-side latency hints unavailable",
+        err,
+      );
+    }
     localPc.addTransceiver("audio", { direction: "recvonly" });
 
     const offer = await abortable(localPc.createOffer(), signal);
