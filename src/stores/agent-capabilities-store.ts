@@ -311,6 +311,14 @@ interface AgentCapabilitiesState {
   /** How the agent landed on its current profile. Undefined for legacy
    * heartbeats. See AgentCapabilities.profileSource for the value set. */
   profileSource?: string;
+  /** Node deployment category. "drone" or "ground-station" today,
+   * "compute" / "lite" in the future. Defaults to "drone" when the
+   * heartbeat omits the field (older agents). Drives Command-tab
+   * panel selection and tab visibility per node. */
+  profile: "drone" | "ground-station" | "compute" | "lite";
+  /** Ground-station role when applicable. Null on drones and
+   * compute nodes, undefined on agents that predate the field. */
+  role?: "direct" | "relay" | "receiver" | null;
   /** Local panel attached to the companion board (e.g. SPI LCD on a
    * ground-station node). Undefined when no display is bound. */
   display: AgentCapabilities["display"];
@@ -381,6 +389,8 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
   runtimeMode: "full",
   setupState: undefined,
   profileSource: undefined,
+  profile: "drone",
+  role: undefined,
   display: undefined,
   videoLocalTap: undefined,
   videoRecording: undefined,
@@ -424,6 +434,29 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       (caps as { profile_source?: unknown }).profile_source;
     const profileSource =
       typeof rawProfileSource === "string" ? rawProfileSource : undefined;
+
+    // Wire-contract identity. Profile is "drone" or "ground-station"
+    // (hyphen form) coming off the heartbeat. Older agents that omit
+    // the field default to drone. Role applies only to ground-station
+    // nodes; on drones it's null. Accept snake_case and camelCase.
+    const rawProfile =
+      (caps as { profile?: unknown }).profile ??
+      (caps as { node_profile?: unknown }).node_profile;
+    const profile: "drone" | "ground-station" | "compute" | "lite" =
+      rawProfile === "ground-station" ||
+      rawProfile === "compute" ||
+      rawProfile === "lite"
+        ? rawProfile
+        : "drone";
+    const rawRole = (caps as { role?: unknown }).role;
+    const role: "direct" | "relay" | "receiver" | null | undefined =
+      rawRole === "direct" ||
+      rawRole === "relay" ||
+      rawRole === "receiver"
+        ? rawRole
+        : rawRole === null
+          ? null
+          : undefined;
 
     // Air-side radio snapshot. Field name is camelCase here. The cloud
     // relay action remaps the agent's snake_case wire keys before the
@@ -504,6 +537,8 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       runtimeMode,
       setupState,
       profileSource,
+      profile,
+      role: role === undefined ? state.role : role,
       display: normalized.display,
       videoLocalTap: normalized.videoLocalTap,
       videoRecording: normalized.videoRecording,
@@ -567,6 +602,8 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       runtimeMode: "full",
       setupState: undefined,
       profileSource: undefined,
+      profile: "drone",
+      role: undefined,
       display: undefined,
       videoLocalTap: undefined,
       videoRecording: undefined,

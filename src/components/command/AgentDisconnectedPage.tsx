@@ -2,176 +2,41 @@
 
 /**
  * @module AgentDisconnectedPage
- * @description Pairing-first page shown when no agent is connected.
- * Composes the pairing code card, discovered agents list, feature grid,
- * and requirements footer.
+ * @description Pairing-first page shown when no agent is selected.
+ * Local-first by design: the Add-a-Node card lets the operator
+ * pair any agent on the LAN without signing in. The cloud
+ * pairing-code card is available behind the "Sign in for remote
+ * access" branch but is never a gate.
  * @license GPL-3.0-only
  */
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { AlertTriangle } from "lucide-react";
-import { useMutation } from "convex/react";
 import { useConvexAvailable } from "@/app/ConvexClientProvider";
-import { cmdPairingApi } from "@/lib/community-api-drones";
-import { usePairingStore } from "@/stores/pairing-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { SignInModal } from "@/components/auth/SignInModal";
-import {
-  PairingCodeCard,
-  getInstallCommand,
-} from "./disconnected/PairingCodeCard";
-import { DiscoveredAgentsList } from "./disconnected/DiscoveredAgentsList";
+import { AddNodeCard } from "./disconnected/AddNodeCard";
+import { CloudPairingCodeSection } from "./disconnected/CloudPairingCodeSection";
 import { FeatureGrid } from "./disconnected/FeatureGrid";
 import { RequirementsFooter } from "./disconnected/RequirementsFooter";
-
-const CODE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
 interface AgentDisconnectedPageProps {
   onOpenPairing?: () => void;
 }
 
-type PreGenerateMutation = ((args: Record<string, never>) => Promise<{
-  code: string;
-}>) | null;
-
 export function AgentDisconnectedPage({
   onOpenPairing,
 }: AgentDisconnectedPageProps) {
-  const convexAvailable = useConvexAvailable();
-  if (convexAvailable) {
-    return <AgentDisconnectedPageWithConvex onOpenPairing={onOpenPairing} />;
-  }
-  return (
-    <AgentDisconnectedPageBase
-      onOpenPairing={onOpenPairing}
-      preGenerate={null}
-      requiresSignIn={false}
-    />
-  );
-}
-
-function AgentDisconnectedPageWithConvex({
-  onOpenPairing,
-}: AgentDisconnectedPageProps) {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const isAuthLoading = useAuthStore((s) => s.isLoading);
-  const preGenerate = useMutation(cmdPairingApi.preGenerateCode);
-  return (
-    <AgentDisconnectedPageBase
-      onOpenPairing={onOpenPairing}
-      preGenerate={isAuthenticated ? (preGenerate as PreGenerateMutation) : null}
-      requiresSignIn={!isAuthenticated && !isAuthLoading}
-    />
-  );
-}
-
-function AgentDisconnectedPageBase({
-  onOpenPairing,
-  preGenerate,
-  requiresSignIn,
-}: AgentDisconnectedPageProps & {
-  preGenerate: PreGenerateMutation;
-  requiresSignIn: boolean;
-}) {
   const t = useTranslations("disconnectedPage");
-
-  const [code, setCode] = useState<string | null>(null);
-  const [copiedCode, setCopiedCode] = useState(false);
-  const [copiedInstall, setCopiedInstall] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(CODE_TTL_MS / 1000);
-  const [expired, setExpired] = useState(false);
-  const [codeError, setCodeError] = useState<string | null>(null);
+  const convexAvailable = useConvexAvailable();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [signInOpen, setSignInOpen] = useState(false);
 
-  const expiryRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const codeGeneratedAt = useRef<number>(0);
-
-  const discoveredAgents = usePairingStore((s) => s.discoveredAgents);
-
-  const generateCode = useCallback(async () => {
-    setExpired(false);
-    setCopiedCode(false);
-    setCopiedInstall(false);
-    setCodeError(null);
-
-    const fallback = () =>
-      Array.from(
-        { length: 6 },
-        () =>
-          "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[Math.floor(Math.random() * 32)]
-      ).join("");
-
-    let generated: string;
-    if (preGenerate) {
-      try {
-        const result = await preGenerate({});
-        generated = result.code;
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        setCodeError(msg);
-        setCode(null);
-        return;
-      }
-    } else {
-      generated = fallback();
-    }
-
-    setCode(generated);
-    codeGeneratedAt.current = Date.now();
-    setSecondsLeft(CODE_TTL_MS / 1000);
-
-    // Start countdown
-    if (expiryRef.current) clearInterval(expiryRef.current);
-    expiryRef.current = setInterval(() => {
-      const elapsed = Date.now() - codeGeneratedAt.current;
-      const remaining = Math.max(
-        0,
-        Math.ceil((CODE_TTL_MS - elapsed) / 1000)
-      );
-      setSecondsLeft(remaining);
-      if (remaining <= 0) {
-        setExpired(true);
-        if (expiryRef.current) clearInterval(expiryRef.current);
-      }
-    }, 1000);
-  }, [preGenerate]);
-
-  // Generate code on mount, but only when pairing is actually possible.
-  // When `requiresSignIn` is true, we show a sign-in CTA instead and never
-  // fire the mutation that would throw "Not authenticated" server-side.
-  useEffect(() => {
-    if (requiresSignIn) return;
-    let cancelled = false;
-    void Promise.resolve().then(() => {
-      if (!cancelled) void generateCode();
-    });
-    return () => {
-      cancelled = true;
-      if (expiryRef.current) clearInterval(expiryRef.current);
-    };
-  }, [generateCode, requiresSignIn]);
-
-  function handleCopyCode() {
-    if (!code) return;
-    navigator.clipboard
-      .writeText(code)
-      .then(() => {
-        setCopiedCode(true);
-        setTimeout(() => setCopiedCode(false), 2000);
-      })
-      .catch(() => {});
-  }
-
-  function handleCopyInstall() {
-    if (!code) return;
-    navigator.clipboard
-      .writeText(getInstallCommand(code))
-      .then(() => {
-        setCopiedInstall(true);
-        setTimeout(() => setCopiedInstall(false), 2000);
-      })
-      .catch(() => {});
+  function handlePaired(_deviceId: string) {
+    // The local-nodes-store has the new entry. Notify the parent
+    // so it can refresh the fleet sidebar selection if needed.
+    onOpenPairing?.();
   }
 
   return (
@@ -191,27 +56,21 @@ function AgentDisconnectedPageBase({
           </p>
         </div>
 
-        {/* Pairing code hero */}
+        {/* Add a node — local first, no auth gate */}
         <div className="max-w-md mx-auto">
-          <PairingCodeCard
-            requiresSignIn={requiresSignIn}
-            codeError={codeError}
-            code={code}
-            expired={expired}
-            secondsLeft={secondsLeft}
-            copiedCode={copiedCode}
-            copiedInstall={copiedInstall}
+          <AddNodeCard
+            cloudAvailable={convexAvailable}
             onSignIn={() => setSignInOpen(true)}
-            onRegenerate={generateCode}
-            onCopyCode={handleCopyCode}
-            onCopyInstall={handleCopyInstall}
+            onPaired={handlePaired}
           />
         </div>
 
-        <DiscoveredAgentsList
-          agents={discoveredAgents}
-          onSelect={onOpenPairing}
-        />
+        {/* Cloud pair code — only when signed in. Optional path. */}
+        {convexAvailable && isAuthenticated && (
+          <div className="max-w-md mx-auto">
+            <CloudPairingCodeSection />
+          </div>
+        )}
 
         <FeatureGrid />
 

@@ -388,6 +388,16 @@ export function CloudStatusBridge() {
           typeof cloudStatus.profileSource === "string"
             ? cloudStatus.profileSource
             : undefined;
+        const profile =
+          typeof cloudRecord.profile === "string"
+            ? (cloudRecord.profile as string)
+            : undefined;
+        const role =
+          typeof cloudRecord.role === "string"
+            ? (cloudRecord.role as string)
+            : cloudRecord.role === null
+              ? null
+              : undefined;
         const payload: Record<string, unknown> = {
           ...inferred,
           runtimeMode,
@@ -399,6 +409,8 @@ export function CloudStatusBridge() {
         };
         if (setupState !== undefined) payload.setupState = setupState;
         if (profileSource !== undefined) payload.profileSource = profileSource;
+        if (profile !== undefined) payload.profile = profile;
+        if (role !== undefined) payload.role = role;
         if (radioFromHeartbeat !== undefined) payload.radio = radioFromHeartbeat;
         if (videoPipeline !== undefined) payload.videoPipeline = videoPipeline;
         useAgentCapabilitiesStore.getState().setCapabilities(payload);
@@ -418,6 +430,16 @@ export function CloudStatusBridge() {
       const mergedDisplay = reInferredDisplay
         ? reInferredDisplay
         : capState.display;
+      const reMergedProfile =
+        typeof cloudRecord.profile === "string"
+          ? (cloudRecord.profile as string)
+          : capState.profile;
+      const reMergedRole =
+        typeof cloudRecord.role === "string"
+          ? (cloudRecord.role as string)
+          : cloudRecord.role === null
+            ? null
+            : capState.role;
       useAgentCapabilitiesStore.getState().setCapabilities({
         tier: capState.tier,
         cameras: capState.cameras,
@@ -428,6 +450,8 @@ export function CloudStatusBridge() {
         runtimeMode: capState.runtimeMode,
         setupState: capState.setupState,
         profileSource: capState.profileSource,
+        profile: reMergedProfile,
+        role: reMergedRole,
         display: mergedDisplay,
         videoLocalTap: reInferred?.videoLocalTap ?? capState.videoLocalTap,
         videoRecording: reInferred?.videoRecording ?? capState.videoRecording,

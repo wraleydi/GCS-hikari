@@ -1,0 +1,224 @@
+"use client";
+
+/**
+ * @module AddNodeCard
+ * @description Local-first entry point for adding any ADOS node
+ * (drone agent, ground station, future compute) to the GCS.
+ * Replaces the previous sign-in-gated pairing card. Three branches:
+ *
+ *  1. Paste hostname / URL → probe → confirm → pair locally.
+ *  2. Install agent (copy the install one-liner).
+ *  3. Sign in for cloud / remote access (opt-in, never blocking).
+ * @license GPL-3.0-only
+ */
+
+import { useEffect, useRef, useState } from "react";
+import {
+  ChevronRight,
+  CloudOff,
+  Copy,
+  Check,
+  Loader2,
+  Plus,
+  Radio,
+  Search,
+} from "lucide-react";
+import { probeAgent, type ProbeResult } from "@/lib/agent/local-pair-client";
+import { ProbeResultCard } from "./ProbeResultCard";
+
+const INSTALL_URL =
+  "https://raw.githubusercontent.com/altnautica/ADOSDroneAgent/main/scripts/install.sh";
+const INSTALL_COMMAND = `curl -sSL ${INSTALL_URL} | sudo bash`;
+
+interface AddNodeCardProps {
+  /** Whether to show the sign-in branch (cloud features available). */
+  cloudAvailable: boolean;
+  /** Opens the cloud sign-in modal. */
+  onSignIn: () => void;
+  /** Fired after a successful local pair. Parent can navigate. */
+  onPaired?: (deviceId: string) => void;
+}
+
+export function AddNodeCard({
+  cloudAvailable,
+  onSignIn,
+  onPaired,
+}: AddNodeCardProps) {
+  const [host, setHost] = useState("");
+  const [probing, setProbing] = useState(false);
+  const [probe, setProbe] = useState<ProbeResult | null>(null);
+  const [probeError, setProbeError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, []);
+
+  async function handleProbe() {
+    if (!host.trim() || probing) return;
+    setProbeError(null);
+    setProbe(null);
+    setProbing(true);
+    abortRef.current?.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+    try {
+      const result = await probeAgent(host, ctrl.signal);
+      setProbe(result);
+    } catch (e) {
+      if (ctrl.signal.aborted) return;
+      const msg =
+        e instanceof Error
+          ? e.message
+          : "Could not reach that address. Check the agent is running and on the same network.";
+      setProbeError(msg);
+    } finally {
+      if (!ctrl.signal.aborted) setProbing(false);
+    }
+  }
+
+  function handleKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      void handleProbe();
+    }
+  }
+
+  async function handleCopyInstall() {
+    try {
+      await navigator.clipboard.writeText(INSTALL_COMMAND);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard rejection is non-fatal
+    }
+  }
+
+  if (probe) {
+    return (
+      <ProbeResultCard
+        probe={probe}
+        onPaired={(deviceId) => {
+          setProbe(null);
+          setHost("");
+          onPaired?.(deviceId);
+        }}
+        onCancel={() => {
+          setProbe(null);
+        }}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Pair-by-link branch */}
+      <div className="p-5 bg-bg-secondary border border-border-default rounded-lg space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-accent-primary/10 flex items-center justify-center">
+            <Radio size={14} className="text-accent-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-text-primary">Pair a node on your LAN</p>
+            <p className="text-[10px] text-text-tertiary">
+              No account required. Works fully offline.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={host}
+            onChange={(e) => setHost(e.target.value)}
+            onKeyDown={handleKey}
+            placeholder="skynode.local  or  http://192.168.1.42:8080"
+            disabled={probing}
+            className="flex-1 px-3 py-2 bg-bg-primary border border-border-default rounded text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent-primary disabled:opacity-50"
+            autoFocus
+          />
+          <button
+            onClick={handleProbe}
+            disabled={probing || !host.trim()}
+            className="px-3 py-2 text-xs font-medium bg-accent-primary text-white rounded hover:bg-accent-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+          >
+            {probing ? (
+              <>
+                <Loader2 size={12} className="animate-spin" />
+                Probing
+              </>
+            ) : (
+              <>
+                <Search size={12} />
+                Probe
+              </>
+            )}
+          </button>
+        </div>
+
+        {probeError && (
+          <p className="text-xs text-status-error">{probeError}</p>
+        )}
+      </div>
+
+      {/* Install-a-new-agent branch */}
+      <div className="p-5 bg-bg-secondary border border-border-default rounded-lg space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-bg-tertiary flex items-center justify-center">
+            <Plus size={14} className="text-text-secondary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-text-primary">Install a new agent</p>
+            <p className="text-[10px] text-text-tertiary">
+              Run this on the SBC, then paste the hostname above.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-start gap-2 p-3 bg-bg-primary border border-border-default rounded">
+          <code className="flex-1 text-xs font-mono text-text-secondary leading-relaxed break-all select-all">
+            {INSTALL_COMMAND}
+          </code>
+          <button
+            onClick={handleCopyInstall}
+            className="p-1.5 text-text-tertiary hover:text-text-primary transition-colors shrink-0"
+            title="Copy install command"
+          >
+            {copied ? (
+              <Check size={14} className="text-status-success" />
+            ) : (
+              <Copy size={14} />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Cloud sign-in branch — optional, never blocking */}
+      <button
+        onClick={onSignIn}
+        disabled={!cloudAvailable}
+        className="w-full p-4 bg-bg-secondary border border-border-default rounded-lg text-left hover:bg-bg-tertiary transition-colors disabled:opacity-40 disabled:cursor-not-allowed group"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-bg-tertiary flex items-center justify-center">
+            <CloudOff size={14} className="text-text-secondary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-text-primary">
+              Sign in for remote access
+            </p>
+            <p className="text-[10px] text-text-tertiary">
+              Optional. Lets you reach a paired node from outside your LAN.
+            </p>
+          </div>
+          <ChevronRight
+            size={14}
+            className="text-text-tertiary group-hover:text-text-secondary transition-colors"
+          />
+        </div>
+      </button>
+    </div>
+  );
+}

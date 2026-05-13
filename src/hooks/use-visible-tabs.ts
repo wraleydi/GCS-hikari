@@ -21,6 +21,7 @@ export function useVisibleTabs(): CommandSubTab[] {
   const npuAvailable = useAgentCapabilitiesStore((s) => s.compute.npu_available);
   const ros2State = useAgentCapabilitiesStore((s) => s.ros2State);
   const runtimeMode = useAgentCapabilitiesStore((s) => s.runtimeMode);
+  const profile = useAgentCapabilitiesStore((s) => s.profile);
 
   return useMemo(() => {
     const tabs: CommandSubTab[] = ["overview", "features"];
@@ -31,11 +32,16 @@ export function useVisibleTabs(): CommandSubTab[] {
     // the running backend cannot serve.
     const isLite = runtimeMode === "lite";
 
+    // Ground stations don't fly. Drop tabs that only make sense on a
+    // node that flies a vehicle. Compute nodes get their own panel
+    // tree (handled at the panel level, not here).
+    const isGroundStation = profile === "ground-station";
+
     // Show Smart Modes tab when:
     // 1. At least one smart-mode or vision-requiring feature is enabled
     // 2. Camera is detected
     // 3. NPU or sufficient tier exists
-    if (loaded && !isLite) {
+    if (loaded && !isLite && !isGroundStation) {
       const hasSmartMode = enabledFeatures.some((id) => {
         const feat = FEATURE_CATALOG[id];
         return feat?.type === "smart-mode" || feat?.visionBehavior;
@@ -49,15 +55,15 @@ export function useVisibleTabs(): CommandSubTab[] {
     }
 
     // Show ROS tab when agent reports ROS support (any state except "absent")
-    // and is not the lite backend.
-    if (loaded && !isLite && ros2State !== "absent") {
+    // and is not the lite backend. ROS doesn't run on ground stations.
+    if (loaded && !isLite && !isGroundStation && ros2State !== "absent") {
       tabs.push("ros");
     }
 
     tabs.push("system");
-    if (!isLite) {
+    if (!isLite && !isGroundStation) {
       tabs.push("scripts");
     }
     return tabs;
-  }, [loaded, tier, enabledFeatures, cameras, npuAvailable, ros2State, runtimeMode]);
+  }, [loaded, tier, enabledFeatures, cameras, npuAvailable, ros2State, runtimeMode, profile]);
 }

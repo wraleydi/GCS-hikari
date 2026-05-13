@@ -13,21 +13,18 @@ import {
   Check,
   Copy,
   Loader2,
-  Radio,
 } from "lucide-react";
 
 const INSTALL_URL =
   "https://raw.githubusercontent.com/altnautica/ADOSDroneAgent/main/scripts/install.sh";
 
 export interface PairingCodeCardProps {
-  requiresSignIn: boolean;
   codeError: string | null;
   code: string | null;
   expired: boolean;
   secondsLeft: number;
   copiedCode: boolean;
   copiedInstall: boolean;
-  onSignIn: () => void;
   onRegenerate: () => void;
   onCopyCode: () => void;
   onCopyInstall: () => void;
@@ -44,49 +41,17 @@ export function formatTime(secs: number): string {
 }
 
 export function PairingCodeCard({
-  requiresSignIn,
   codeError,
   code,
   expired,
   secondsLeft,
   copiedCode,
   copiedInstall,
-  onSignIn,
   onRegenerate,
   onCopyCode,
   onCopyInstall,
 }: PairingCodeCardProps) {
   const tc = useTranslations("command");
-
-  if (requiresSignIn) {
-    return (
-      <div className="p-5 bg-bg-secondary border border-border-default rounded-lg text-center space-y-4">
-        <div className="w-10 h-10 mx-auto rounded-full bg-accent-primary/10 flex items-center justify-center">
-          <Radio size={18} className="text-accent-primary" />
-        </div>
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-text-primary">
-            Sign in to pair a drone
-          </p>
-          <p className="text-xs text-text-tertiary leading-relaxed">
-            Cloud pairing links your drone to your account so you can
-            reach it from anywhere. Local network flight still works
-            without an account.
-          </p>
-        </div>
-        <button
-          onClick={onSignIn}
-          className="w-full px-4 py-2 text-xs font-medium bg-accent-primary text-white rounded hover:bg-accent-primary/90 transition-colors"
-        >
-          Sign in
-        </button>
-        <p className="text-[10px] text-text-tertiary">
-          Already connected on your LAN? Use the fleet sidebar to pair
-          a discovered agent directly.
-        </p>
-      </div>
-    );
-  }
 
   if (codeError) {
     return (
