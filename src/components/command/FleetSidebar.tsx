@@ -18,6 +18,7 @@ import { cmdDronesApi } from "@/lib/community-api-drones";
 import { cn } from "@/lib/utils";
 import { usePairingStore, type PairedDrone } from "@/stores/pairing-store";
 import { useAgentConnectionStore } from "@/stores/agent-connection-store";
+import { useLocalNodesStore } from "@/stores/local-nodes-store";
 import { useClockTick } from "@/lib/agent/freshness";
 import { DroneRowExpanded } from "./fleet/DroneRow";
 import { DroneContextMenu } from "./fleet/DroneContextMenu";
@@ -133,6 +134,7 @@ function FleetSidebarBase({
   useClockTick();
 
   const agentConnectCloud = useAgentConnectionStore((s) => s.connectCloud);
+  const agentConnect = useAgentConnectionStore((s) => s.connect);
   const agentConnected = useAgentConnectionStore((s) => s.connected);
 
   // One-shot flag: only auto-reconnect on initial page load, not on
@@ -188,19 +190,40 @@ function FleetSidebarBase({
     }
   }, [renaming]);
 
-  // Auto-reconnect on page load if a drone was previously selected.
+  // Auto-reconnect on page load if a node was previously selected.
   // Only fires once (autoConnectDone ref) to prevent infinite reconnect
-  // loops when the agent is offline.
+  // loops when the agent is offline. Branches on the selected id
+  // prefix: synthetic "local:<deviceId>" ids resolve to the local-
+  // nodes store and reconnect directly via REST, otherwise the
+  // selection is a Convex-backed cloud pair and goes through the
+  // cloud relay.
   useEffect(() => {
     if (autoConnectDone.current) return;
-    if (!agentConnected && selectedPairedId && pairedDrones.length > 0) {
-      const drone = pairedDrones.find((d) => d._id === selectedPairedId);
-      if (drone) {
-        autoConnectDone.current = true;
-        agentConnectCloud(drone.deviceId);
+    if (!agentConnected && selectedPairedId) {
+      if (selectedPairedId.startsWith("local:")) {
+        const deviceId = selectedPairedId.slice("local:".length);
+        const node = useLocalNodesStore
+          .getState()
+          .nodes.find((n) => n.deviceId === deviceId);
+        if (node && node.hostname && node.apiKey) {
+          autoConnectDone.current = true;
+          void agentConnect(node.hostname, node.apiKey);
+        }
+      } else if (pairedDrones.length > 0) {
+        const drone = pairedDrones.find((d) => d._id === selectedPairedId);
+        if (drone) {
+          autoConnectDone.current = true;
+          agentConnectCloud(drone.deviceId);
+        }
       }
     }
-  }, [selectedPairedId, pairedDrones, agentConnected, agentConnectCloud]);
+  }, [
+    selectedPairedId,
+    pairedDrones,
+    agentConnected,
+    agentConnect,
+    agentConnectCloud,
+  ]);
 
   function handleDroneClick(drone: PairedDrone) {
     selectPairedDrone(drone._id);

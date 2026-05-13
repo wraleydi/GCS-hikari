@@ -74,14 +74,16 @@ export function CommandPage() {
   const selectedProfile = useAgentCapabilitiesStore((s) => s.profile);
   const capsLoaded = useAgentCapabilitiesStore((s) => s.loaded);
 
-  const tabConfig: Record<CommandSubTab, { label: string; icon: typeof Monitor }> = useMemo(() => ({
+  // `t` is a fresh function ref per render so the prior useMemo on
+  // `[t]` never hit its cache. Compute inline; the object is cheap.
+  const tabConfig: Record<CommandSubTab, { label: string; icon: typeof Monitor }> = {
     overview: { label: t("overview"), icon: Monitor },
     features: { label: "Features", icon: Sparkles },
     "smart-modes": { label: "Smart Modes", icon: Zap },
     ros: { label: "ROS", icon: Cpu },
     system: { label: "System", icon: Wrench },
     scripts: { label: t("scripts"), icon: TerminalSquare },
-  }), [t]);
+  };
 
   const [activeTab, setActiveTab] = useState<CommandSubTab>("overview");
   const [viewMode, setViewMode] = useState<"fleet" | "agent">("fleet");
@@ -92,12 +94,14 @@ export function CommandPage() {
   // Reconcile activeTab state when the visible-tabs set shrinks (e.g.
   // a profile change drops the "ros" tab). Without this, the stale
   // id sits in state and re-flips the render the moment the tab set
-  // grows again, causing a UI race.
+  // grows again, causing a UI race. `renderedActiveTab` is omitted
+  // from deps because it's derived from `visibleTabs + activeTab`;
+  // including it would re-run the effect on every activeTab change.
   useEffect(() => {
     if (!visibleTabs.includes(activeTab)) {
-      setActiveTab(renderedActiveTab);
+      setActiveTab(visibleTabs[0] ?? "overview");
     }
-  }, [visibleTabs, activeTab, renderedActiveTab]);
+  }, [visibleTabs, activeTab]);
   const [urlInput, setUrlInput] = useState("http://localhost:8080");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [pairingOpen, setPairingOpen] = useState(false);
@@ -141,25 +145,46 @@ export function CommandPage() {
           deduped.set(d.deviceId, d);
         }
       }
+      const VALID_PROFILES = new Set([
+        "drone",
+        "ground-station",
+        "compute",
+        "lite",
+      ]);
+      const VALID_ROLES = new Set(["direct", "relay", "receiver"]);
       usePairingStore.getState().setPairedDrones(
-        Array.from(deduped.values()).map((d) => ({
-          _id: d._id,
-          userId: d.userId,
-          deviceId: d.deviceId,
-          name: d.name,
-          apiKey: d.apiKey,
-          agentVersion: d.agentVersion,
-          board: d.board,
-          tier: d.tier,
-          os: d.os,
-          mdnsHost: d.mdnsHost,
-          lastIp: d.lastIp,
-          lastSeen: d.lastSeen,
-          fcConnected: d.fcConnected,
-          pairedAt: d.pairedAt,
-          profile: (d as { profile?: string }).profile as PairedDrone["profile"] | undefined,
-          role: (d as { role?: string }).role as PairedDrone["role"] | undefined,
-        }))
+        Array.from(deduped.values()).map((d) => {
+          const rawProfile = (d as { profile?: unknown }).profile;
+          const rawRole = (d as { role?: unknown }).role;
+          const profile =
+            typeof rawProfile === "string" && VALID_PROFILES.has(rawProfile)
+              ? (rawProfile as PairedDrone["profile"])
+              : undefined;
+          const role =
+            typeof rawRole === "string" && VALID_ROLES.has(rawRole)
+              ? (rawRole as PairedDrone["role"])
+              : rawRole === null
+                ? null
+                : undefined;
+          return {
+            _id: d._id,
+            userId: d.userId,
+            deviceId: d.deviceId,
+            name: d.name,
+            apiKey: d.apiKey,
+            agentVersion: d.agentVersion,
+            board: d.board,
+            tier: d.tier,
+            os: d.os,
+            mdnsHost: d.mdnsHost,
+            lastIp: d.lastIp,
+            lastSeen: d.lastSeen,
+            fcConnected: d.fcConnected,
+            pairedAt: d.pairedAt,
+            profile,
+            role,
+          };
+        })
       );
     }
   }, [myDrones]);

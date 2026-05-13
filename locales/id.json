@@ -882,7 +882,7 @@
     "pairedCount": "{count} paired",
     "addNode": {
       "title": "Tambahkan node",
-      "subtitle": "Pasangkan node ADOS apa pun — drone, ground station, atau compute masa depan — langsung melalui LAN Anda.",
+      "subtitle": "Pasangkan node ADOS apa pun (drone, stasiun darat, atau unit komputasi mendatang) langsung melalui LAN Anda.",
       "pairOnLan": "Pasangkan node di LAN Anda",
       "noAccountRequired": "Tidak perlu akun. Berfungsi sepenuhnya offline.",
       "hostnamePlaceholder": "skynode.local  atau  http://192.168.1.42:8080",
@@ -896,14 +896,14 @@
       "enterHostnameError": "Masukkan hostname atau URL untuk diperiksa",
       "probeFailedError": "Tidak dapat menjangkau alamat tersebut. Pastikan agen berjalan dan berada di jaringan yang sama.",
       "alreadyPairedTitle": "Agen sudah dipasangkan",
-      "alreadyPairedMessage": "Agen ini sudah dipasangkan. Pasangkan secara lokal untuk mencoba mengambil alih kepemilikan — agen akan merespons dengan kesalahan yang jelas jika tidak bisa.",
+      "alreadyPairedMessage": "Agen ini sudah dipasangkan. Pasangkan secara lokal untuk mencoba mengambil kepemilikan. Agen akan merespons dengan kesalahan yang jelas jika tidak dapat melakukannya.",
       "alreadyPairedToOtherBrowser": "Agen ini sudah dipasangkan ke browser lain. Lepaskan pasangan dari halaman pengaturan agen, lalu coba lagi.",
       "pairLocallyButton": "Pasangkan secara lokal",
       "pairingButton": "Memasangkan",
       "cancelButton": "Batal",
       "mixedContentError": "Mission Control ini disajikan melalui HTTPS. Browser memblokir pemeriksaan HTTP biasa dari halaman HTTPS. Muat Mission Control melalui http:// (atau gunakan build localhost) untuk memasangkan agen LAN.",
       "missingDeviceIdError": "Respons pemeriksaan tidak memiliki device_id",
-      "pairedButConnectFailed": "Dipasangkan, tetapi tidak dapat membuat koneksi langsung: {error}. Node telah disimpan — coba ulangi dari sidebar.",
+      "pairedButConnectFailed": "Dipasangkan, tetapi tidak dapat membuat koneksi langsung: {error}. Node telah disimpan. Coba lagi dari bilah samping.",
       "profileLabel": {
         "drone": "Drone",
         "groundStation": "Stasiun darat",
@@ -937,7 +937,7 @@
       "consolidatingNotice": {
         "title": "Kontrol perangkat keras sedang dikonsolidasikan ke tab Command.",
         "body": "Tab Command kini menampung alur Tambah Node mode lokal dan akan menampung setiap jenis node (agen drone, stasiun darat, relai, penerima, komputasi mendatang) di bawah satu sidebar. Hardware tetap tersedia selama masa transisi untuk subtampilan yang lebih dalam.",
-        "computeComingSoon": "Node komputasi — segera hadir",
+        "computeComingSoon": "Node komputasi segera hadir",
         "computeBody": "Profil komputasi adalah node kelas workstation yang mengonsumsi dataset survei dan menghasilkan ortomosaik, rekonstruksi NeRF, dan gaussian splats. Lihat product/specs/compute-agent/ untuk desain lengkap."
       }
     },

@@ -448,6 +448,23 @@ export const useAgentCapabilitiesStore = create<AgentCapabilitiesStore>((set) =>
       rawProfile === "lite"
         ? rawProfile
         : "drone";
+    // Forward-compat dev hint: if a future agent ships a profile
+    // string we don't know yet, the cap store clamps to "drone" so
+    // the GCS doesn't crash, but we surface the unknown value in
+    // dev tooling so the next plan/audit catches it.
+    if (
+      typeof rawProfile === "string" &&
+      rawProfile !== "drone" &&
+      rawProfile !== "ground-station" &&
+      rawProfile !== "compute" &&
+      rawProfile !== "lite" &&
+      typeof console !== "undefined"
+    ) {
+      console.warn(
+        "[agent-capabilities-store] unknown profile %s — clamped to drone",
+        rawProfile,
+      );
+    }
     const rawRole = (caps as { role?: unknown }).role;
     const role: "direct" | "relay" | "receiver" | null | undefined =
       rawRole === "direct" ||

@@ -887,7 +887,7 @@
     "reconnectTooltip": "Re-subscribe to cloud heartbeats for this drone",
     "addNode": {
       "title": "Add a node",
-      "subtitle": "Pair any ADOS node — drone, ground station, or future compute — directly over your LAN.",
+      "subtitle": "Pair any ADOS node (drone, ground station, or future compute) directly over your LAN.",
       "pairOnLan": "Pair a node on your LAN",
       "noAccountRequired": "No account required. Works fully offline.",
       "hostnamePlaceholder": "skynode.local  or  http://192.168.1.42:8080",
@@ -901,7 +901,7 @@
       "enterHostnameError": "Enter a hostname or URL to probe",
       "probeFailedError": "Could not reach that address. Check the agent is running and on the same network.",
       "alreadyPairedTitle": "Agent is already paired",
-      "alreadyPairedMessage": "This agent is already paired. Pair locally to attempt to take ownership — the agent will respond with a clear error if it can't.",
+      "alreadyPairedMessage": "This agent is already paired. Pair locally to attempt to take ownership. The agent will respond with a clear error if it can't.",
       "alreadyPairedToOtherBrowser": "This agent is already paired to another browser. Unpair from the agent's setup page, then try again.",
       "pairLocallyButton": "Pair locally",
       "pairingButton": "Pairing",
@@ -911,7 +911,7 @@
       "probeFailedStatusError": "Probe failed: {status} {statusText}",
       "pairFailedStatusError": "Pair failed: {status} {statusText}",
       "unpairFailedStatusError": "Unpair failed: {status} {statusText}",
-      "pairedButConnectFailed": "Paired, but could not establish a live connection: {error}. The node is saved — retry from the sidebar.",
+      "pairedButConnectFailed": "Paired, but could not establish a live connection: {error}. The node is saved. Retry from the sidebar.",
       "profileLabel": {
         "drone": "Drone",
         "groundStation": "Ground station",
@@ -942,7 +942,7 @@
       "consolidatingNotice": {
         "title": "Hardware controls are consolidating into the Command tab.",
         "body": "The Command tab now hosts the local-first Add-a-Node flow and will host every node type (drone agent, ground station, relay, receiver, future compute) under one sidebar. Hardware will stay available during the transition for deeper sub-views.",
-        "computeComingSoon": "Compute node — coming soon",
+        "computeComingSoon": "Compute node coming soon",
         "computeBody": "The compute profile is a workstation-class node that consumes survey datasets and produces orthomosaics, NeRF reconstructions, and gaussian splats. See product/specs/compute-agent/ for the full design."
       }
     }

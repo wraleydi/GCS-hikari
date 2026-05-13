@@ -882,7 +882,7 @@
     "pairedCount": "{count} paired",
     "addNode": {
       "title": "Adicionar um nó",
-      "subtitle": "Pareie qualquer nó ADOS — drone, estação de solo ou computação futura — diretamente pela sua LAN.",
+      "subtitle": "Pareie qualquer nó ADOS (drone, estação terrestre ou futura unidade de computação) diretamente pela sua rede local.",
       "pairOnLan": "Parear um nó na sua LAN",
       "noAccountRequired": "Nenhuma conta necessária. Funciona totalmente offline.",
       "hostnamePlaceholder": "skynode.local  ou  http://192.168.1.42:8080",
@@ -896,14 +896,14 @@
       "enterHostnameError": "Digite um hostname ou URL para sondar",
       "probeFailedError": "Não foi possível alcançar esse endereço. Verifique se o agente está em execução e na mesma rede.",
       "alreadyPairedTitle": "O agente já está pareado",
-      "alreadyPairedMessage": "Este agente já está pareado. Pareie localmente para tentar tomar posse — o agente responderá com um erro claro se não puder.",
+      "alreadyPairedMessage": "Este agente já está pareado. Pareie localmente para tentar assumir a propriedade. O agente responderá com um erro claro caso não consiga.",
       "alreadyPairedToOtherBrowser": "Este agente já está pareado com outro navegador. Despareie pela página de configuração do agente e tente novamente.",
       "pairLocallyButton": "Parear localmente",
       "pairingButton": "Pareando",
       "cancelButton": "Cancelar",
       "mixedContentError": "Este Mission Control é servido por HTTPS. Os navegadores bloqueiam sondagens HTTP simples a partir de páginas HTTPS. Carregue o Mission Control via http:// (ou use uma build localhost) para parear agentes na LAN.",
       "missingDeviceIdError": "Resposta da sondagem sem device_id",
-      "pairedButConnectFailed": "Pareado, mas não foi possível estabelecer uma conexão ativa: {error}. O nó foi salvo — tente novamente pela barra lateral.",
+      "pairedButConnectFailed": "Pareado, mas não foi possível estabelecer uma conexão ativa: {error}. O nó foi salvo. Tente novamente pela barra lateral.",
       "profileLabel": {
         "drone": "Drone",
         "groundStation": "Estação terrestre",
@@ -937,7 +937,7 @@
       "consolidatingNotice": {
         "title": "Os controles de hardware estão sendo consolidados na aba Command.",
         "body": "A aba Command agora hospeda o fluxo Adicionar um nó em modo local e abrigará todos os tipos de nó (agente de drone, estação terrestre, relé, receptor e futura computação) sob uma única barra lateral. Hardware permanecerá disponível durante a transição para subvisões mais detalhadas.",
-        "computeComingSoon": "Nó de computação — em breve",
+        "computeComingSoon": "Nó de computação em breve",
         "computeBody": "O perfil de computação é um nó de classe estação de trabalho que consome conjuntos de dados de levantamento e produz ortomosaicos, reconstruções NeRF e gaussian splats. Consulte product/specs/compute-agent/ para o projeto completo."
       }
     },

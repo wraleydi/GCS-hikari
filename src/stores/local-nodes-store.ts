@@ -8,6 +8,24 @@
  * Independent of the Convex-backed ``pairing-store`` so the GCS
  * works fully offline. Persisted to localStorage with a version /
  * migrate handler per the project convention.
+ *
+ * THREAT MODEL (local-first credential storage):
+ *   - Each ``LocalNode`` stores an ``apiKey`` returned by the
+ *     agent's ``/api/pairing/claim``. This key is the credential
+ *     for every subsequent REST call to that agent. localStorage is
+ *     plaintext: any XSS that runs on the GCS origin reads every
+ *     paired agent's apiKey. Browser-extension access and devtools
+ *     see the same.
+ *   - There is no key derivation, no encryption at rest, no
+ *     hardware-backed key isolation. This is the local-first
+ *     trade-off and the pragmatic posture for v1.
+ *   - If the operator clears browser storage the apiKeys are lost.
+ *     Recovery: unpair the agent from its own setup webapp at
+ *     ``http://<host>:8080/setup.html``, then re-pair from the GCS.
+ *   - See also ``browser-identity-store.ts`` for the per-browser
+ *     UUID that acts as pair-owner identifier on the same threat
+ *     surface.
+ *
  * @license GPL-3.0-only
  */
 
@@ -85,6 +103,11 @@ export const useLocalNodesStore = create<LocalNodesState>()(
     {
       name: "altcmd:local-nodes",
       version: 1,
+      // TODO(schema-bump): when LocalNode evolves (rename, new
+      // required field), replace this identity passthrough with an
+      // explicit version branch that validates each entry and
+      // discards or back-fills as appropriate. See
+      // src/stores/settings-store/migrations.ts for a reference.
       migrate: (persisted, _version) => persisted as LocalNodesState,
     },
   ),

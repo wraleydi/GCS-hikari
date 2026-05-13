@@ -57,18 +57,29 @@ function adaptCloud(d: PairedDrone): FleetNodeEntry {
   };
 }
 
+/** Pure merge function exposed for unit tests. Local nodes shadow
+ * cloud entries with the same deviceId; the result is sorted by
+ * pairedAt ascending. */
+export function mergeFleetNodes(
+  cloudPaired: readonly PairedDrone[],
+  localNodes: readonly LocalNode[],
+): FleetNodeEntry[] {
+  const localById = new Map(localNodes.map((n) => [n.deviceId, n]));
+  const cloudAdapted = cloudPaired
+    .filter((d) => !localById.has(d.deviceId))
+    .map(adaptCloud);
+  const localAdapted = localNodes.map(adaptLocal);
+  return [...cloudAdapted, ...localAdapted].sort(
+    (a, b) => a.pairedAt - b.pairedAt,
+  );
+}
+
 export function useFleetNodes(): FleetNodeEntry[] {
   const cloudPaired = usePairingStore((s) => s.pairedDrones);
   const localNodes = useLocalNodesStore((s) => s.nodes);
 
-  return useMemo(() => {
-    const localById = new Map(localNodes.map((n) => [n.deviceId, n]));
-    const cloudAdapted = cloudPaired
-      .filter((d) => !localById.has(d.deviceId))
-      .map(adaptCloud);
-    const localAdapted = localNodes.map(adaptLocal);
-    return [...cloudAdapted, ...localAdapted].sort(
-      (a, b) => a.pairedAt - b.pairedAt,
-    );
-  }, [cloudPaired, localNodes]);
+  return useMemo(
+    () => mergeFleetNodes(cloudPaired, localNodes),
+    [cloudPaired, localNodes],
+  );
 }

@@ -67,6 +67,24 @@ export function normaliseHost(input: string): string {
 
 const FETCH_TIMEOUT_MS = 8000;
 
+/** Reject before fetch if Mission Control is on HTTPS but the target
+ * is HTTP. Browsers block plain HTTP probes from HTTPS pages silently;
+ * surfacing a typed error gives the operator a clear message. Called
+ * by every pair-client REST helper so the guard never gets bypassed
+ * through one entry point but missed on another. */
+function assertReachable(host: string): void {
+  if (
+    typeof window !== "undefined" &&
+    window.location.protocol === "https:" &&
+    host.startsWith("http://")
+  ) {
+    throw new PairClientError(
+      "mixedContentError",
+      "Mission Control is served over HTTPS but the target is HTTP. Load Mission Control over http:// to pair LAN agents.",
+    );
+  }
+}
+
 /** Combine an optional caller signal with a local timeout signal. */
 function combineSignals(
   caller?: AbortSignal,
@@ -96,18 +114,7 @@ export async function probeAgent(
   if (!host) {
     throw new PairClientError("enterHostnameError", "Enter a hostname or URL to probe");
   }
-  // Mixed-content guard: HTTPS pages can't fetch HTTP endpoints. The
-  // browser will block silently otherwise; surface a clear message.
-  if (
-    typeof window !== "undefined" &&
-    window.location.protocol === "https:" &&
-    host.startsWith("http://")
-  ) {
-    throw new PairClientError(
-      "mixedContentError",
-      "Mission Control is served over HTTPS but the target is HTTP. Load Mission Control over http:// to pair LAN agents.",
-    );
-  }
+  assertReachable(host);
   const resp = await fetch(`${host}/api/pairing/info`, {
     method: "GET",
     headers: { Accept: "application/json" },
@@ -154,15 +161,37 @@ export class AgentAlreadyPairedError extends Error {
  * field maps to an i18n key under ``command.addNode.*`` so the
  * consuming component can render a translated message; the
  * ``message`` is kept as a dev-readable fallback. ``details`` is
- * spread into the translation interpolation context. */
+ * spread into the translation interpolation context, so values are
+ * filtered to ``string | number`` at construction. Object-valued
+ * fields (which the agent shouldn't return but might in error
+ * paths) are stringified to ``[object Object]``-resistant strings
+ * via ``JSON.stringify`` so the t() call never blows up. */
 export class PairClientError extends Error {
   readonly code: string;
-  readonly details: Record<string, unknown>;
-  constructor(code: string, message: string, details: Record<string, unknown> = {}) {
+  readonly details: Record<string, string | number>;
+  constructor(
+    code: string,
+    message: string,
+    details: Record<string, unknown> = {},
+  ) {
     super(message);
     this.name = "PairClientError";
     this.code = code;
-    this.details = details;
+    const filtered: Record<string, string | number> = {};
+    for (const [k, v] of Object.entries(details)) {
+      if (typeof v === "string" || typeof v === "number") {
+        filtered[k] = v;
+      } else if (v == null) {
+        filtered[k] = "";
+      } else {
+        try {
+          filtered[k] = JSON.stringify(v);
+        } catch {
+          filtered[k] = String(v);
+        }
+      }
+    }
+    this.details = filtered;
   }
 }
 
@@ -175,6 +204,7 @@ export async function pairLocally(
   signal?: AbortSignal,
 ): Promise<ClaimResult> {
   const host = normaliseHost(rawHost);
+  assertReachable(host);
   const userId = getBrowserId();
   const resp = await fetch(`${host}/api/pairing/claim`, {
     method: "POST",
@@ -212,6 +242,7 @@ export async function unpairLocal(
   signal?: AbortSignal,
 ): Promise<void> {
   const host = normaliseHost(hostname);
+  assertReachable(host);
   const resp = await fetch(`${host}/api/pairing/unpair`, {
     method: "POST",
     headers: {

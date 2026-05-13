@@ -867,7 +867,7 @@
     "pairedCount": "{count} paired",
     "addNode": {
       "title": "Añadir un nodo",
-      "subtitle": "Empareja cualquier nodo ADOS — dron, estación terrestre o cómputo futuro — directamente a través de tu LAN.",
+      "subtitle": "Empareja cualquier nodo ADOS (dron, estación terrestre o futura unidad de cómputo) directamente a través de tu red local.",
       "pairOnLan": "Empareja un nodo en tu LAN",
       "noAccountRequired": "No se requiere cuenta. Funciona totalmente sin conexión.",
       "hostnamePlaceholder": "skynode.local  o  http://192.168.1.42:8080",
@@ -881,14 +881,14 @@
       "enterHostnameError": "Introduce un nombre de host o URL para sondear",
       "probeFailedError": "No se pudo alcanzar esa dirección. Comprueba que el agente esté en ejecución y en la misma red.",
       "alreadyPairedTitle": "El agente ya está emparejado",
-      "alreadyPairedMessage": "Este agente ya está emparejado. Empareja localmente para intentar tomar posesión — el agente responderá con un error claro si no puede.",
+      "alreadyPairedMessage": "Este agente ya está emparejado. Empareja localmente para intentar tomar la propiedad. El agente responderá con un error claro si no puede.",
       "alreadyPairedToOtherBrowser": "Este agente ya está emparejado con otro navegador. Desempareja desde la página de configuración del agente y vuelve a intentarlo.",
       "pairLocallyButton": "Emparejar localmente",
       "pairingButton": "Emparejando",
       "cancelButton": "Cancelar",
       "mixedContentError": "Este Mission Control se sirve por HTTPS. Los navegadores bloquean los sondeos HTTP sin cifrar desde páginas HTTPS. Carga Mission Control sobre http:// (o usa una compilación localhost) para emparejar agentes en la LAN.",
       "missingDeviceIdError": "Falta device_id en la respuesta del sondeo",
-      "pairedButConnectFailed": "Emparejado, pero no se pudo establecer una conexión en vivo: {error}. El nodo está guardado — reinténtalo desde la barra lateral.",
+      "pairedButConnectFailed": "Emparejado, pero no se pudo establecer una conexión en vivo: {error}. El nodo se guardó. Reinténtalo desde la barra lateral.",
       "profileLabel": {
         "drone": "Dron",
         "groundStation": "Estación terrestre",
@@ -922,7 +922,7 @@
       "consolidatingNotice": {
         "title": "Los controles de hardware se están consolidando en la pestaña Command.",
         "body": "La pestaña Command ahora aloja el flujo Añadir un nodo en modo local y alojará cada tipo de nodo (agente de dron, estación terrestre, relé, receptor y futuro nodo de cómputo) bajo una sola barra lateral. Hardware seguirá disponible durante la transición para subvistas más detalladas.",
-        "computeComingSoon": "Nodo de cómputo — próximamente",
+        "computeComingSoon": "Nodo de cómputo próximamente",
         "computeBody": "El perfil de cómputo es un nodo de clase estación de trabajo que consume conjuntos de datos de relevamiento y produce ortomosaicos, reconstrucciones NeRF y gaussian splats. Consulta product/specs/compute-agent/ para el diseño completo."
       }
     },

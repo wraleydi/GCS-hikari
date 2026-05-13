@@ -882,7 +882,7 @@
     "pairedCount": "{count} paired",
     "addNode": {
       "title": "노드 추가",
-      "subtitle": "드론, 지상국, 또는 향후 컴퓨팅 노드 등 모든 ADOS 노드를 LAN을 통해 직접 페어링하세요.",
+      "subtitle": "모든 ADOS 노드(드론, 지상국 또는 향후 컴퓨트 노드)를 LAN을 통해 직접 페어링하세요.",
       "pairOnLan": "LAN에서 노드 페어링",
       "noAccountRequired": "계정이 필요하지 않습니다. 완전히 오프라인으로 작동합니다.",
       "hostnamePlaceholder": "skynode.local  또는  http://192.168.1.42:8080",
@@ -896,14 +896,14 @@
       "enterHostnameError": "프로브할 호스트 이름이나 URL을 입력하세요",
       "probeFailedError": "해당 주소에 연결할 수 없습니다. 에이전트가 실행 중이고 동일한 네트워크에 있는지 확인하세요.",
       "alreadyPairedTitle": "에이전트가 이미 페어링되어 있습니다",
-      "alreadyPairedMessage": "이 에이전트는 이미 페어링되어 있습니다. 소유권을 가져오려면 로컬로 페어링을 시도하세요. 에이전트가 불가능한 경우 명확한 오류로 응답합니다.",
+      "alreadyPairedMessage": "이 에이전트는 이미 페어링되어 있습니다. 소유권을 가져오려면 로컬에서 페어링하세요. 불가능한 경우 에이전트가 명확한 오류로 응답합니다.",
       "alreadyPairedToOtherBrowser": "이 에이전트는 이미 다른 브라우저에 페어링되어 있습니다. 에이전트의 설정 페이지에서 페어링을 해제한 후 다시 시도하세요.",
       "pairLocallyButton": "로컬로 페어링",
       "pairingButton": "페어링 중",
       "cancelButton": "취소",
       "mixedContentError": "이 Mission Control은 HTTPS로 제공됩니다. 브라우저는 HTTPS 페이지에서 일반 HTTP 프로브를 차단합니다. LAN 에이전트를 페어링하려면 Mission Control을 http://로 로드하거나 localhost 빌드를 사용하세요.",
       "missingDeviceIdError": "프로브 응답에 device_id가 누락되었습니다",
-      "pairedButConnectFailed": "페어링되었지만 실시간 연결을 설정할 수 없습니다: {error}. 노드가 저장되었습니다. 사이드바에서 다시 시도하세요.",
+      "pairedButConnectFailed": "페어링은 되었지만 실시간 연결을 설정하지 못했습니다: {error}. 노드는 저장되었습니다. 사이드바에서 다시 시도하세요.",
       "profileLabel": {
         "drone": "드론",
         "groundStation": "지상국",
@@ -937,7 +937,7 @@
       "consolidatingNotice": {
         "title": "하드웨어 컨트롤이 Command 탭으로 통합되고 있습니다.",
         "body": "Command 탭은 이제 로컬 우선 노드 추가 흐름을 호스팅하며, 앞으로 모든 노드 유형(드론 에이전트, 지상국, 릴레이, 리시버, 향후 컴퓨트)을 하나의 사이드바 아래에 두게 됩니다. Hardware는 전환 기간 동안 더 깊은 하위 보기를 위해 계속 사용할 수 있습니다.",
-        "computeComingSoon": "컴퓨트 노드 — 곧 출시",
+        "computeComingSoon": "컴퓨트 노드 곧 출시",
         "computeBody": "컴퓨트 프로필은 측량 데이터셋을 소비하여 정사 모자이크, NeRF 재구성 및 가우시안 스플랫을 생성하는 워크스테이션급 노드입니다. 전체 설계는 product/specs/compute-agent/를 참조하세요."
       }
     },

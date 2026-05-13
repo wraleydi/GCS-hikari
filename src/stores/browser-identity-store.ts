@@ -7,6 +7,24 @@
  * paired nodes without ever round-tripping through a cloud account.
  *
  * Persisted to localStorage. Generated once on first read.
+ *
+ * THREAT MODEL (local-first credential storage):
+ *   - The UUID is the pair OWNER identifier the agent uses to scope
+ *     unpair / re-pair requests. Anyone with access to this UUID can
+ *     unpair the agent from this browser.
+ *   - localStorage is plaintext. XSS that runs on the GCS origin
+ *     reads everything. Browser-extension access also reads
+ *     localStorage; devtools sees the same. This is the local-first
+ *     trade-off: no cloud account means no server-side credential
+ *     anchor.
+ *   - If localStorage is cleared, the operator loses ownership of
+ *     every locally-paired node. Recovery: unpair the agent from
+ *     its own setup webapp (`http://<host>:8080/setup.html`), then
+ *     re-pair from the GCS.
+ *   - Future hardening (WebCrypto wrapping key + per-browser
+ *     passphrase) is intentionally deferred. The pragmatic posture
+ *     for now is "operator trusts their own browser session".
+ *
  * @license GPL-3.0-only
  */
 
@@ -44,6 +62,11 @@ export const useBrowserIdentityStore = create<BrowserIdentityState>()(
     {
       name: "altcmd:browser-identity",
       version: 1,
+      // TODO(schema-bump): when a future version adds a required
+      // field, replace this identity passthrough with an explicit
+      // version branch that validates and back-fills the persisted
+      // payload (see src/stores/settings-store/migrations.ts for a
+      // reference chain).
       migrate: (persisted, _version) => persisted as BrowserIdentityState,
     },
   ),

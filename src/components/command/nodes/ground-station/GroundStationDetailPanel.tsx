@@ -68,15 +68,24 @@ export function GroundStationDetailPanel() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Tab nav */}
-      <div className="flex items-center gap-0 border-b border-border-default bg-bg-secondary px-3 overflow-x-auto">
+      <div
+        role="tablist"
+        aria-label="Ground station detail"
+        className="flex items-center gap-0 border-b border-border-default bg-bg-secondary px-3 overflow-x-auto"
+      >
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            id={`gs-tab-${tab.id}`}
+            role="tab"
+            aria-selected={visibleTab === tab.id}
+            aria-controls={`gs-tabpanel-${tab.id}`}
+            tabIndex={visibleTab === tab.id ? 0 : -1}
             onClick={() => setActiveTab(tab.id)}
             className={
               visibleTab === tab.id
-                ? "px-3 py-2.5 text-xs font-medium text-accent-primary border-b-2 border-accent-primary -mb-px whitespace-nowrap"
-                : "px-3 py-2.5 text-xs font-medium text-text-secondary hover:text-text-primary border-b-2 border-transparent whitespace-nowrap"
+                ? "px-3 py-2.5 text-xs font-medium text-accent-primary border-b-2 border-accent-primary -mb-px whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary"
+                : "px-3 py-2.5 text-xs font-medium text-text-secondary hover:text-text-primary border-b-2 border-transparent whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary"
             }
           >
             {tab.label}
@@ -85,7 +94,12 @@ export function GroundStationDetailPanel() {
       </div>
 
       {/* Tab body */}
-      <div className="flex-1 min-h-0 overflow-auto">
+      <div
+        id={`gs-tabpanel-${visibleTab}`}
+        role="tabpanel"
+        aria-labelledby={`gs-tab-${visibleTab}`}
+        className="flex-1 min-h-0 overflow-auto"
+      >
         {visibleTab === "overview" && <OverviewTab />}
         {visibleTab === "radio" && <RadioTab />}
         {visibleTab === "network" && <NetworkTab />}

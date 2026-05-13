@@ -80,9 +80,10 @@ export function AddNodeCard({
       if (e instanceof PairClientError) {
         // Map the pair-client's structured error code to its
         // translated message. Falls back to the dev-readable
-        // message on a key miss.
+        // message on a key miss. `e.details` is already filtered
+        // to string | number values at PairClientError construction.
         try {
-          msg = t(e.code, e.details as Record<string, string | number>);
+          msg = t(e.code, e.details);
         } catch {
           msg = e.message;
         }
@@ -177,7 +178,13 @@ export function AddNodeCard({
         </div>
 
         {probeError && (
-          <p className="text-xs text-status-error">{probeError}</p>
+          <p
+            role="alert"
+            aria-live="polite"
+            className="text-xs text-status-error"
+          >
+            {probeError}
+          </p>
         )}
       </div>
 

@@ -14,6 +14,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation } from "convex/react";
+import { useConvexAvailable } from "@/app/ConvexClientProvider";
 import { cmdPairingApi } from "@/lib/community-api-drones";
 import {
   PairingCodeCard,
@@ -23,6 +24,16 @@ import {
 const CODE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
 export function CloudPairingCodeSection() {
+  // Defensive: the parent (AgentDisconnectedPage) gates this mount on
+  // `convexAvailable && isAuthenticated`, but a future refactor could
+  // drop one of those checks. useMutation outside the Convex context
+  // throws at render time, so we short-circuit here as a belt.
+  const convexAvailable = useConvexAvailable();
+  if (!convexAvailable) return null;
+  return <CloudPairingCodeSectionInner />;
+}
+
+function CloudPairingCodeSectionInner() {
   const preGenerate = useMutation(cmdPairingApi.preGenerateCode);
 
   const [code, setCode] = useState<string | null>(null);

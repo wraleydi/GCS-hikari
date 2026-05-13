@@ -94,6 +94,11 @@ export function NodeSidebar({ onFocusAgent }: NodeSidebarProps) {
     selectPairedDrone(node._id);
     onFocusAgent();
     try {
+      // Cleanly tear down any prior connection before switching
+      // modes. connect() and connectCloud() both mutate agentUrl /
+      // apiKey / cloudMode without an atomic transition, so a
+      // back-to-back call can leak a half-configured state.
+      disconnect();
       if (node.isLocal) {
         // Local nodes connect directly via the agent's REST URL.
         const hostname =
@@ -153,13 +158,18 @@ export function NodeSidebar({ onFocusAgent }: NodeSidebarProps) {
                     key={n._id}
                     role="button"
                     tabIndex={0}
+                    aria-pressed={selected}
+                    aria-label={`${n.name} ${groupLabels[key]}`}
                     onClick={() => void handleSelect(n)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ")
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
                         void handleSelect(n);
+                      }
                     }}
                     className={cn(
                       "group flex items-start gap-2 rounded border p-2 cursor-pointer transition-colors",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary",
                       selected
                         ? "border-accent-primary/30 bg-accent-primary/10"
                         : "border-transparent hover:bg-bg-tertiary",

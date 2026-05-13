@@ -30,19 +30,18 @@ interface ProbeResultCardProps {
 function profileLabel(profile: string, t: (k: string) => string): string {
   switch (profile) {
     case "ground-station":
-      return t("groundStation");
+      return t("profileLabel.groundStation");
     case "compute":
-      return t("compute");
+      return t("profileLabel.compute");
     case "lite":
-      return t("lite");
+      return t("profileLabel.lite");
     default:
-      return t("drone");
+      return t("profileLabel.drone");
   }
 }
 
 export function ProbeResultCard({ probe, onPaired, onCancel }: ProbeResultCardProps) {
   const t = useTranslations("command.addNode");
-  const tProfile = useTranslations("command.addNode.profileLabel");
   const [pairing, setPairing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const addNode = useLocalNodesStore((s) => s.addNode);
@@ -67,6 +66,22 @@ export function ProbeResultCard({ probe, onPaired, onCancel }: ProbeResultCardPr
     try {
       const claim = await pairLocally(probe.hostname, ctrl.signal);
       if (!mountedRef.current) return;
+      // Activate the live connection FIRST so a failed handshake
+      // doesn't leave an orphan node entry that the operator has to
+      // manually clean up. Only persist to local-nodes-store after
+      // the agent confirms the link is up.
+      try {
+        await useAgentConnectionStore
+          .getState()
+          .connect(probe.hostname, claim.apiKey);
+      } catch (connectErr) {
+        if (!mountedRef.current) return;
+        const msg =
+          connectErr instanceof Error ? connectErr.message : String(connectErr);
+        setError(t("pairedButConnectFailed", { error: msg }));
+        return;
+      }
+      if (!mountedRef.current) return;
       addNode({
         deviceId: claim.deviceId,
         name: claim.name,
@@ -80,20 +95,6 @@ export function ProbeResultCard({ probe, onPaired, onCancel }: ProbeResultCardPr
         pairedAt: Date.now(),
         lastSeenAt: Date.now(),
       });
-      // Activate this node immediately. Await so connect failures
-      // surface here instead of behind onPaired().
-      try {
-        await useAgentConnectionStore
-          .getState()
-          .connect(probe.hostname, claim.apiKey);
-      } catch (connectErr) {
-        if (!mountedRef.current) return;
-        const msg =
-          connectErr instanceof Error ? connectErr.message : String(connectErr);
-        setError(t("pairedButConnectFailed", { error: msg }));
-        return;
-      }
-      if (!mountedRef.current) return;
       onPaired(claim.deviceId);
     } catch (e) {
       if (!mountedRef.current) return;
@@ -104,7 +105,7 @@ export function ProbeResultCard({ probe, onPaired, onCancel }: ProbeResultCardPr
         return;
       } else if (e instanceof PairClientError) {
         try {
-          setError(t(e.code, e.details as Record<string, string | number>));
+          setError(t(e.code, e.details));
         } catch {
           setError(e.message);
         }
@@ -131,7 +132,7 @@ export function ProbeResultCard({ probe, onPaired, onCancel }: ProbeResultCardPr
           </div>
           <div className="flex flex-wrap gap-1.5 text-[10px]">
             <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-accent-primary/10 text-accent-primary font-medium">
-              {profileLabel(probe.profile, tProfile)}
+              {profileLabel(probe.profile, t)}
             </span>
             {probe.role && (
               <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-bg-tertiary text-text-secondary font-mono lowercase">
@@ -159,7 +160,11 @@ export function ProbeResultCard({ probe, onPaired, onCancel }: ProbeResultCardPr
       )}
 
       {error && (
-        <div className="flex items-start gap-2 p-2 bg-status-error/10 border border-status-error/30 rounded text-xs text-status-error">
+        <div
+          role="alert"
+          aria-live="polite"
+          className="flex items-start gap-2 p-2 bg-status-error/10 border border-status-error/30 rounded text-xs text-status-error"
+        >
           <AlertTriangle size={14} className="mt-0.5 shrink-0" />
           <span>{error}</span>
         </div>
