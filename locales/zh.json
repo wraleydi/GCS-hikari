@@ -897,7 +897,12 @@
       },
       "probeFailedStatusError": "探测失败：{status} {statusText}",
       "pairFailedStatusError": "配对失败：{status} {statusText}",
-      "unpairFailedStatusError": "解除配对失败：{status} {statusText}"
+      "unpairFailedStatusError": "解除配对失败：{status} {statusText}",
+      "firstPairWarning": {
+        "title": "您的 API 密钥保存在此浏览器中",
+        "body": "清除浏览器存储将解除所有本地配对的节点。如需恢复，请在代理的设置网页 http://<host>:8080/setup.html 中解除配对，然后从此处重新配对。",
+        "dismiss": "知道了"
+      }
     },
     "nodes": {
       "drones": "无人机",
@@ -924,6 +929,10 @@
         "body": "Command 选项卡现已承载本地优先的添加节点流程,并将在同一侧边栏下托管所有节点类型(无人机代理、地面站、中继、接收器以及未来的计算节点)。在过渡期间,Hardware 仍可用于查看更深入的子视图。",
         "computeComingSoon": "计算节点即将推出",
         "computeBody": "计算配置文件是一种工作站级节点,负责处理测绘数据集并生成正射影像、NeRF 重建和高斯泼溅。完整设计请参见 product/specs/compute-agent/。"
+      },
+      "demoMode": {
+        "title": "演示数据不适用于地面站控制",
+        "body": "这些选项卡通过 REST 与实时代理通信。请在“指挥”选项卡上的 Add-a-Node 卡片中配对一个真实的地面站后使用。"
       }
     },
     "cloudBadge": "云端",

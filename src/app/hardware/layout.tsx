@@ -2,14 +2,14 @@
 
 /**
  * @module HardwareLayout
- * @description Two-pane layout for the Hardware tab. Left primary nav
- * (HardwareSidebar) lists every hardware category. The content area renders
- * the active sub-page with a shared header and the mesh banner.
+ * @description Slim layout for the Hardware tab. The full
+ * ground-station sub-nav was retired in Stage 5 once those
+ * surfaces consolidated into the Command tab. This shell now
+ * just centres a content column for the residual Hardware
+ * routes: the consolidation notice at ``/hardware`` and the
+ * browser-gamepad surface at ``/hardware/controllers``.
  * @license GPL-3.0-only
  */
-
-import { HardwareSidebar } from "@/components/hardware/HardwareSidebar";
-import { MeshWsBanner } from "@/components/hardware/MeshWsBanner";
 
 export default function HardwareLayout({
   children,
@@ -18,13 +18,8 @@ export default function HardwareLayout({
 }) {
   return (
     <div className="flex flex-1 overflow-hidden bg-bg-primary">
-      <HardwareSidebar />
-
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-5xl px-6 py-6">
-          <MeshWsBanner />
-          {children}
-        </div>
+        <div className="mx-auto max-w-5xl px-6 py-6">{children}</div>
       </div>
     </div>
   );

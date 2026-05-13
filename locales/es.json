@@ -897,7 +897,12 @@
       },
       "probeFailedStatusError": "Error en la sonda: {status} {statusText}",
       "pairFailedStatusError": "Error al emparejar: {status} {statusText}",
-      "unpairFailedStatusError": "Error al desemparejar: {status} {statusText}"
+      "unpairFailedStatusError": "Error al desemparejar: {status} {statusText}",
+      "firstPairWarning": {
+        "title": "Sus claves de API se guardan en este navegador",
+        "body": "Borrar el almacenamiento del navegador desvinculará todos los nodos emparejados localmente. Para recuperarlos, desvincule desde la aplicación web de configuración del agente en http://<host>:8080/setup.html y vuelva a emparejar desde aquí.",
+        "dismiss": "Entendido"
+      }
     },
     "nodes": {
       "drones": "Drones",
@@ -924,6 +929,10 @@
         "body": "La pestaña Command ahora aloja el flujo Añadir un nodo en modo local y alojará cada tipo de nodo (agente de dron, estación terrestre, relé, receptor y futuro nodo de cómputo) bajo una sola barra lateral. Hardware seguirá disponible durante la transición para subvistas más detalladas.",
         "computeComingSoon": "Nodo de cómputo próximamente",
         "computeBody": "El perfil de cómputo es un nodo de clase estación de trabajo que consume conjuntos de datos de relevamiento y produce ortomosaicos, reconstrucciones NeRF y gaussian splats. Consulta product/specs/compute-agent/ para el diseño completo."
+      },
+      "demoMode": {
+        "title": "Los datos de demostración no están disponibles para los controles de la estación terrestre",
+        "body": "Estas pestañas se comunican con un agente activo a través de REST. Empareje una estación terrestre real desde la tarjeta Add-a-Node en la pestaña Command para usarlas."
       }
     },
     "cloudBadge": "Nube",

@@ -917,6 +917,11 @@
         "groundStation": "Ground station",
         "compute": "Compute",
         "lite": "Drone (lite)"
+      },
+      "firstPairWarning": {
+        "title": "Your API keys live in this browser",
+        "body": "Clearing browser storage will unpair every locally-paired node. To recover, unpair from the agent's setup webapp at http://<host>:8080/setup.html and re-pair from here.",
+        "dismiss": "Got it"
       }
     },
     "nodes": {
@@ -944,6 +949,10 @@
         "body": "The Command tab now hosts the local-first Add-a-Node flow and will host every node type (drone agent, ground station, relay, receiver, future compute) under one sidebar. Hardware will stay available during the transition for deeper sub-views.",
         "computeComingSoon": "Compute node coming soon",
         "computeBody": "The compute profile is a workstation-class node that consumes survey datasets and produces orthomosaics, NeRF reconstructions, and gaussian splats. See product/specs/compute-agent/ for the full design."
+      },
+      "demoMode": {
+        "title": "Demo data is not available for ground-station controls",
+        "body": "These tabs talk to a live agent over REST. Pair a real ground station from the Add-a-Node card on the Command tab to use them."
       }
     }
   },

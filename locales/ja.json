@@ -912,7 +912,12 @@
       },
       "probeFailedStatusError": "プローブに失敗しました: {status} {statusText}",
       "pairFailedStatusError": "ペアリングに失敗しました: {status} {statusText}",
-      "unpairFailedStatusError": "ペアリング解除に失敗しました: {status} {statusText}"
+      "unpairFailedStatusError": "ペアリング解除に失敗しました: {status} {statusText}",
+      "firstPairWarning": {
+        "title": "API キーはこのブラウザに保存されています",
+        "body": "ブラウザストレージを消去すると、ローカルでペアリングされたすべてのノードのペアリングが解除されます。復旧するには、エージェントのセットアップ Web アプリ (http://<host>:8080/setup.html) からペアリングを解除し、ここから再ペアリングしてください。",
+        "dismiss": "了解しました"
+      }
     },
     "nodes": {
       "drones": "ドローン",
@@ -939,6 +944,10 @@
         "body": "Command タブは現在、ローカルファーストのノード追加フローをホストしており、今後はすべてのノードタイプ(ドローンエージェント、地上局、リレー、レシーバー、将来のコンピュート)を 1 つのサイドバーの下にまとめます。Hardware は移行期間中、より詳細なサブビュー用として引き続き利用できます。",
         "computeComingSoon": "コンピュートノードは近日公開",
         "computeBody": "コンピュートプロファイルは、測量データセットを処理し、オルソモザイク、NeRF 再構成、ガウシアンスプラットを生成するワークステーションクラスのノードです。完全な設計については product/specs/compute-agent/ を参照してください。"
+      },
+      "demoMode": {
+        "title": "デモデータは地上局コントロールでは利用できません",
+        "body": "これらのタブは REST 経由で稼働中のエージェントと通信します。利用するには、Command タブの Add-a-Node カードから実際の地上局をペアリングしてください。"
       }
     },
     "cloudBadge": "クラウド",

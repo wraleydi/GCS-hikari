@@ -15,6 +15,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
+  AlertTriangle,
   ChevronRight,
   CloudOff,
   Copy,
@@ -23,12 +24,15 @@ import {
   Plus,
   Radio,
   Search,
+  X,
 } from "lucide-react";
 import {
   probeAgent,
   PairClientError,
   type ProbeResult,
 } from "@/lib/agent/local-pair-client";
+import { useBrowserIdentityStore } from "@/stores/browser-identity-store";
+import { useLocalNodesStore } from "@/stores/local-nodes-store";
 import { ProbeResultCard } from "./ProbeResultCard";
 
 const INSTALL_URL =
@@ -115,6 +119,16 @@ export function AddNodeCard({
     }
   }
 
+  const localNodeCount = useLocalNodesStore((s) => s.nodes.length);
+  const warningDismissedAt = useBrowserIdentityStore(
+    (s) => s.localPairWarningDismissedAt,
+  );
+  const dismissWarning = useBrowserIdentityStore(
+    (s) => s.dismissLocalPairWarning,
+  );
+  const showFirstPairWarning =
+    localNodeCount === 0 && warningDismissedAt === 0;
+
   if (probe) {
     return (
       <ProbeResultCard
@@ -133,6 +147,26 @@ export function AddNodeCard({
 
   return (
     <div className="space-y-5">
+      {showFirstPairWarning && (
+        <div className="flex items-start gap-3 p-3 bg-status-warning/10 border border-status-warning/30 rounded-lg text-xs text-text-secondary">
+          <AlertTriangle size={14} className="mt-0.5 shrink-0 text-status-warning" />
+          <div className="flex-1 space-y-1">
+            <p className="font-medium text-text-primary">
+              {t("firstPairWarning.title")}
+            </p>
+            <p className="text-text-tertiary leading-relaxed">
+              {t("firstPairWarning.body")}
+            </p>
+          </div>
+          <button
+            onClick={dismissWarning}
+            className="shrink-0 inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-text-secondary hover:text-text-primary transition-colors"
+          >
+            {t("firstPairWarning.dismiss")}
+            <X size={10} />
+          </button>
+        </div>
+      )}
       {/* Pair-by-link branch */}
       <div className="p-5 bg-bg-secondary border border-border-default rounded-lg space-y-3">
         <div className="flex items-center gap-2">

@@ -897,7 +897,12 @@
       },
       "probeFailedStatusError": "Prüfung fehlgeschlagen: {status} {statusText}",
       "pairFailedStatusError": "Kopplung fehlgeschlagen: {status} {statusText}",
-      "unpairFailedStatusError": "Entkopplung fehlgeschlagen: {status} {statusText}"
+      "unpairFailedStatusError": "Entkopplung fehlgeschlagen: {status} {statusText}",
+      "firstPairWarning": {
+        "title": "Ihre API-Schlüssel sind in diesem Browser gespeichert",
+        "body": "Das Löschen des Browser-Speichers hebt die Kopplung aller lokal gekoppelten Knoten auf. Zur Wiederherstellung entkoppeln Sie über die Setup-Webapp des Agenten unter http://<host>:8080/setup.html und koppeln Sie von hier aus erneut.",
+        "dismiss": "Verstanden"
+      }
     },
     "nodes": {
       "drones": "Drohnen",
@@ -924,6 +929,10 @@
         "body": "Der Command-Tab beherbergt jetzt den local-first Add-a-Node-Ablauf und wird jeden Knotentyp (Drohnen-Agent, Bodenstation, Relais, Empfänger, künftige Compute) unter einer Seitenleiste verwalten. Hardware bleibt während des Übergangs für tiefergehende Unteransichten verfügbar.",
         "computeComingSoon": "Recheneinheit bald verfügbar",
         "computeBody": "Das Compute-Profil ist ein Knoten der Workstation-Klasse, der Vermessungsdatensätze verarbeitet und Orthomosaike, NeRF-Rekonstruktionen und Gaussian Splats erzeugt. Vollständiges Design siehe product/specs/compute-agent/."
+      },
+      "demoMode": {
+        "title": "Demodaten sind für die Bodenstationssteuerung nicht verfügbar",
+        "body": "Diese Registerkarten kommunizieren per REST mit einem aktiven Agenten. Koppeln Sie eine echte Bodenstation über die Add-a-Node-Karte auf der Registerkarte Command, um sie zu verwenden."
       }
     },
     "cloudBadge": "Cloud",

@@ -912,7 +912,12 @@
       },
       "probeFailedStatusError": "Probe gagal: {status} {statusText}",
       "pairFailedStatusError": "Pemasangan gagal: {status} {statusText}",
-      "unpairFailedStatusError": "Pelepasan pasangan gagal: {status} {statusText}"
+      "unpairFailedStatusError": "Pelepasan pasangan gagal: {status} {statusText}",
+      "firstPairWarning": {
+        "title": "Kunci API Anda tersimpan di browser ini",
+        "body": "Menghapus penyimpanan browser akan memutuskan pemasangan semua node yang dipasangkan secara lokal. Untuk memulihkan, batalkan pemasangan dari aplikasi web setup agen di http://<host>:8080/setup.html lalu pasangkan kembali dari sini.",
+        "dismiss": "Mengerti"
+      }
     },
     "nodes": {
       "drones": "Drone",
@@ -939,6 +944,10 @@
         "body": "Tab Command kini menampung alur Tambah Node mode lokal dan akan menampung setiap jenis node (agen drone, stasiun darat, relai, penerima, komputasi mendatang) di bawah satu sidebar. Hardware tetap tersedia selama masa transisi untuk subtampilan yang lebih dalam.",
         "computeComingSoon": "Node komputasi segera hadir",
         "computeBody": "Profil komputasi adalah node kelas workstation yang mengonsumsi dataset survei dan menghasilkan ortomosaik, rekonstruksi NeRF, dan gaussian splats. Lihat product/specs/compute-agent/ untuk desain lengkap."
+      },
+      "demoMode": {
+        "title": "Data demo tidak tersedia untuk kontrol stasiun darat",
+        "body": "Tab ini berkomunikasi dengan agen langsung melalui REST. Pasangkan stasiun darat sungguhan dari kartu Add-a-Node di tab Command untuk menggunakannya."
       }
     },
     "cloudBadge": "Cloud",

@@ -130,6 +130,26 @@ export function DroneRowExpanded({
                   {tierLabel(drone.tier)}
                 </span>
               )}
+              {drone.profile === "ground-station" && (
+                <span
+                  className="text-[9px] px-1 py-px bg-accent-primary/10 text-accent-primary rounded font-medium"
+                  title={
+                    drone.role
+                      ? `Ground station — ${drone.role}`
+                      : "Ground station"
+                  }
+                >
+                  GS{drone.role && drone.role !== "direct" ? ` / ${drone.role}` : ""}
+                </span>
+              )}
+              {drone.profile === "compute" && (
+                <span
+                  className="text-[9px] px-1 py-px bg-accent-primary/10 text-accent-primary rounded font-medium"
+                  title="Compute node"
+                >
+                  CMP
+                </span>
+              )}
               <SigningStatusBadge droneId={drone._id} compact />
             </div>
           </>

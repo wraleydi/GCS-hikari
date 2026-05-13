@@ -912,7 +912,12 @@
       },
       "probeFailedStatusError": "Falha na sondagem: {status} {statusText}",
       "pairFailedStatusError": "Falha no emparelhamento: {status} {statusText}",
-      "unpairFailedStatusError": "Falha no desemparelhamento: {status} {statusText}"
+      "unpairFailedStatusError": "Falha no desemparelhamento: {status} {statusText}",
+      "firstPairWarning": {
+        "title": "Suas chaves de API ficam armazenadas neste navegador",
+        "body": "Limpar o armazenamento do navegador desemparelhará todos os nós emparelhados localmente. Para recuperar, desemparelhe pelo webapp de configuração do agente em http://<host>:8080/setup.html e emparelhe novamente daqui.",
+        "dismiss": "Entendi"
+      }
     },
     "nodes": {
       "drones": "Drones",
@@ -939,6 +944,10 @@
         "body": "A aba Command agora hospeda o fluxo Adicionar um nó em modo local e abrigará todos os tipos de nó (agente de drone, estação terrestre, relé, receptor e futura computação) sob uma única barra lateral. Hardware permanecerá disponível durante a transição para subvisões mais detalhadas.",
         "computeComingSoon": "Nó de computação em breve",
         "computeBody": "O perfil de computação é um nó de classe estação de trabalho que consome conjuntos de dados de levantamento e produz ortomosaicos, reconstruções NeRF e gaussian splats. Consulte product/specs/compute-agent/ para o projeto completo."
+      },
+      "demoMode": {
+        "title": "Os dados de demonstração não estão disponíveis para os controles da estação terrestre",
+        "body": "Estas abas se comunicam com um agente ativo por REST. Emparelhe uma estação terrestre real pelo cartão Add-a-Node na aba Command para utilizá-las."
       }
     },
     "cloudBadge": "Nuvem",

@@ -897,7 +897,12 @@
       },
       "probeFailedStatusError": "Échec de la sonde : {status} {statusText}",
       "pairFailedStatusError": "Échec de l'appairage : {status} {statusText}",
-      "unpairFailedStatusError": "Échec du désappairage : {status} {statusText}"
+      "unpairFailedStatusError": "Échec du désappairage : {status} {statusText}",
+      "firstPairWarning": {
+        "title": "Vos clés API sont stockées dans ce navigateur",
+        "body": "Effacer le stockage du navigateur dissociera tous les nœuds appariés localement. Pour récupérer, dissociez depuis l'application web de configuration de l'agent à l'adresse http://<host>:8080/setup.html, puis effectuez à nouveau l'appairage ici.",
+        "dismiss": "Compris"
+      }
     },
     "nodes": {
       "drones": "Drones",
@@ -924,6 +929,10 @@
         "body": "L'onglet Command héberge désormais le flux Ajouter un nœud en mode local et accueillera tous les types de nœuds (agent de drone, station au sol, relais, récepteur, futur nœud de calcul) sous une seule barre latérale. Hardware restera disponible pendant la transition pour les sous-vues plus détaillées.",
         "computeComingSoon": "Nœud de calcul bientôt disponible",
         "computeBody": "Le profil de calcul est un nœud de classe station de travail qui consomme des jeux de données de relevé et produit des orthomosaïques, des reconstructions NeRF et des gaussian splats. Voir product/specs/compute-agent/ pour la conception complète."
+      },
+      "demoMode": {
+        "title": "Les données de démonstration ne sont pas disponibles pour les contrôles de la station au sol",
+        "body": "Ces onglets communiquent avec un agent en direct via REST. Appairez une véritable station au sol depuis la carte Add-a-Node de l'onglet Command pour les utiliser."
       }
     },
     "cloudBadge": "Cloud",

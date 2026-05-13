@@ -11,7 +11,9 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { Radio } from "lucide-react";
 import { useAgentCapabilitiesStore } from "@/stores/agent-capabilities-store";
+import { isDemoMode } from "@/lib/utils";
 import { OverviewTab } from "./OverviewTab";
 import { RadioTab } from "./RadioTab";
 import { NetworkTab } from "./NetworkTab";
@@ -50,8 +52,31 @@ function visibleTabsForRole(role: string | null | undefined): TabId[] {
 
 export function GroundStationDetailPanel() {
   const t = useTranslations("command.groundStation.tabs");
+  const tDemo = useTranslations("command.groundStation.demoMode");
   const role = useAgentCapabilitiesStore((s) => s.role);
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+
+  // Ground-station controls call into the agent's REST surface for
+  // every tab. Demo mode has no real agent, so all 8 tabs would
+  // silently fail. Surface a single guard at the panel level so
+  // operators understand why the surface is inert in demo.
+  if (isDemoMode()) {
+    return (
+      <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-border-default bg-bg-secondary text-text-tertiary">
+            <Radio size={24} />
+          </div>
+          <h2 className="text-sm font-display font-semibold text-text-primary">
+            {tDemo("title")}
+          </h2>
+          <p className="mt-2 max-w-md text-xs text-text-tertiary leading-relaxed">
+            {tDemo("body")}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Compute the visible tab set once per render so the nav strip and
   // the body always agree even on rapid role flips.
@@ -64,6 +89,34 @@ export function GroundStationDetailPanel() {
   const visibleTab: TabId = visibleIds.includes(activeTab)
     ? activeTab
     : "overview";
+
+  // WAI-ARIA roving-tabindex + arrow-key navigation. The active tab
+  // is the only one in the tab order; Left/Right/Home/End move focus
+  // AND activate the new tab. Operators using Tab from the sidebar
+  // land on the active tab, then use arrow keys inside the tablist.
+  function handleTabKey(e: React.KeyboardEvent<HTMLButtonElement>) {
+    const idx = visibleIds.indexOf(visibleTab);
+    let nextIdx = idx;
+    if (e.key === "ArrowRight") {
+      nextIdx = (idx + 1) % visibleIds.length;
+    } else if (e.key === "ArrowLeft") {
+      nextIdx = (idx - 1 + visibleIds.length) % visibleIds.length;
+    } else if (e.key === "Home") {
+      nextIdx = 0;
+    } else if (e.key === "End") {
+      nextIdx = visibleIds.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    const nextId = visibleIds[nextIdx];
+    setActiveTab(nextId);
+    // Move focus to the newly active tab on the next paint so the
+    // operator sees the focus ring follow the selection.
+    requestAnimationFrame(() => {
+      document.getElementById(`gs-tab-${nextId}`)?.focus();
+    });
+  }
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -80,11 +133,9 @@ export function GroundStationDetailPanel() {
             role="tab"
             aria-selected={visibleTab === tab.id}
             aria-controls={`gs-tabpanel-${tab.id}`}
-            // Use default tabIndex=0 on all tabs (not roving) to match
-            // DroneDetailPanel precedent. aria-selected carries the
-            // active-state signal to screen readers; full keyboard
-            // navigation between tabs happens via standard Tab/Shift+Tab.
+            tabIndex={visibleTab === tab.id ? 0 : -1}
             onClick={() => setActiveTab(tab.id)}
+            onKeyDown={handleTabKey}
             className={
               visibleTab === tab.id
                 ? "px-3 py-2.5 text-xs font-medium text-accent-primary border-b-2 border-accent-primary -mb-px whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary"

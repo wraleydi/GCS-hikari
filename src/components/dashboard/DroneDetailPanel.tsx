@@ -132,20 +132,57 @@ export function DroneDetailPanel({ droneId, onClose }: DroneDetailPanelProps) {
 
           <div className="w-px h-5 bg-border-default shrink-0" />
 
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "self-stretch flex items-center px-2.5 text-xs font-medium transition-colors cursor-pointer shrink-0 -mb-px border-b-2",
-                visibleTab === tab.id
-                  ? "text-accent-primary border-accent-primary"
-                  : "text-text-secondary hover:text-text-primary border-transparent"
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
+          <div
+            role="tablist"
+            aria-label="Drone detail"
+            className="flex items-center self-stretch"
+          >
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                id={`drone-tab-${tab.id}`}
+                role="tab"
+                aria-selected={visibleTab === tab.id}
+                aria-controls={`drone-tabpanel-${tab.id}`}
+                tabIndex={visibleTab === tab.id ? 0 : -1}
+                onClick={() => setActiveTab(tab.id)}
+                onKeyDown={(e) => {
+                  // Roving-tabindex + arrow-key nav per WAI-ARIA tab
+                  // pattern. Left/Right/Home/End move + activate.
+                  const idsArr = tabs.map((tt) => tt.id);
+                  const idx = idsArr.indexOf(visibleTab as DroneDetailTab);
+                  let nextIdx = idx;
+                  if (e.key === "ArrowRight") {
+                    nextIdx = (idx + 1) % idsArr.length;
+                  } else if (e.key === "ArrowLeft") {
+                    nextIdx = (idx - 1 + idsArr.length) % idsArr.length;
+                  } else if (e.key === "Home") {
+                    nextIdx = 0;
+                  } else if (e.key === "End") {
+                    nextIdx = idsArr.length - 1;
+                  } else {
+                    return;
+                  }
+                  e.preventDefault();
+                  const nextId = idsArr[nextIdx];
+                  setActiveTab(nextId);
+                  requestAnimationFrame(() => {
+                    document
+                      .getElementById(`drone-tab-${nextId}`)
+                      ?.focus();
+                  });
+                }}
+                className={cn(
+                  "self-stretch flex items-center px-2.5 text-xs font-medium transition-colors cursor-pointer shrink-0 -mb-px border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary",
+                  visibleTab === tab.id
+                    ? "text-accent-primary border-accent-primary"
+                    : "text-text-secondary hover:text-text-primary border-transparent"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
           <span className="text-[10px] font-mono text-text-tertiary ml-auto shrink-0">
             ID: {drone.id}
@@ -177,7 +214,12 @@ export function DroneDetailPanel({ droneId, onClose }: DroneDetailPanelProps) {
       )}
 
       {/* Tab content */}
-      <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+      <div
+        id={`drone-tabpanel-${visibleTab}`}
+        role="tabpanel"
+        aria-labelledby={`drone-tab-${visibleTab}`}
+        className="flex-1 min-h-0 overflow-hidden flex flex-col"
+      >
         {visibleTab === "overview" && <DroneOverviewTab drone={drone} />}
         {visibleTab === "flights" && <DroneFlightsTab droneId={droneId} />}
         {visibleTab === "calibrate" && <CalibrationPanel />}

@@ -102,7 +102,9 @@ vi.mock("@/components/ui/toast", () => ({
   useToast: () => ({ toast: vi.fn() }),
 }));
 
-import HardwareDisplayPage from "@/app/hardware/display/page";
+// The hardware display route retired in Stage 5; the body lives at
+// the lifted Command-tab tab component.
+import { DisplayTab as HardwareDisplayPage } from "@/components/command/nodes/ground-station/DisplayTab";
 import { useAgentCapabilitiesStore } from "@/stores/agent-capabilities-store";
 import { useAgentSystemStore } from "@/stores/agent-system-store";
 

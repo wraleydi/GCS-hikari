@@ -33,7 +33,11 @@ import { persist } from "zustand/middleware";
 
 interface BrowserIdentityState {
   browserId: string;
+  /** Epoch ms when the operator dismissed the first-pair UX warning,
+   * or 0 if it has never been dismissed. */
+  localPairWarningDismissedAt: number;
   ensureBrowserId: () => string;
+  dismissLocalPairWarning: () => void;
 }
 
 function generateBrowserId(): string {
@@ -50,6 +54,7 @@ export const useBrowserIdentityStore = create<BrowserIdentityState>()(
   persist(
     (set, get) => ({
       browserId: "",
+      localPairWarningDismissedAt: 0,
       ensureBrowserId: () => {
         let id = get().browserId;
         if (!id) {
@@ -57,6 +62,9 @@ export const useBrowserIdentityStore = create<BrowserIdentityState>()(
           set({ browserId: id });
         }
         return id;
+      },
+      dismissLocalPairWarning: () => {
+        set({ localPairWarningDismissedAt: Date.now() });
       },
     }),
     {
