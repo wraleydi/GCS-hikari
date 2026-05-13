@@ -894,7 +894,10 @@
         "groundStation": "ਗ੍ਰਾਊਂਡ ਸਟੇਸ਼ਨ",
         "compute": "ਕੰਪਿਊਟ",
         "lite": "ਡ੍ਰੋਨ (ਲਾਈਟ)"
-      }
+      },
+      "probeFailedStatusError": "ਜਾਂਚ ਅਸਫਲ: {status} {statusText}",
+      "pairFailedStatusError": "ਪੇਅਰਿੰਗ ਅਸਫਲ: {status} {statusText}",
+      "unpairFailedStatusError": "ਅਨਪੇਅਰਿੰਗ ਅਸਫਲ: {status} {statusText}"
     },
     "nodes": {
       "drones": "ਡਰੋਨ",
@@ -922,7 +925,12 @@
         "computeComingSoon": "ਕੰਪਿਊਟ ਨੋਡ — ਛੇਤੀ ਆ ਰਿਹਾ ਹੈ",
         "computeBody": "ਕੰਪਿਊਟ ਪ੍ਰੋਫਾਈਲ ਇੱਕ ਵਰਕਸਟੇਸ਼ਨ-ਸ਼੍ਰੇਣੀ ਦਾ ਨੋਡ ਹੈ ਜੋ ਸਰਵੇ ਡੇਟਾਸੈੱਟ ਵਰਤਦਾ ਹੈ ਅਤੇ ਆਰਥੋਮੋਜ਼ੇਕ, NeRF ਪੁਨਰ ਨਿਰਮਾਣ ਅਤੇ ਗੌਸੀਅਨ ਸਪਲੈਟ ਤਿਆਰ ਕਰਦਾ ਹੈ। ਪੂਰੇ ਡਿਜ਼ਾਈਨ ਲਈ product/specs/compute-agent/ ਵੇਖੋ।"
       }
-    }
+    },
+    "cloudBadge": "ਕਲਾਉਡ",
+    "staleLastSeen": "ਪੁਰਾਣਾ · ਆਖਰੀ ਵਾਰ ਦੇਖਿਆ {label}",
+    "offlineLastSeen": "ਔਫਲਾਈਨ · ਆਖਰੀ ਵਾਰ ਦੇਖਿਆ {label}",
+    "reconnectButton": "ਮੁੜ ਕਨੈਕਟ ਕਰੋ",
+    "reconnectTooltip": "ਇਸ ਡਰੋਨ ਲਈ ਕਲਾਉਡ ਹਾਰਟਬੀਟਾਂ ਦੀ ਮੁੜ ਸਬਸਕ੍ਰਾਈਬ ਕਰੋ"
   },
   "agent": {
     "status": "ਸਥਿਤੀ",

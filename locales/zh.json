@@ -894,7 +894,10 @@
         "groundStation": "地面站",
         "compute": "计算节点",
         "lite": "无人机（精简版）"
-      }
+      },
+      "probeFailedStatusError": "探测失败：{status} {statusText}",
+      "pairFailedStatusError": "配对失败：{status} {statusText}",
+      "unpairFailedStatusError": "解除配对失败：{status} {statusText}"
     },
     "nodes": {
       "drones": "无人机",
@@ -922,7 +925,12 @@
         "computeComingSoon": "计算节点 — 即将推出",
         "computeBody": "计算配置文件是一种工作站级节点,负责处理测绘数据集并生成正射影像、NeRF 重建和高斯泼溅。完整设计请参见 product/specs/compute-agent/。"
       }
-    }
+    },
+    "cloudBadge": "云端",
+    "staleLastSeen": "数据陈旧 · 最后在线 {label}",
+    "offlineLastSeen": "离线 · 最后在线 {label}",
+    "reconnectButton": "重新连接",
+    "reconnectTooltip": "重新订阅该无人机的云端心跳"
   },
   "agent": {
     "status": "状态",

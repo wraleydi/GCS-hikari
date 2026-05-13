@@ -880,6 +880,11 @@
     "tier": "Tier",
     "allAgents": "All Agents",
     "pairedCount": "{count} paired",
+    "cloudBadge": "Cloud",
+    "staleLastSeen": "Stale · last seen {label}",
+    "offlineLastSeen": "Offline · last seen {label}",
+    "reconnectButton": "Reconnect",
+    "reconnectTooltip": "Re-subscribe to cloud heartbeats for this drone",
     "addNode": {
       "title": "Add a node",
       "subtitle": "Pair any ADOS node — drone, ground station, or future compute — directly over your LAN.",
@@ -903,6 +908,9 @@
       "cancelButton": "Cancel",
       "mixedContentError": "This Mission Control is served over HTTPS. Browsers block plain HTTP probes from HTTPS pages. Load Mission Control over http:// (or use a localhost build) to pair LAN agents.",
       "missingDeviceIdError": "Probe response missing device_id",
+      "probeFailedStatusError": "Probe failed: {status} {statusText}",
+      "pairFailedStatusError": "Pair failed: {status} {statusText}",
+      "unpairFailedStatusError": "Unpair failed: {status} {statusText}",
       "pairedButConnectFailed": "Paired, but could not establish a live connection: {error}. The node is saved — retry from the sidebar.",
       "profileLabel": {
         "drone": "Drone",

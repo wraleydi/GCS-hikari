@@ -909,7 +909,10 @@
         "groundStation": "Stasiun darat",
         "compute": "Komputasi",
         "lite": "Drone (lite)"
-      }
+      },
+      "probeFailedStatusError": "Probe gagal: {status} {statusText}",
+      "pairFailedStatusError": "Pemasangan gagal: {status} {statusText}",
+      "unpairFailedStatusError": "Pelepasan pasangan gagal: {status} {statusText}"
     },
     "nodes": {
       "drones": "Drone",
@@ -937,7 +940,12 @@
         "computeComingSoon": "Node komputasi — segera hadir",
         "computeBody": "Profil komputasi adalah node kelas workstation yang mengonsumsi dataset survei dan menghasilkan ortomosaik, rekonstruksi NeRF, dan gaussian splats. Lihat product/specs/compute-agent/ untuk desain lengkap."
       }
-    }
+    },
+    "cloudBadge": "Cloud",
+    "staleLastSeen": "Usang · terakhir terlihat {label}",
+    "offlineLastSeen": "Luring · terakhir terlihat {label}",
+    "reconnectButton": "Sambungkan ulang",
+    "reconnectTooltip": "Berlangganan ulang detak jantung cloud untuk drone ini"
   },
   "agent": {
     "status": "Status Agent",

@@ -894,7 +894,10 @@
         "groundStation": "Estación terrestre",
         "compute": "Cómputo",
         "lite": "Dron (lite)"
-      }
+      },
+      "probeFailedStatusError": "Error en la sonda: {status} {statusText}",
+      "pairFailedStatusError": "Error al emparejar: {status} {statusText}",
+      "unpairFailedStatusError": "Error al desemparejar: {status} {statusText}"
     },
     "nodes": {
       "drones": "Drones",
@@ -922,7 +925,12 @@
         "computeComingSoon": "Nodo de cómputo — próximamente",
         "computeBody": "El perfil de cómputo es un nodo de clase estación de trabajo que consume conjuntos de datos de relevamiento y produce ortomosaicos, reconstrucciones NeRF y gaussian splats. Consulta product/specs/compute-agent/ para el diseño completo."
       }
-    }
+    },
+    "cloudBadge": "Nube",
+    "staleLastSeen": "Obsoleto · visto por última vez {label}",
+    "offlineLastSeen": "Sin conexión · visto por última vez {label}",
+    "reconnectButton": "Reconectar",
+    "reconnectTooltip": "Volver a suscribirse a las señales en la nube de este dron"
   },
   "agent": {
     "status": "Estado",

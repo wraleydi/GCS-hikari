@@ -909,7 +909,10 @@
         "groundStation": "ग्राउंड स्टेशन",
         "compute": "कंप्यूट",
         "lite": "ड्रोन (लाइट)"
-      }
+      },
+      "probeFailedStatusError": "तपासणी अयशस्वी: {status} {statusText}",
+      "pairFailedStatusError": "जोडणी अयशस्वी: {status} {statusText}",
+      "unpairFailedStatusError": "जोडणी तोडणे अयशस्वी: {status} {statusText}"
     },
     "nodes": {
       "drones": "ड्रोन",
@@ -937,7 +940,12 @@
         "computeComingSoon": "कंप्यूट नोड — लवकरच येत आहे",
         "computeBody": "कंप्यूट प्रोफाइल हा एक वर्कस्टेशन-श्रेणीचा नोड आहे जो सर्व्हे डेटासेट वापरतो आणि ऑर्थोमोझेक, NeRF पुनर्रचना आणि गॉसियन स्प्लॅट तयार करतो. संपूर्ण रचनेसाठी product/specs/compute-agent/ पहा."
       }
-    }
+    },
+    "cloudBadge": "क्लाउड",
+    "staleLastSeen": "जुने · शेवटचे पाहिले {label}",
+    "offlineLastSeen": "ऑफलाइन · शेवटचे पाहिले {label}",
+    "reconnectButton": "पुन्हा कनेक्ट करा",
+    "reconnectTooltip": "या ड्रोनसाठी क्लाउड हार्टबीट्सची पुन्हा सदस्यता घ्या"
   },
   "agent": {
     "status": "एजंट स्थिती",

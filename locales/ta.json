@@ -894,7 +894,10 @@
         "groundStation": "தரை நிலையம்",
         "compute": "கம்ப்யூட்",
         "lite": "ட்ரோன் (லைட்)"
-      }
+      },
+      "probeFailedStatusError": "ஆய்வு தோல்வியடைந்தது: {status} {statusText}",
+      "pairFailedStatusError": "இணைப்பு தோல்வியடைந்தது: {status} {statusText}",
+      "unpairFailedStatusError": "இணைப்பு நீக்கம் தோல்வியடைந்தது: {status} {statusText}"
     },
     "nodes": {
       "drones": "டிரோன்கள்",
@@ -922,7 +925,12 @@
         "computeComingSoon": "கம்ப்யூட் கணு — விரைவில் வரும்",
         "computeBody": "கம்ப்யூட் சுயவிவரம் என்பது சர்வே தரவுத் தொகுப்புகளை உட்கொள்ளும் ஒரு பணியிட வகுப்பு கணு ஆகும், இது ஆர்த்தோமொசைக், NeRF மறுசீரமைப்புகள் மற்றும் காசியன் ஸ்ப்ளாட்களை உருவாக்குகிறது. முழுமையான வடிவமைப்புக்கு product/specs/compute-agent/ பார்க்கவும்."
       }
-    }
+    },
+    "cloudBadge": "கிளவுட்",
+    "staleLastSeen": "பழையது · கடைசியாகக் கண்டது {label}",
+    "offlineLastSeen": "ஆஃப்லைன் · கடைசியாகக் கண்டது {label}",
+    "reconnectButton": "மீண்டும் இணை",
+    "reconnectTooltip": "இந்த டிரோனுக்கான கிளவுட் ஹார்ட்பீட்களுக்கு மீண்டும் குழுசேரவும்"
   },
   "agent": {
     "status": "Agent நிலை",

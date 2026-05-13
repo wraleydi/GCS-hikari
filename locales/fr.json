@@ -894,7 +894,10 @@
         "groundStation": "Station au sol",
         "compute": "Calcul",
         "lite": "Drone (allégé)"
-      }
+      },
+      "probeFailedStatusError": "Échec de la sonde : {status} {statusText}",
+      "pairFailedStatusError": "Échec de l'appairage : {status} {statusText}",
+      "unpairFailedStatusError": "Échec du désappairage : {status} {statusText}"
     },
     "nodes": {
       "drones": "Drones",
@@ -922,7 +925,12 @@
         "computeComingSoon": "Nœud de calcul — bientôt disponible",
         "computeBody": "Le profil de calcul est un nœud de classe station de travail qui consomme des jeux de données de relevé et produit des orthomosaïques, des reconstructions NeRF et des gaussian splats. Voir product/specs/compute-agent/ pour la conception complète."
       }
-    }
+    },
+    "cloudBadge": "Cloud",
+    "staleLastSeen": "Obsolète · vu pour la dernière fois {label}",
+    "offlineLastSeen": "Hors ligne · vu pour la dernière fois {label}",
+    "reconnectButton": "Reconnecter",
+    "reconnectTooltip": "Se réabonner aux signaux cloud de ce drone"
   },
   "agent": {
     "status": "Statut",

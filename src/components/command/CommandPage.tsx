@@ -88,6 +88,16 @@ export function CommandPage() {
 
   // Render-safe fallback when active tab becomes unavailable.
   const renderedActiveTab = visibleTabs.includes(activeTab) ? activeTab : "overview";
+
+  // Reconcile activeTab state when the visible-tabs set shrinks (e.g.
+  // a profile change drops the "ros" tab). Without this, the stale
+  // id sits in state and re-flips the render the moment the tab set
+  // grows again, causing a UI race.
+  useEffect(() => {
+    if (!visibleTabs.includes(activeTab)) {
+      setActiveTab(renderedActiveTab);
+    }
+  }, [visibleTabs, activeTab, renderedActiveTab]);
   const [urlInput, setUrlInput] = useState("http://localhost:8080");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [pairingOpen, setPairingOpen] = useState(false);
@@ -283,7 +293,7 @@ export function CommandPage() {
                 {cloudMode && (
                   <span className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 bg-accent-primary/15 text-accent-primary rounded font-medium">
                     <Cloud size={10} />
-                    Cloud
+                    {t("cloudBadge")}
                   </span>
                 )}
                 {activeFeatureName && headerState === "live" && (
@@ -294,12 +304,12 @@ export function CommandPage() {
                 )}
                 {headerState === "stale" && (
                   <span className="text-[10px] px-1.5 py-0.5 bg-status-warning/15 text-status-warning rounded font-medium uppercase tracking-wide">
-                    Stale · last seen {freshness.label}
+                    {t("staleLastSeen", { label: freshness.label })}
                   </span>
                 )}
                 {headerState === "offline" && (
                   <span className="text-[10px] px-1.5 py-0.5 bg-status-error/15 text-status-error rounded font-medium uppercase tracking-wide">
-                    Offline · last seen {freshness.label}
+                    {t("offlineLastSeen", { label: freshness.label })}
                   </span>
                 )}
               </div>
@@ -308,10 +318,10 @@ export function CommandPage() {
                   <button
                     onClick={() => connectCloud(cloudDeviceId)}
                     className="flex items-center gap-1.5 px-2.5 py-1 text-xs text-accent-primary hover:bg-bg-tertiary rounded transition-colors"
-                    title="Re-subscribe to cloud heartbeats for this drone"
+                    title={t("reconnectTooltip")}
                   >
                     <Plug size={12} />
-                    Reconnect
+                    {t("reconnectButton")}
                   </button>
                 )}
                 <button

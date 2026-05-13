@@ -909,7 +909,10 @@
         "groundStation": "Estação terrestre",
         "compute": "Computação",
         "lite": "Drone (lite)"
-      }
+      },
+      "probeFailedStatusError": "Falha na sondagem: {status} {statusText}",
+      "pairFailedStatusError": "Falha no emparelhamento: {status} {statusText}",
+      "unpairFailedStatusError": "Falha no desemparelhamento: {status} {statusText}"
     },
     "nodes": {
       "drones": "Drones",
@@ -937,7 +940,12 @@
         "computeComingSoon": "Nó de computação — em breve",
         "computeBody": "O perfil de computação é um nó de classe estação de trabalho que consome conjuntos de dados de levantamento e produz ortomosaicos, reconstruções NeRF e gaussian splats. Consulte product/specs/compute-agent/ para o projeto completo."
       }
-    }
+    },
+    "cloudBadge": "Nuvem",
+    "staleLastSeen": "Desatualizado · visto pela última vez {label}",
+    "offlineLastSeen": "Offline · visto pela última vez {label}",
+    "reconnectButton": "Reconectar",
+    "reconnectTooltip": "Reassinar os sinais de nuvem deste drone"
   },
   "agent": {
     "status": "Status do Agente",

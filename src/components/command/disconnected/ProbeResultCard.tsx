@@ -15,6 +15,7 @@ import { AlertTriangle, Check, Loader2, Radio, X } from "lucide-react";
 import {
   pairLocally,
   AgentAlreadyPairedError,
+  PairClientError,
   type ProbeResult,
 } from "@/lib/agent/local-pair-client";
 import { useLocalNodesStore } from "@/stores/local-nodes-store";
@@ -101,6 +102,12 @@ export function ProbeResultCard({ probe, onPaired, onCancel }: ProbeResultCardPr
       } else if (e instanceof DOMException && e.name === "AbortError") {
         // Component unmounted or user navigated away. No-op.
         return;
+      } else if (e instanceof PairClientError) {
+        try {
+          setError(t(e.code, e.details as Record<string, string | number>));
+        } catch {
+          setError(e.message);
+        }
       } else {
         setError(e instanceof Error ? e.message : String(e));
       }

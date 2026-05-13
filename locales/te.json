@@ -909,7 +909,10 @@
         "groundStation": "గ్రౌండ్ స్టేషన్",
         "compute": "కంప్యూట్",
         "lite": "డ్రోన్ (లైట్)"
-      }
+      },
+      "probeFailedStatusError": "పరిశీలన విఫలమైంది: {status} {statusText}",
+      "pairFailedStatusError": "జత చేయడం విఫలమైంది: {status} {statusText}",
+      "unpairFailedStatusError": "జత తొలగింపు విఫలమైంది: {status} {statusText}"
     },
     "nodes": {
       "drones": "డ్రోన్‌లు",
@@ -937,7 +940,12 @@
         "computeComingSoon": "కంప్యూట్ నోడ్ — త్వరలో రాబోతోంది",
         "computeBody": "కంప్యూట్ ప్రొఫైల్ అనేది వర్క్‌స్టేషన్-క్లాస్ నోడ్, ఇది సర్వే డేటాసెట్‌లను ఉపయోగిస్తుంది మరియు ఆర్థోమొజైక్‌లు, NeRF పునర్నిర్మాణాలు మరియు గాసియన్ స్ప్లాట్‌లను ఉత్పత్తి చేస్తుంది. పూర్తి డిజైన్ కోసం product/specs/compute-agent/ చూడండి."
       }
-    }
+    },
+    "cloudBadge": "క్లౌడ్",
+    "staleLastSeen": "పాతది · చివరిసారి కనిపించింది {label}",
+    "offlineLastSeen": "ఆఫ్‌లైన్ · చివరిసారి కనిపించింది {label}",
+    "reconnectButton": "మళ్లీ కనెక్ట్ చేయి",
+    "reconnectTooltip": "ఈ డ్రోన్ కోసం క్లౌడ్ హార్ట్‌బీట్‌లకు మళ్లీ సబ్‌స్క్రైబ్ చేయండి"
   },
   "agent": {
     "status": "ఏజెంట్ స్థితి",

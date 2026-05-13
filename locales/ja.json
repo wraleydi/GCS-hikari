@@ -909,7 +909,10 @@
         "groundStation": "地上局",
         "compute": "コンピュート",
         "lite": "ドローン (Lite)"
-      }
+      },
+      "probeFailedStatusError": "プローブに失敗しました: {status} {statusText}",
+      "pairFailedStatusError": "ペアリングに失敗しました: {status} {statusText}",
+      "unpairFailedStatusError": "ペアリング解除に失敗しました: {status} {statusText}"
     },
     "nodes": {
       "drones": "ドローン",
@@ -937,7 +940,12 @@
         "computeComingSoon": "コンピュートノード — 近日公開",
         "computeBody": "コンピュートプロファイルは、測量データセットを処理し、オルソモザイク、NeRF 再構成、ガウシアンスプラットを生成するワークステーションクラスのノードです。完全な設計については product/specs/compute-agent/ を参照してください。"
       }
-    }
+    },
+    "cloudBadge": "クラウド",
+    "staleLastSeen": "古い情報 · 最終確認 {label}",
+    "offlineLastSeen": "オフライン · 最終確認 {label}",
+    "reconnectButton": "再接続",
+    "reconnectTooltip": "このドローンのクラウドハートビートを再購読します"
   },
   "agent": {
     "status": "エージェントステータス",

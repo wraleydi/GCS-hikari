@@ -894,7 +894,10 @@
         "groundStation": "Bodenstation",
         "compute": "Compute",
         "lite": "Drohne (Lite)"
-      }
+      },
+      "probeFailedStatusError": "Prüfung fehlgeschlagen: {status} {statusText}",
+      "pairFailedStatusError": "Kopplung fehlgeschlagen: {status} {statusText}",
+      "unpairFailedStatusError": "Entkopplung fehlgeschlagen: {status} {statusText}"
     },
     "nodes": {
       "drones": "Drohnen",
@@ -922,7 +925,12 @@
         "computeComingSoon": "Compute-Knoten — demnächst verfügbar",
         "computeBody": "Das Compute-Profil ist ein Knoten der Workstation-Klasse, der Vermessungsdatensätze verarbeitet und Orthomosaike, NeRF-Rekonstruktionen und Gaussian Splats erzeugt. Vollständiges Design siehe product/specs/compute-agent/."
       }
-    }
+    },
+    "cloudBadge": "Cloud",
+    "staleLastSeen": "Veraltet · zuletzt gesehen {label}",
+    "offlineLastSeen": "Offline · zuletzt gesehen {label}",
+    "reconnectButton": "Neu verbinden",
+    "reconnectTooltip": "Cloud-Heartbeats für diese Drohne erneut abonnieren"
   },
   "agent": {
     "status": "Status",

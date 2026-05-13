@@ -909,7 +909,10 @@
         "groundStation": "ગ્રાઉન્ડ સ્ટેશન",
         "compute": "કમ્પ્યુટ",
         "lite": "ડ્રોન (લાઇટ)"
-      }
+      },
+      "probeFailedStatusError": "તપાસ નિષ્ફળ: {status} {statusText}",
+      "pairFailedStatusError": "જોડાણ નિષ્ફળ: {status} {statusText}",
+      "unpairFailedStatusError": "જોડાણ દૂર કરવું નિષ્ફળ: {status} {statusText}"
     },
     "nodes": {
       "drones": "ડ્રોન",
@@ -937,7 +940,12 @@
         "computeComingSoon": "કમ્પ્યુટ નોડ — ટૂંક સમયમાં આવી રહ્યું છે",
         "computeBody": "કમ્પ્યુટ પ્રોફાઇલ એ વર્કસ્ટેશન-ક્લાસ નોડ છે જે સર્વે ડેટાસેટ્સનો ઉપયોગ કરે છે અને ઓર્થોમોઝેઇક્સ, NeRF પુનઃનિર્માણ અને ગૌસિયન સ્પ્લેટ્સ ઉત્પન્ન કરે છે. સંપૂર્ણ ડિઝાઇન માટે product/specs/compute-agent/ જુઓ."
       }
-    }
+    },
+    "cloudBadge": "ક્લાઉડ",
+    "staleLastSeen": "જૂનું · છેલ્લે જોવામાં આવ્યું {label}",
+    "offlineLastSeen": "ઑફલાઇન · છેલ્લે જોવામાં આવ્યું {label}",
+    "reconnectButton": "ફરી કનેક્ટ કરો",
+    "reconnectTooltip": "આ ડ્રોન માટે ક્લાઉડ હાર્ટબીટ્સ ફરી સબ્સ્ક્રાઇબ કરો"
   },
   "agent": {
     "status": "એજન્ટ સ્થિતિ",

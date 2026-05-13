@@ -94,7 +94,7 @@ export async function probeAgent(
 ): Promise<ProbeResult> {
   const host = normaliseHost(rawHost);
   if (!host) {
-    throw new Error("Enter a hostname or URL to probe");
+    throw new PairClientError("enterHostnameError", "Enter a hostname or URL to probe");
   }
   // Mixed-content guard: HTTPS pages can't fetch HTTP endpoints. The
   // browser will block silently otherwise; surface a clear message.
@@ -103,8 +103,9 @@ export async function probeAgent(
     window.location.protocol === "https:" &&
     host.startsWith("http://")
   ) {
-    throw new Error(
-      "This Mission Control is served over HTTPS. Browsers block plain HTTP probes from HTTPS pages. Load Mission Control over http:// (or use a localhost build) to pair LAN agents.",
+    throw new PairClientError(
+      "mixedContentError",
+      "Mission Control is served over HTTPS but the target is HTTP. Load Mission Control over http:// to pair LAN agents.",
     );
   }
   const resp = await fetch(`${host}/api/pairing/info`, {
@@ -113,12 +114,16 @@ export async function probeAgent(
     signal: combineSignals(signal),
   });
   if (!resp.ok) {
-    throw new Error(`Probe failed: ${resp.status} ${resp.statusText}`);
+    throw new PairClientError(
+      "probeFailedStatusError",
+      `Probe failed: ${resp.status} ${resp.statusText}`,
+      { status: resp.status, statusText: resp.statusText },
+    );
   }
   const body = (await resp.json()) as Record<string, unknown>;
   const deviceId = String(body.device_id ?? "");
   if (!deviceId) {
-    throw new Error("Probe response missing device_id");
+    throw new PairClientError("missingDeviceIdError", "Probe response missing device_id");
   }
   const profile = (body.profile as string) || "drone";
   const role = (body.role as string | undefined) ?? null;
@@ -145,6 +150,22 @@ export class AgentAlreadyPairedError extends Error {
   }
 }
 
+/** Structured error class for pair-client failures. The ``code``
+ * field maps to an i18n key under ``command.addNode.*`` so the
+ * consuming component can render a translated message; the
+ * ``message`` is kept as a dev-readable fallback. ``details`` is
+ * spread into the translation interpolation context. */
+export class PairClientError extends Error {
+  readonly code: string;
+  readonly details: Record<string, unknown>;
+  constructor(code: string, message: string, details: Record<string, unknown> = {}) {
+    super(message);
+    this.name = "PairClientError";
+    this.code = code;
+    this.details = details;
+  }
+}
+
 /** POST ``/api/pairing/claim`` with the browser-local UUID as ``user_id``.
  * The browser UUID acts as the pair owner id — the agent treats it
  * as the credential for unpair on subsequent requests.
@@ -168,7 +189,11 @@ export async function pairLocally(
     throw new AgentAlreadyPairedError();
   }
   if (!resp.ok) {
-    throw new Error(`Pair failed: ${resp.status} ${resp.statusText}`);
+    throw new PairClientError(
+      "pairFailedStatusError",
+      `Pair failed: ${resp.status} ${resp.statusText}`,
+      { status: resp.status, statusText: resp.statusText },
+    );
   }
   const body = (await resp.json()) as Record<string, unknown>;
   return {
@@ -196,6 +221,10 @@ export async function unpairLocal(
     signal,
   });
   if (!resp.ok && resp.status !== 409) {
-    throw new Error(`Unpair failed: ${resp.status} ${resp.statusText}`);
+    throw new PairClientError(
+      "unpairFailedStatusError",
+      `Unpair failed: ${resp.status} ${resp.statusText}`,
+      { status: resp.status, statusText: resp.statusText },
+    );
   }
 }

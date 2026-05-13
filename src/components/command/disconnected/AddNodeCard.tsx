@@ -24,7 +24,11 @@ import {
   Radio,
   Search,
 } from "lucide-react";
-import { probeAgent, type ProbeResult } from "@/lib/agent/local-pair-client";
+import {
+  probeAgent,
+  PairClientError,
+  type ProbeResult,
+} from "@/lib/agent/local-pair-client";
 import { ProbeResultCard } from "./ProbeResultCard";
 
 const INSTALL_URL =
@@ -72,10 +76,21 @@ export function AddNodeCard({
       setProbe(result);
     } catch (e) {
       if (ctrl.signal.aborted) return;
-      const msg =
-        e instanceof Error
-          ? e.message
-          : "Could not reach that address. Check the agent is running and on the same network.";
+      let msg: string;
+      if (e instanceof PairClientError) {
+        // Map the pair-client's structured error code to its
+        // translated message. Falls back to the dev-readable
+        // message on a key miss.
+        try {
+          msg = t(e.code, e.details as Record<string, string | number>);
+        } catch {
+          msg = e.message;
+        }
+      } else if (e instanceof Error) {
+        msg = e.message;
+      } else {
+        msg = t("probeFailedError");
+      }
       setProbeError(msg);
     } finally {
       if (!ctrl.signal.aborted) setProbing(false);
