@@ -33,6 +33,9 @@ import {
 } from "@/lib/agent/local-pair-client";
 import { useBrowserIdentityStore } from "@/stores/browser-identity-store";
 import { useLocalNodesStore } from "@/stores/local-nodes-store";
+import { usePairingStore } from "@/stores/pairing-store";
+import { useDiscoveredAgents } from "@/hooks/use-discovered-agents";
+import { DiscoveredAgentsList } from "./DiscoveredAgentsList";
 import { ProbeResultCard } from "./ProbeResultCard";
 
 const INSTALL_URL =
@@ -67,8 +70,12 @@ export function AddNodeCard({
     };
   }, []);
 
-  async function handleProbe() {
-    if (!host.trim() || probing) return;
+  // Tauri path only — populates pairing-store.discoveredAgents on a
+  // 5s poll. Inside the browser GCS the hook returns immediately.
+  useDiscoveredAgents();
+  const discoveredAgents = usePairingStore((s) => s.discoveredAgents);
+
+  async function handleProbeHost(rawHost: string) {
     setProbeError(null);
     setProbe(null);
     setProbing(true);
@@ -76,7 +83,7 @@ export function AddNodeCard({
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     try {
-      const result = await probeAgent(host, ctrl.signal);
+      const result = await probeAgent(rawHost, ctrl.signal);
       setProbe(result);
     } catch (e) {
       if (ctrl.signal.aborted) return;
@@ -102,11 +109,26 @@ export function AddNodeCard({
     }
   }
 
+  async function handleProbe() {
+    if (!host.trim() || probing) return;
+    await handleProbeHost(host);
+  }
+
   function handleKey(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       e.preventDefault();
       void handleProbe();
     }
+  }
+
+  function handleDiscoveredSelect(agent: { mdnsHost?: string; localIp?: string; name: string }) {
+    // Prefer the mDNS hostname (more portable than IPs that change
+    // on DHCP). The agent listens on 8080 by default; normaliseHost
+    // will fill that in.
+    const target = agent.mdnsHost || agent.localIp;
+    if (!target) return;
+    setHost(target);
+    void handleProbeHost(target);
   }
 
   async function handleCopyInstall() {
@@ -167,6 +189,18 @@ export function AddNodeCard({
           </button>
         </div>
       )}
+
+      {/* Tauri mDNS auto-discovery. The list stays hidden in the
+          browser GCS (the hook short-circuits in non-Tauri runtimes
+          and discoveredAgents stays empty). Inside the Tauri build
+          it polls every 5s and one-click pairs an agent on the LAN. */}
+      {discoveredAgents.length > 0 && (
+        <DiscoveredAgentsList
+          agents={discoveredAgents}
+          onSelect={handleDiscoveredSelect}
+        />
+      )}
+
       {/* Pair-by-link branch */}
       <div className="p-5 bg-bg-secondary border border-border-default rounded-lg space-y-3">
         <div className="flex items-center gap-2">

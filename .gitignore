@@ -39,3 +39,7 @@ next-env.d.ts
 /dist-electron
 /release
 .vercel
+
+# tauri
+/tauri/src-tauri/target/
+/tauri/src-tauri/Cargo.lock

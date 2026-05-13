@@ -15,11 +15,16 @@ interface DiscoveredAgent {
   name: string;
   board: string;
   pairingCode: string;
+  mdnsHost?: string;
+  localIp?: string;
 }
 
 export interface DiscoveredAgentsListProps {
   agents: DiscoveredAgent[];
-  onSelect?: () => void;
+  /** Fired with the agent the operator clicked. The caller decides
+   * what to do — typically auto-fill the hostname input + trigger a
+   * probe. */
+  onSelect?: (agent: DiscoveredAgent) => void;
 }
 
 export function DiscoveredAgentsList({
@@ -31,28 +36,33 @@ export function DiscoveredAgentsList({
   if (agents.length === 0) return null;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-3">
-      <h2 className="text-xs font-medium text-text-primary flex items-center gap-2">
+    <div className="space-y-2">
+      <h2 className="text-xs font-medium text-text-primary flex items-center gap-2 px-1">
         <Wifi size={12} className="text-status-success" />
         {tc("discoveredOnYourNetwork")}
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2">
         {agents.map((agent) => (
           <button
             key={agent.deviceId}
-            onClick={onSelect}
+            onClick={() => onSelect?.(agent)}
             className="flex items-center gap-3 p-3 bg-bg-secondary border border-border-default rounded hover:border-accent-primary/40 transition-colors text-left"
           >
             <div className="w-8 h-8 rounded bg-accent-primary/10 flex items-center justify-center shrink-0">
               <Cpu size={14} className="text-accent-primary" />
             </div>
-            <div>
-              <p className="text-xs font-medium text-text-primary">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-text-primary truncate">
                 {agent.name}
               </p>
-              <p className="text-[10px] text-text-tertiary">
-                {agent.board} &middot;{" "}
-                <span className="font-mono">{agent.pairingCode}</span>
+              <p className="text-[10px] text-text-tertiary truncate">
+                {agent.board}
+                {agent.mdnsHost ? (
+                  <>
+                    {" · "}
+                    <span className="font-mono">{agent.mdnsHost}</span>
+                  </>
+                ) : null}
               </p>
             </div>
           </button>

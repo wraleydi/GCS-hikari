@@ -1,0 +1,64 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Altnautica Command",
+  "version": "0.1.0",
+  "identifier": "com.altnautica.command-tauri",
+  "build": {
+    "beforeDevCommand": "npm run build",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../../dist-electron/standalone",
+    "devUrl": "http://127.0.0.1:4000"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Altnautica Command",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 1100,
+        "minHeight": 700,
+        "fullscreen": false,
+        "resizable": true,
+        "decorations": true,
+        "transparent": false,
+        "alwaysOnTop": false,
+        "url": "http://127.0.0.1:4000"
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg", "msi", "deb", "appimage"],
+    "category": "DeveloperTool",
+    "shortDescription": "Altnautica Command GCS desktop wrapper",
+    "longDescription": "Ground-control software for ADOS drones and ground stations. The Tauri build adds native mDNS auto-discovery on top of the cross-platform Electron build.",
+    "icon": [
+      "icons/icon.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "copyright": "Altnautica",
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "10.13",
+      "exceptionDomain": "127.0.0.1",
+      "signingIdentity": null,
+      "providerShortName": null,
+      "entitlements": null
+    },
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
+    },
+    "linux": {
+      "deb": {
+        "depends": ["libwebkit2gtk-4.1-0"]
+      }
+    }
+  }
+}

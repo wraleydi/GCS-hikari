@@ -1,0 +1,25 @@
+[package]
+name = "altnautica-command-tauri"
+version = "0.1.0"
+description = "Altnautica Command Tauri desktop wrapper with native mDNS auto-discovery"
+authors = ["Altnautica"]
+edition = "2021"
+license = "GPL-3.0-only"
+
+[lib]
+name = "altnautica_command_tauri_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
+mdns-sd = "0.13"
+
+[features]
+default = []
+custom-protocol = ["tauri/custom-protocol"]
