@@ -903,7 +903,13 @@
       "cancelButton": "Batal",
       "mixedContentError": "Mission Control ini disajikan melalui HTTPS. Browser memblokir pemeriksaan HTTP biasa dari halaman HTTPS. Muat Mission Control melalui http:// (atau gunakan build localhost) untuk memasangkan agen LAN.",
       "missingDeviceIdError": "Respons pemeriksaan tidak memiliki device_id",
-      "pairedButConnectFailed": "Dipasangkan, tetapi tidak dapat membuat koneksi langsung: {error}. Node telah disimpan — coba ulangi dari sidebar."
+      "pairedButConnectFailed": "Dipasangkan, tetapi tidak dapat membuat koneksi langsung: {error}. Node telah disimpan — coba ulangi dari sidebar.",
+      "profileLabel": {
+        "drone": "Drone",
+        "groundStation": "Stasiun darat",
+        "compute": "Komputasi",
+        "lite": "Drone (lite)"
+      }
     },
     "nodes": {
       "drones": "Drone",
@@ -924,6 +930,12 @@
         "peripherals": "Periferal",
         "mesh": "Mesh",
         "distributedRx": "RX Terdistribusi"
+      },
+      "consolidatingNotice": {
+        "title": "Kontrol perangkat keras sedang dikonsolidasikan ke tab Command.",
+        "body": "Tab Command kini menampung alur Tambah Node mode lokal dan akan menampung setiap jenis node (agen drone, stasiun darat, relai, penerima, komputasi mendatang) di bawah satu sidebar. Hardware tetap tersedia selama masa transisi untuk subtampilan yang lebih dalam.",
+        "computeComingSoon": "Node komputasi — segera hadir",
+        "computeBody": "Profil komputasi adalah node kelas workstation yang mengonsumsi dataset survei dan menghasilkan ortomosaik, rekonstruksi NeRF, dan gaussian splats. Lihat product/specs/compute-agent/ untuk desain lengkap."
       }
     }
   },

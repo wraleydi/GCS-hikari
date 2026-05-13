@@ -26,21 +26,22 @@ interface ProbeResultCardProps {
   onCancel: () => void;
 }
 
-function profileLabel(profile: string): string {
+function profileLabel(profile: string, t: (k: string) => string): string {
   switch (profile) {
     case "ground-station":
-      return "Ground station";
+      return t("groundStation");
     case "compute":
-      return "Compute";
+      return t("compute");
     case "lite":
-      return "Drone (lite)";
+      return t("lite");
     default:
-      return "Drone";
+      return t("drone");
   }
 }
 
 export function ProbeResultCard({ probe, onPaired, onCancel }: ProbeResultCardProps) {
   const t = useTranslations("command.addNode");
+  const tProfile = useTranslations("command.addNode.profileLabel");
   const [pairing, setPairing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const addNode = useLocalNodesStore((s) => s.addNode);
@@ -123,7 +124,7 @@ export function ProbeResultCard({ probe, onPaired, onCancel }: ProbeResultCardPr
           </div>
           <div className="flex flex-wrap gap-1.5 text-[10px]">
             <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-accent-primary/10 text-accent-primary font-medium">
-              {profileLabel(probe.profile)}
+              {profileLabel(probe.profile, tProfile)}
             </span>
             {probe.role && (
               <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-bg-tertiary text-text-secondary font-mono lowercase">

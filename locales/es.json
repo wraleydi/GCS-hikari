@@ -888,7 +888,13 @@
       "cancelButton": "Cancelar",
       "mixedContentError": "Este Mission Control se sirve por HTTPS. Los navegadores bloquean los sondeos HTTP sin cifrar desde páginas HTTPS. Carga Mission Control sobre http:// (o usa una compilación localhost) para emparejar agentes en la LAN.",
       "missingDeviceIdError": "Falta device_id en la respuesta del sondeo",
-      "pairedButConnectFailed": "Emparejado, pero no se pudo establecer una conexión en vivo: {error}. El nodo está guardado — reinténtalo desde la barra lateral."
+      "pairedButConnectFailed": "Emparejado, pero no se pudo establecer una conexión en vivo: {error}. El nodo está guardado — reinténtalo desde la barra lateral.",
+      "profileLabel": {
+        "drone": "Dron",
+        "groundStation": "Estación terrestre",
+        "compute": "Cómputo",
+        "lite": "Dron (lite)"
+      }
     },
     "nodes": {
       "drones": "Drones",
@@ -909,6 +915,12 @@
         "peripherals": "Periféricos",
         "mesh": "Malla",
         "distributedRx": "RX distribuida"
+      },
+      "consolidatingNotice": {
+        "title": "Los controles de hardware se están consolidando en la pestaña Command.",
+        "body": "La pestaña Command ahora aloja el flujo Añadir un nodo en modo local y alojará cada tipo de nodo (agente de dron, estación terrestre, relé, receptor y futuro nodo de cómputo) bajo una sola barra lateral. Hardware seguirá disponible durante la transición para subvistas más detalladas.",
+        "computeComingSoon": "Nodo de cómputo — próximamente",
+        "computeBody": "El perfil de cómputo es un nodo de clase estación de trabajo que consume conjuntos de datos de relevamiento y produce ortomosaicos, reconstrucciones NeRF y gaussian splats. Consulta product/specs/compute-agent/ para el diseño completo."
       }
     }
   },

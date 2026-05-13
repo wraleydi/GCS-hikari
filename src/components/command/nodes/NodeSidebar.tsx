@@ -58,10 +58,12 @@ export function NodeSidebar({ onFocusAgent }: NodeSidebarProps) {
 
   // Cloud-paired drones still render through FleetSidebar's full-featured
   // list above (rename inline-edit, context menu, virtualization). This
-  // sidebar groups LAN-paired nodes by profile so the operator can see
-  // ground stations, relays, receivers, and compute nodes at a glance
-  // even when there's no cloud account.
-  const nodes = useFleetNodes().filter((n) => n.isLocal);
+  // sidebar groups every other node by profile: ground stations, relays,
+  // receivers, and compute nodes — whether cloud-paired or LAN-paired —
+  // plus any local-paired drones that aren't in the Convex-backed list.
+  const nodes = useFleetNodes().filter(
+    (n) => n.isLocal || n.profile !== "drone",
+  );
   const selectedPairedId = usePairingStore((s) => s.selectedPairedId);
   const selectPairedDrone = usePairingStore((s) => s.selectPairedDrone);
   const removeNode = useLocalNodesStore((s) => s.removeNode);
@@ -91,18 +93,25 @@ export function NodeSidebar({ onFocusAgent }: NodeSidebarProps) {
   async function handleSelect(node: FleetNodeEntry) {
     selectPairedDrone(node._id);
     onFocusAgent();
-    if (node.isLocal) {
-      // Local nodes connect directly via the agent's REST URL.
-      const hostname =
-        useLocalNodesStore
-          .getState()
-          .nodes.find((n) => n.deviceId === node.deviceId)?.hostname;
-      if (hostname && node.apiKey) {
-        await connect(hostname, node.apiKey);
+    try {
+      if (node.isLocal) {
+        // Local nodes connect directly via the agent's REST URL.
+        const hostname =
+          useLocalNodesStore
+            .getState()
+            .nodes.find((n) => n.deviceId === node.deviceId)?.hostname;
+        if (hostname && node.apiKey) {
+          await connect(hostname, node.apiKey);
+        }
+      } else {
+        // Cloud-paired nodes go through the cloud relay.
+        agentConnectCloud(node.deviceId);
       }
-    } else {
-      // Cloud-paired nodes go through the cloud relay.
-      agentConnectCloud(node.deviceId);
+    } catch (err) {
+      // Surface rejected promises in dev so an offline node or
+      // network blip doesn't silently fail. The connect path also
+      // sets `connectionError` on the store which the header reads.
+      console.error("NodeSidebar handleSelect failed:", err);
     }
   }
 

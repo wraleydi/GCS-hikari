@@ -888,7 +888,13 @@
       "cancelButton": "Abbrechen",
       "mixedContentError": "Diese Mission Control wird über HTTPS bereitgestellt. Browser blockieren einfache HTTP-Anfragen von HTTPS-Seiten. Laden Sie Mission Control über http:// (oder nutzen Sie einen Localhost-Build), um LAN-Agenten zu koppeln.",
       "missingDeviceIdError": "In der Prüfungsantwort fehlt die device_id",
-      "pairedButConnectFailed": "Gekoppelt, aber es konnte keine Live-Verbindung hergestellt werden: {error}. Der Knoten ist gespeichert – erneut über die Seitenleiste versuchen."
+      "pairedButConnectFailed": "Gekoppelt, aber es konnte keine Live-Verbindung hergestellt werden: {error}. Der Knoten ist gespeichert – erneut über die Seitenleiste versuchen.",
+      "profileLabel": {
+        "drone": "Drohne",
+        "groundStation": "Bodenstation",
+        "compute": "Compute",
+        "lite": "Drohne (Lite)"
+      }
     },
     "nodes": {
       "drones": "Drohnen",
@@ -909,6 +915,12 @@
         "peripherals": "Peripheriegeräte",
         "mesh": "Mesh",
         "distributedRx": "Verteilter Empfang"
+      },
+      "consolidatingNotice": {
+        "title": "Hardware-Steuerungen werden in den Command-Tab zusammengeführt.",
+        "body": "Der Command-Tab beherbergt jetzt den local-first Add-a-Node-Ablauf und wird jeden Knotentyp (Drohnen-Agent, Bodenstation, Relais, Empfänger, künftige Compute) unter einer Seitenleiste verwalten. Hardware bleibt während des Übergangs für tiefergehende Unteransichten verfügbar.",
+        "computeComingSoon": "Compute-Knoten — demnächst verfügbar",
+        "computeBody": "Das Compute-Profil ist ein Knoten der Workstation-Klasse, der Vermessungsdatensätze verarbeitet und Orthomosaike, NeRF-Rekonstruktionen und Gaussian Splats erzeugt. Vollständiges Design siehe product/specs/compute-agent/."
       }
     }
   },

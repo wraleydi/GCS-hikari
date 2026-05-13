@@ -903,7 +903,13 @@
       "cancelButton": "Cancel",
       "mixedContentError": "This Mission Control is served over HTTPS. Browsers block plain HTTP probes from HTTPS pages. Load Mission Control over http:// (or use a localhost build) to pair LAN agents.",
       "missingDeviceIdError": "Probe response missing device_id",
-      "pairedButConnectFailed": "Paired, but could not establish a live connection: {error}. The node is saved — retry from the sidebar."
+      "pairedButConnectFailed": "Paired, but could not establish a live connection: {error}. The node is saved — retry from the sidebar.",
+      "profileLabel": {
+        "drone": "Drone",
+        "groundStation": "Ground station",
+        "compute": "Compute",
+        "lite": "Drone (lite)"
+      }
     },
     "nodes": {
       "drones": "Drones",
@@ -924,6 +930,12 @@
         "peripherals": "Peripherals",
         "mesh": "Mesh",
         "distributedRx": "Distributed RX"
+      },
+      "consolidatingNotice": {
+        "title": "Hardware controls are consolidating into the Command tab.",
+        "body": "The Command tab now hosts the local-first Add-a-Node flow and will host every node type (drone agent, ground station, relay, receiver, future compute) under one sidebar. Hardware will stay available during the transition for deeper sub-views.",
+        "computeComingSoon": "Compute node — coming soon",
+        "computeBody": "The compute profile is a workstation-class node that consumes survey datasets and produces orthomosaics, NeRF reconstructions, and gaussian splats. See product/specs/compute-agent/ for the full design."
       }
     }
   },

@@ -903,7 +903,13 @@
       "cancelButton": "キャンセル",
       "mixedContentError": "このMission ControlはHTTPS経由で提供されています。ブラウザはHTTPSページからの平文HTTPプローブをブロックします。LANエージェントをペアリングするには、http://経由でMission Controlを読み込む（またはlocalhostビルドを使用する）必要があります。",
       "missingDeviceIdError": "プローブ応答にdevice_idがありません",
-      "pairedButConnectFailed": "ペアリングしましたが、ライブ接続を確立できませんでした：{error}。ノードは保存されました。サイドバーから再試行してください。"
+      "pairedButConnectFailed": "ペアリングしましたが、ライブ接続を確立できませんでした：{error}。ノードは保存されました。サイドバーから再試行してください。",
+      "profileLabel": {
+        "drone": "ドローン",
+        "groundStation": "地上局",
+        "compute": "コンピュート",
+        "lite": "ドローン (Lite)"
+      }
     },
     "nodes": {
       "drones": "ドローン",
@@ -924,6 +930,12 @@
         "peripherals": "周辺機器",
         "mesh": "メッシュ",
         "distributedRx": "分散RX"
+      },
+      "consolidatingNotice": {
+        "title": "ハードウェアコントロールは Command タブに統合されつつあります。",
+        "body": "Command タブは現在、ローカルファーストのノード追加フローをホストしており、今後はすべてのノードタイプ(ドローンエージェント、地上局、リレー、レシーバー、将来のコンピュート)を 1 つのサイドバーの下にまとめます。Hardware は移行期間中、より詳細なサブビュー用として引き続き利用できます。",
+        "computeComingSoon": "コンピュートノード — 近日公開",
+        "computeBody": "コンピュートプロファイルは、測量データセットを処理し、オルソモザイク、NeRF 再構成、ガウシアンスプラットを生成するワークステーションクラスのノードです。完全な設計については product/specs/compute-agent/ を参照してください。"
       }
     }
   },

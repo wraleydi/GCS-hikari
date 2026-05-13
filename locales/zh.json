@@ -888,7 +888,13 @@
       "cancelButton": "取消",
       "mixedContentError": "此 Mission Control 通过 HTTPS 提供服务。浏览器会阻止从 HTTPS 页面发起的明文 HTTP 探测。请通过 http:// 加载 Mission Control（或使用 localhost 构建）以配对局域网代理。",
       "missingDeviceIdError": "探测响应缺少 device_id",
-      "pairedButConnectFailed": "已配对，但无法建立实时连接：{error}。节点已保存——请从侧边栏重试。"
+      "pairedButConnectFailed": "已配对，但无法建立实时连接：{error}。节点已保存——请从侧边栏重试。",
+      "profileLabel": {
+        "drone": "无人机",
+        "groundStation": "地面站",
+        "compute": "计算节点",
+        "lite": "无人机（精简版）"
+      }
     },
     "nodes": {
       "drones": "无人机",
@@ -909,6 +915,12 @@
         "peripherals": "外设",
         "mesh": "网状网络",
         "distributedRx": "分布式接收"
+      },
+      "consolidatingNotice": {
+        "title": "硬件控制正在整合到 Command 选项卡中。",
+        "body": "Command 选项卡现已承载本地优先的添加节点流程,并将在同一侧边栏下托管所有节点类型(无人机代理、地面站、中继、接收器以及未来的计算节点)。在过渡期间,Hardware 仍可用于查看更深入的子视图。",
+        "computeComingSoon": "计算节点 — 即将推出",
+        "computeBody": "计算配置文件是一种工作站级节点,负责处理测绘数据集并生成正射影像、NeRF 重建和高斯泼溅。完整设计请参见 product/specs/compute-agent/。"
       }
     }
   },

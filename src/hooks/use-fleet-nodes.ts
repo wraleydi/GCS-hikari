@@ -48,11 +48,11 @@ function adaptLocal(n: LocalNode): FleetNodeEntry {
 function adaptCloud(d: PairedDrone): FleetNodeEntry {
   return {
     ...d,
-    // Cloud-paired entries assume drone profile until the heartbeat
-    // tells us otherwise. The Command-tab right pane reads the live
-    // profile off the capabilities store anyway.
-    profile: "drone",
-    role: undefined,
+    // Convex pushStatus syncs profile + role onto cmd_drones from
+    // the agent's heartbeat (additive schema). Older rows that
+    // predate the field default to drone.
+    profile: d.profile ?? "drone",
+    role: d.role,
     isLocal: false,
   };
 }

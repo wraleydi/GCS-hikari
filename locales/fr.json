@@ -888,7 +888,13 @@
       "cancelButton": "Annuler",
       "mixedContentError": "Cette instance de Mission Control est servie via HTTPS. Les navigateurs bloquent les sondes HTTP en clair depuis les pages HTTPS. Chargez Mission Control via http:// (ou utilisez une version localhost) pour appairer des agents sur le réseau local.",
       "missingDeviceIdError": "La réponse de la sonde ne contient pas de device_id",
-      "pairedButConnectFailed": "Appairé, mais impossible d'établir une connexion active : {error}. Le nœud est enregistré — réessayez depuis la barre latérale."
+      "pairedButConnectFailed": "Appairé, mais impossible d'établir une connexion active : {error}. Le nœud est enregistré — réessayez depuis la barre latérale.",
+      "profileLabel": {
+        "drone": "Drone",
+        "groundStation": "Station au sol",
+        "compute": "Calcul",
+        "lite": "Drone (allégé)"
+      }
     },
     "nodes": {
       "drones": "Drones",
@@ -909,6 +915,12 @@
         "peripherals": "Périphériques",
         "mesh": "Maillage",
         "distributedRx": "RX distribué"
+      },
+      "consolidatingNotice": {
+        "title": "Les contrôles matériels sont en cours de regroupement dans l'onglet Command.",
+        "body": "L'onglet Command héberge désormais le flux Ajouter un nœud en mode local et accueillera tous les types de nœuds (agent de drone, station au sol, relais, récepteur, futur nœud de calcul) sous une seule barre latérale. Hardware restera disponible pendant la transition pour les sous-vues plus détaillées.",
+        "computeComingSoon": "Nœud de calcul — bientôt disponible",
+        "computeBody": "Le profil de calcul est un nœud de classe station de travail qui consomme des jeux de données de relevé et produit des orthomosaïques, des reconstructions NeRF et des gaussian splats. Voir product/specs/compute-agent/ pour la conception complète."
       }
     }
   },

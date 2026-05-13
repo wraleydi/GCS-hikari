@@ -903,7 +903,13 @@
       "cancelButton": "Cancelar",
       "mixedContentError": "Este Mission Control é servido por HTTPS. Os navegadores bloqueiam sondagens HTTP simples a partir de páginas HTTPS. Carregue o Mission Control via http:// (ou use uma build localhost) para parear agentes na LAN.",
       "missingDeviceIdError": "Resposta da sondagem sem device_id",
-      "pairedButConnectFailed": "Pareado, mas não foi possível estabelecer uma conexão ativa: {error}. O nó foi salvo — tente novamente pela barra lateral."
+      "pairedButConnectFailed": "Pareado, mas não foi possível estabelecer uma conexão ativa: {error}. O nó foi salvo — tente novamente pela barra lateral.",
+      "profileLabel": {
+        "drone": "Drone",
+        "groundStation": "Estação terrestre",
+        "compute": "Computação",
+        "lite": "Drone (lite)"
+      }
     },
     "nodes": {
       "drones": "Drones",
@@ -924,6 +930,12 @@
         "peripherals": "Periféricos",
         "mesh": "Malha",
         "distributedRx": "RX distribuído"
+      },
+      "consolidatingNotice": {
+        "title": "Os controles de hardware estão sendo consolidados na aba Command.",
+        "body": "A aba Command agora hospeda o fluxo Adicionar um nó em modo local e abrigará todos os tipos de nó (agente de drone, estação terrestre, relé, receptor e futura computação) sob uma única barra lateral. Hardware permanecerá disponível durante a transição para subvisões mais detalhadas.",
+        "computeComingSoon": "Nó de computação — em breve",
+        "computeBody": "O perfil de computação é um nó de classe estação de trabalho que consome conjuntos de dados de levantamento e produz ortomosaicos, reconstruções NeRF e gaussian splats. Consulte product/specs/compute-agent/ para o projeto completo."
       }
     }
   },

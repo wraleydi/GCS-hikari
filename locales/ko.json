@@ -903,7 +903,13 @@
       "cancelButton": "취소",
       "mixedContentError": "이 Mission Control은 HTTPS로 제공됩니다. 브라우저는 HTTPS 페이지에서 일반 HTTP 프로브를 차단합니다. LAN 에이전트를 페어링하려면 Mission Control을 http://로 로드하거나 localhost 빌드를 사용하세요.",
       "missingDeviceIdError": "프로브 응답에 device_id가 누락되었습니다",
-      "pairedButConnectFailed": "페어링되었지만 실시간 연결을 설정할 수 없습니다: {error}. 노드가 저장되었습니다. 사이드바에서 다시 시도하세요."
+      "pairedButConnectFailed": "페어링되었지만 실시간 연결을 설정할 수 없습니다: {error}. 노드가 저장되었습니다. 사이드바에서 다시 시도하세요.",
+      "profileLabel": {
+        "drone": "드론",
+        "groundStation": "지상국",
+        "compute": "컴퓨트",
+        "lite": "드론 (라이트)"
+      }
     },
     "nodes": {
       "drones": "드론",
@@ -924,6 +930,12 @@
         "peripherals": "주변기기",
         "mesh": "메시",
         "distributedRx": "분산 RX"
+      },
+      "consolidatingNotice": {
+        "title": "하드웨어 컨트롤이 Command 탭으로 통합되고 있습니다.",
+        "body": "Command 탭은 이제 로컬 우선 노드 추가 흐름을 호스팅하며, 앞으로 모든 노드 유형(드론 에이전트, 지상국, 릴레이, 리시버, 향후 컴퓨트)을 하나의 사이드바 아래에 두게 됩니다. Hardware는 전환 기간 동안 더 깊은 하위 보기를 위해 계속 사용할 수 있습니다.",
+        "computeComingSoon": "컴퓨트 노드 — 곧 출시",
+        "computeBody": "컴퓨트 프로필은 측량 데이터셋을 소비하여 정사 모자이크, NeRF 재구성 및 가우시안 스플랫을 생성하는 워크스테이션급 노드입니다. 전체 설계는 product/specs/compute-agent/를 참조하세요."
       }
     }
   },

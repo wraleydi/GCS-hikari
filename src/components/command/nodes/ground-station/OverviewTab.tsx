@@ -76,6 +76,7 @@ export function OverviewTab() {
   const tProfile = useTranslations("hardware.profileLabels");
   const tOverview = useTranslations("hardware.overviewPage");
   const tCommon = useTranslations("hardware.common");
+  const tNotice = useTranslations("command.groundStation.consolidatingNotice");
 
   const formatProfile = (profile: string): string => {
     if (profile === "ground_station") return tProfile("groundStation");
@@ -254,13 +255,10 @@ export function OverviewTab() {
     <div className="flex flex-col">
       <div className="m-4 mb-0 rounded-lg border border-accent-primary/20 bg-accent-primary/5 p-3 text-xs text-text-secondary">
         <p className="font-medium text-text-primary">
-          Hardware controls are consolidating into the Command tab.
+          {tNotice("title")}
         </p>
         <p className="mt-1 text-text-tertiary">
-          The Command tab now hosts the local-first Add-a-Node flow and
-          will host every node type (drone agent, ground station, relay,
-          receiver, future compute) under one sidebar. Hardware will stay
-          available during the transition for deeper sub-views.
+          {tNotice("body")}
         </p>
       </div>
 

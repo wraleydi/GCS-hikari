@@ -29,7 +29,7 @@ import { useConvexSkipQuery } from "@/hooks/use-convex-skip-query";
 import { useAgentConnectionStore } from "@/stores/agent-connection-store";
 import { useAgentSystemStore } from "@/stores/agent-system-store";
 import { useAuthStore } from "@/stores/auth-store";
-import { usePairingStore } from "@/stores/pairing-store";
+import { usePairingStore, type PairedDrone } from "@/stores/pairing-store";
 import { useFreshness } from "@/lib/agent/freshness";
 import { useVisibleTabs, type CommandSubTab } from "@/hooks/use-visible-tabs";
 import { useAgentCapabilitiesStore } from "@/stores/agent-capabilities-store";
@@ -40,6 +40,7 @@ import { PairingDialog } from "./PairingDialog";
 import { AgentDisconnectedPage } from "./AgentDisconnectedPage";
 import { CommandFleetOverview } from "./CommandFleetOverview";
 import { GroundStationDetailPanel } from "./nodes/ground-station/GroundStationDetailPanel";
+import { ComputePanelPlaceholder } from "./nodes/compute/ComputePanelPlaceholder";
 import { CommandFleetMqttBridge } from "./CommandFleetMqttBridge";
 import { CommandFleetStatusBridge } from "./CommandFleetStatusBridge";
 import { DroneContextRail } from "./shared/DroneContextRail";
@@ -146,6 +147,8 @@ export function CommandPage() {
           lastSeen: d.lastSeen,
           fcConnected: d.fcConnected,
           pairedAt: d.pairedAt,
+          profile: (d as { profile?: string }).profile as PairedDrone["profile"] | undefined,
+          role: (d as { role?: string }).role as PairedDrone["role"] | undefined,
         }))
       );
     }
@@ -372,6 +375,26 @@ export function CommandPage() {
           )}
         </div>
 
+        {/* Top strip with the All Agents return-to-fleet button.
+            Rendered above whichever right-pane branch picks below so
+            the operator can always go back to fleet view, including
+            from inside the ground-station or compute panels. */}
+        {!showingFleet &&
+          status &&
+          pairedDrones.length > 0 &&
+          (selectedProfile === "ground-station" ||
+            selectedProfile === "compute") && (
+            <div className="flex items-center gap-1 px-4 border-b border-border-default bg-bg-secondary">
+              <button
+                onClick={handleShowFleet}
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors self-stretch -mb-px border-b-2 border-transparent text-text-secondary hover:text-text-primary"
+              >
+                <LayoutGrid size={13} />
+                {t("allAgents")}
+              </button>
+            </div>
+          )}
+
         {showingFleet ? (
           <CommandFleetOverview
             pairedDrones={pairedDrones}
@@ -380,6 +403,8 @@ export function CommandPage() {
           />
         ) : status && capsLoaded && selectedProfile === "ground-station" ? (
           <GroundStationDetailPanel />
+        ) : status && capsLoaded && selectedProfile === "compute" ? (
+          <ComputePanelPlaceholder />
         ) : status ? (
           <>
             {/* Sub-tab navigation */}
