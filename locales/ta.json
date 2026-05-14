@@ -900,9 +900,20 @@
       "unpairFailedStatusError": "இணைப்பு நீக்கம் தோல்வியடைந்தது: {status} {statusText}",
       "firstPairWarning": {
         "title": "உங்கள் API சாவிகள் இந்த உலாவியில் சேமிக்கப்பட்டுள்ளன",
-        "body": "உலாவி சேமிப்பகத்தை அழித்தால், உள்ளூரில் இணைக்கப்பட்ட அனைத்து கணுக்களின் இணைப்பும் நீங்கிவிடும். மீட்டெடுக்க, முகவரின் அமைப்பு வலை செயலியான http://<host>:8080/setup.html இல் இணைப்பை நீக்கி, இங்கிருந்து மீண்டும் இணைக்கவும்.",
+        "body": "உலாவி சேமிப்பகத்தை அழித்தால், உள்ளூரில் இணைக்கப்பட்ட அனைத்து கணுக்களின் இணைப்பும் நீங்கிவிடும். மீட்டெடுக்க, முகவரின் அமைப்பு வலை செயலியான http://your-agent.local:8080/setup.html இல் இணைப்பை நீக்கி, இங்கிருந்து மீண்டும் இணைக்கவும்.",
         "dismiss": "புரிந்தது"
-      }
+      },
+      "addNodeTitle": "Add a drone or ground station",
+      "addNodeSubtitle": "No account required. Works fully offline.",
+      "addNodePlaceholder": "skynode.local  or  9TW85C",
+      "addNodeHint": "Same Wi-Fi as the agent? Paste the hostname or IP. New agent showing a 6-character code in `ados status`? Type that.",
+      "pairButton": "Pair",
+      "codeRequiresCloudError": "Pair codes need the cloud relay. Check your network or sign in to use this path.",
+      "codeNoHostError": "Pair code is valid but the agent hasn't advertised a network address yet. Wait a few seconds and try again.",
+      "badCodeError": "Pair code must be six characters (letters and digits).",
+      "signInBody": "Cloud relay routes your drone's telemetry and video through Convex over HTTPS, so Mission Control reaches the agent even when your phone or laptop is on a different network. Optional, never blocking — LAN-direct pairing works without it.",
+      "signInButton": "Sign in",
+      "hostNotPrivateError": "Only private network hosts (RFC1918 IPs, *.local names, or loopback) are allowed for LAN pairing."
     },
     "nodes": {
       "drones": "டிரோன்கள்",
@@ -939,7 +950,19 @@
     "staleLastSeen": "பழையது · கடைசியாகக் கண்டது {label}",
     "offlineLastSeen": "ஆஃப்லைன் · கடைசியாகக் கண்டது {label}",
     "reconnectButton": "மீண்டும் இணை",
-    "reconnectTooltip": "இந்த டிரோனுக்கான கிளவுட் ஹார்ட்பீட்களுக்கு மீண்டும் குழுசேரவும்"
+    "reconnectTooltip": "இந்த டிரோனுக்கான கிளவுட் ஹார்ட்பீட்களுக்கு மீண்டும் குழுசேரவும்",
+    "pairing": {
+      "tab": {
+        "addDrone": "Add a drone",
+        "enterCode": "Enter drone's code",
+        "generateCode": "Generate a code"
+      },
+      "enterCodeTitle": "Pair with a code from your drone",
+      "enterCodeSubtitle": "Works over HTTPS. No LAN access required.",
+      "enterCodeHint": "Run `ados status` on your drone to see its current code, or copy it from the install banner.",
+      "pair": "Pair",
+      "pairing": "Pairing"
+    }
   },
   "agent": {
     "status": "Agent நிலை",

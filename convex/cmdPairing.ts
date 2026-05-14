@@ -57,6 +57,60 @@ function optionalBoundedString(
   return trimmed;
 }
 
+/** Anonymous code-pair: browser identifies itself by a browserUserId
+ *  (the per-browser UUID from browser-identity-store), no Convex
+ *  account required. Returns the agent identity (hostname, apiKey,
+ *  deviceId, name) the operator's browser then stores in
+ *  local-nodes-store the same way the LAN-direct hostname pair does.
+ *
+ *  Trade-off vs the signed-in `claimPairingCode`: this path does NOT
+ *  write a `cmd_drones` row. The drone is LAN-only for this browser
+ *  until the operator signs in and migrates (out of scope today).
+ *  In return, the "no account required" promise extends to the
+ *  short-code path, not just the hostname path.
+ */
+export const claimPairingCodeAnon = mutation({
+  args: { code: v.string(), browserUserId: v.string() },
+  handler: async (ctx, { code, browserUserId }) => {
+    const pairingCode = normalizePairingCode(code);
+    const browserOwner = requireBoundedString(
+      browserUserId,
+      "browserUserId",
+      MAX_LABEL_LENGTH,
+    );
+
+    const request = await ctx.db
+      .query("cmd_pairingRequests")
+      .withIndex("by_pairingCode", (q) => q.eq("pairingCode", pairingCode))
+      .first();
+
+    if (!request) throw new Error("Invalid pairing code");
+    if (request.expiresAt < Date.now()) {
+      await ctx.db.delete(request._id);
+      throw new Error("Pairing code expired");
+    }
+    const browserMarker = `browser:${browserOwner}`;
+    if (request.claimedBy && request.claimedBy !== browserMarker) {
+      throw new Error("Code already claimed");
+    }
+
+    await ctx.db.patch(request._id, {
+      claimedBy: browserMarker,
+      claimedAt: Date.now(),
+    });
+
+    return {
+      deviceId: request.deviceId || `device-${pairingCode}`,
+      name: request.agentName || `Drone ${pairingCode}`,
+      apiKey: request.apiKey || "",
+      mdnsHost: request.mdnsHost,
+      localIp: request.localIp,
+      board: request.board,
+      agentVersion: request.agentVersion,
+    };
+  },
+});
+
 /** User claims a pairing code (enters code displayed on agent terminal). */
 export const claimPairingCode = mutation({
   args: { code: v.string() },

@@ -915,9 +915,20 @@
       "unpairFailedStatusError": "జత తొలగింపు విఫలమైంది: {status} {statusText}",
       "firstPairWarning": {
         "title": "మీ API కీలు ఈ బ్రౌజర్‌లోనే నిల్వ ఉన్నాయి",
-        "body": "బ్రౌజర్ నిల్వను తొలగిస్తే స్థానికంగా జత చేయబడిన అన్ని నోడ్‌ల జతలు తొలగిపోతాయి. తిరిగి పొందడానికి, ఏజెంట్ సెటప్ వెబ్‌యాప్‌లో (http://<host>:8080/setup.html) జతను తొలగించి, ఇక్కడ నుండి మళ్ళీ జత చేయండి.",
+        "body": "బ్రౌజర్ నిల్వను తొలగిస్తే స్థానికంగా జత చేయబడిన అన్ని నోడ్‌ల జతలు తొలగిపోతాయి. తిరిగి పొందడానికి, ఏజెంట్ సెటప్ వెబ్‌యాప్‌లో (http://your-agent.local:8080/setup.html) జతను తొలగించి, ఇక్కడ నుండి మళ్ళీ జత చేయండి.",
         "dismiss": "అర్థమైంది"
-      }
+      },
+      "addNodeTitle": "Add a drone or ground station",
+      "addNodeSubtitle": "No account required. Works fully offline.",
+      "addNodePlaceholder": "skynode.local  or  9TW85C",
+      "addNodeHint": "Same Wi-Fi as the agent? Paste the hostname or IP. New agent showing a 6-character code in `ados status`? Type that.",
+      "pairButton": "Pair",
+      "codeRequiresCloudError": "Pair codes need the cloud relay. Check your network or sign in to use this path.",
+      "codeNoHostError": "Pair code is valid but the agent hasn't advertised a network address yet. Wait a few seconds and try again.",
+      "badCodeError": "Pair code must be six characters (letters and digits).",
+      "signInBody": "Cloud relay routes your drone's telemetry and video through Convex over HTTPS, so Mission Control reaches the agent even when your phone or laptop is on a different network. Optional, never blocking — LAN-direct pairing works without it.",
+      "signInButton": "Sign in",
+      "hostNotPrivateError": "Only private network hosts (RFC1918 IPs, *.local names, or loopback) are allowed for LAN pairing."
     },
     "nodes": {
       "drones": "డ్రోన్‌లు",
@@ -954,7 +965,19 @@
     "staleLastSeen": "పాతది · చివరిసారి కనిపించింది {label}",
     "offlineLastSeen": "ఆఫ్‌లైన్ · చివరిసారి కనిపించింది {label}",
     "reconnectButton": "మళ్లీ కనెక్ట్ చేయి",
-    "reconnectTooltip": "ఈ డ్రోన్ కోసం క్లౌడ్ హార్ట్‌బీట్‌లకు మళ్లీ సబ్‌స్క్రైబ్ చేయండి"
+    "reconnectTooltip": "ఈ డ్రోన్ కోసం క్లౌడ్ హార్ట్‌బీట్‌లకు మళ్లీ సబ్‌స్క్రైబ్ చేయండి",
+    "pairing": {
+      "tab": {
+        "addDrone": "Add a drone",
+        "enterCode": "Enter drone's code",
+        "generateCode": "Generate a code"
+      },
+      "enterCodeTitle": "Pair with a code from your drone",
+      "enterCodeSubtitle": "Works over HTTPS. No LAN access required.",
+      "enterCodeHint": "Run `ados status` on your drone to see its current code, or copy it from the install banner.",
+      "pair": "Pair",
+      "pairing": "Pairing"
+    }
   },
   "agent": {
     "status": "ఏజెంట్ స్థితి",

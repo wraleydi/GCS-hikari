@@ -17,6 +17,7 @@ export const cmdDronesApi = {
 
 export const cmdPairingApi = {
   claimPairingCode: api.cmdPairing.claimPairingCode,
+  claimPairingCodeAnon: api.cmdPairing.claimPairingCodeAnon,
   preGenerateCode: api.cmdPairing.preGenerateCode,
   getPairingStatus: api.cmdPairing.getPairingStatus,
   getMyPendingCodes: api.cmdPairing.getMyPendingCodes,

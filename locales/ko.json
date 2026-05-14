@@ -915,9 +915,20 @@
       "unpairFailedStatusError": "페어링 해제 실패: {status} {statusText}",
       "firstPairWarning": {
         "title": "API 키는 이 브라우저에 저장됩니다",
-        "body": "브라우저 저장소를 지우면 로컬에서 페어링된 모든 노드의 페어링이 해제됩니다. 복구하려면 에이전트의 설정 웹앱 (http://<host>:8080/setup.html) 에서 페어링을 해제한 후 여기에서 다시 페어링하세요.",
+        "body": "브라우저 저장소를 지우면 로컬에서 페어링된 모든 노드의 페어링이 해제됩니다. 복구하려면 에이전트의 설정 웹앱 (http://your-agent.local:8080/setup.html) 에서 페어링을 해제한 후 여기에서 다시 페어링하세요.",
         "dismiss": "확인"
-      }
+      },
+      "addNodeTitle": "Add a drone or ground station",
+      "addNodeSubtitle": "No account required. Works fully offline.",
+      "addNodePlaceholder": "skynode.local  or  9TW85C",
+      "addNodeHint": "Same Wi-Fi as the agent? Paste the hostname or IP. New agent showing a 6-character code in `ados status`? Type that.",
+      "pairButton": "Pair",
+      "codeRequiresCloudError": "Pair codes need the cloud relay. Check your network or sign in to use this path.",
+      "codeNoHostError": "Pair code is valid but the agent hasn't advertised a network address yet. Wait a few seconds and try again.",
+      "badCodeError": "Pair code must be six characters (letters and digits).",
+      "signInBody": "Cloud relay routes your drone's telemetry and video through Convex over HTTPS, so Mission Control reaches the agent even when your phone or laptop is on a different network. Optional, never blocking — LAN-direct pairing works without it.",
+      "signInButton": "Sign in",
+      "hostNotPrivateError": "Only private network hosts (RFC1918 IPs, *.local names, or loopback) are allowed for LAN pairing."
     },
     "nodes": {
       "drones": "드론",
@@ -954,7 +965,19 @@
     "staleLastSeen": "오래된 정보 · 마지막 확인 {label}",
     "offlineLastSeen": "오프라인 · 마지막 확인 {label}",
     "reconnectButton": "다시 연결",
-    "reconnectTooltip": "이 드론의 클라우드 하트비트를 다시 구독합니다"
+    "reconnectTooltip": "이 드론의 클라우드 하트비트를 다시 구독합니다",
+    "pairing": {
+      "tab": {
+        "addDrone": "Add a drone",
+        "enterCode": "Enter drone's code",
+        "generateCode": "Generate a code"
+      },
+      "enterCodeTitle": "Pair with a code from your drone",
+      "enterCodeSubtitle": "Works over HTTPS. No LAN access required.",
+      "enterCodeHint": "Run `ados status` on your drone to see its current code, or copy it from the install banner.",
+      "pair": "Pair",
+      "pairing": "Pairing"
+    }
   },
   "agent": {
     "status": "에이전트 상태",

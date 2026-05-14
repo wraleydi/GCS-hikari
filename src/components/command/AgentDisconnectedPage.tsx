@@ -14,11 +14,10 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { AlertTriangle } from "lucide-react";
 import { useConvexAvailable } from "@/app/ConvexClientProvider";
-import { useAuthStore } from "@/stores/auth-store";
 import { SignInModal } from "@/components/auth/SignInModal";
-import { AddNodeCard } from "./disconnected/AddNodeCard";
-import { ClaimPairingCodeCard } from "./disconnected/ClaimPairingCodeCard";
-import { CloudPairingCodeSection } from "./disconnected/CloudPairingCodeSection";
+import { AddNodeForm } from "./disconnected/AddNodeForm";
+import { InstallAgentStrip } from "./disconnected/InstallAgentStrip";
+import { RemoteAccessStrip } from "./disconnected/RemoteAccessStrip";
 import { FeatureGrid } from "./disconnected/FeatureGrid";
 import { RequirementsFooter } from "./disconnected/RequirementsFooter";
 
@@ -31,7 +30,6 @@ export function AgentDisconnectedPage({
 }: AgentDisconnectedPageProps) {
   const t = useTranslations("disconnectedPage");
   const convexAvailable = useConvexAvailable();
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [signInOpen, setSignInOpen] = useState(false);
 
   function handlePaired(_deviceId: string) {
@@ -57,35 +55,21 @@ export function AgentDisconnectedPage({
           </p>
         </div>
 
-        {/* Add a node — local first, no auth gate */}
+        {/* Primary entry: one smart input that accepts either a
+            hostname or a 6-character pair code. Both flows converge
+            on ProbeResultCard + pairLocally below the surface. */}
         <div className="max-w-md mx-auto">
-          <AddNodeCard
-            cloudAvailable={convexAvailable}
-            onSignIn={() => setSignInOpen(true)}
-            onPaired={handlePaired}
-          />
+          <AddNodeForm onPaired={handlePaired} />
         </div>
 
-        {/* Pair-by-code — HTTPS-safe entry point that claims the
-            agent's beaconed pairing code via Convex. The card self-
-            gates: returns null when convex isn't available, renders
-            a sign-in stub when convex is up but the user is
-            unauthenticated, renders the full input form when
-            authenticated. Always present (when convex is available)
-            so the LAN-direct error block's scroll CTA always lands
-            on something. */}
-        {convexAvailable && (
-          <div className="max-w-md mx-auto">
-            <ClaimPairingCodeCard onSignIn={() => setSignInOpen(true)} />
-          </div>
-        )}
-
-        {/* Cloud pair code — only when signed in. Optional path. */}
-        {convexAvailable && isAuthenticated && (
-          <div className="max-w-md mx-auto">
-            <CloudPairingCodeSection />
-          </div>
-        )}
+        {/* Secondary affordances — both collapsed by default so the
+            pair input stays the dominant surface. */}
+        <div className="max-w-md mx-auto space-y-3">
+          <InstallAgentStrip />
+          {convexAvailable && (
+            <RemoteAccessStrip onSignIn={() => setSignInOpen(true)} />
+          )}
+        </div>
 
         <FeatureGrid />
 

@@ -915,9 +915,20 @@
       "unpairFailedStatusError": "જોડાણ દૂર કરવું નિષ્ફળ: {status} {statusText}",
       "firstPairWarning": {
         "title": "તમારી API કીઓ આ બ્રાઉઝરમાં સંગ્રહિત છે",
-        "body": "બ્રાઉઝર સંગ્રહને સાફ કરવાથી સ્થાનિક રીતે જોડાયેલા તમામ નોડ્સની જોડી તૂટી જશે. પુનઃપ્રાપ્તિ માટે, એજન્ટના સેટઅપ વેબએપ http://<host>:8080/setup.html પર જઈ જોડી તોડો અને અહીંથી ફરી જોડો.",
+        "body": "બ્રાઉઝર સંગ્રહને સાફ કરવાથી સ્થાનિક રીતે જોડાયેલા તમામ નોડ્સની જોડી તૂટી જશે. પુનઃપ્રાપ્તિ માટે, એજન્ટના સેટઅપ વેબએપ http://your-agent.local:8080/setup.html પર જઈ જોડી તોડો અને અહીંથી ફરી જોડો.",
         "dismiss": "સમજાયું"
-      }
+      },
+      "addNodeTitle": "Add a drone or ground station",
+      "addNodeSubtitle": "No account required. Works fully offline.",
+      "addNodePlaceholder": "skynode.local  or  9TW85C",
+      "addNodeHint": "Same Wi-Fi as the agent? Paste the hostname or IP. New agent showing a 6-character code in `ados status`? Type that.",
+      "pairButton": "Pair",
+      "codeRequiresCloudError": "Pair codes need the cloud relay. Check your network or sign in to use this path.",
+      "codeNoHostError": "Pair code is valid but the agent hasn't advertised a network address yet. Wait a few seconds and try again.",
+      "badCodeError": "Pair code must be six characters (letters and digits).",
+      "signInBody": "Cloud relay routes your drone's telemetry and video through Convex over HTTPS, so Mission Control reaches the agent even when your phone or laptop is on a different network. Optional, never blocking — LAN-direct pairing works without it.",
+      "signInButton": "Sign in",
+      "hostNotPrivateError": "Only private network hosts (RFC1918 IPs, *.local names, or loopback) are allowed for LAN pairing."
     },
     "nodes": {
       "drones": "ડ્રોન",
@@ -954,7 +965,19 @@
     "staleLastSeen": "જૂનું · છેલ્લે જોવામાં આવ્યું {label}",
     "offlineLastSeen": "ઑફલાઇન · છેલ્લે જોવામાં આવ્યું {label}",
     "reconnectButton": "ફરી કનેક્ટ કરો",
-    "reconnectTooltip": "આ ડ્રોન માટે ક્લાઉડ હાર્ટબીટ્સ ફરી સબ્સ્ક્રાઇબ કરો"
+    "reconnectTooltip": "આ ડ્રોન માટે ક્લાઉડ હાર્ટબીટ્સ ફરી સબ્સ્ક્રાઇબ કરો",
+    "pairing": {
+      "tab": {
+        "addDrone": "Add a drone",
+        "enterCode": "Enter drone's code",
+        "generateCode": "Generate a code"
+      },
+      "enterCodeTitle": "Pair with a code from your drone",
+      "enterCodeSubtitle": "Works over HTTPS. No LAN access required.",
+      "enterCodeHint": "Run `ados status` on your drone to see its current code, or copy it from the install banner.",
+      "pair": "Pair",
+      "pairing": "Pairing"
+    }
   },
   "agent": {
     "status": "એજન્ટ સ્થિતિ",
