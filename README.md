@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Altnautica Mission Control
 
 **Open-source web GCS for software-defined drones. ArduPilot, PX4, Betaflight, and iNav. AI tuning. 50km+ data link. Full gamepad flight control.**
@@ -373,3 +374,6 @@ npm run lint   # Must pass before PR
 ## License
 
 [GPL-3.0-only](LICENSE). Copyright 2025-2026 Altnautica. Derivative works must also be GPL-3.0, same as ArduPilot.
+=======
+# GCS-hikari
+>>>>>>> f68a360f467681cb9115a45030c5afff044dc822
