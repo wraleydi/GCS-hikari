@@ -105,9 +105,9 @@ export function DroneListPanel({ collapsed, onToggleCollapse }: DroneListPanelPr
   }
 
   return (
-    <div className="w-64 shrink-0 flex flex-col h-full border-r border-border-default bg-bg-secondary">
+    <div className="w-64 shrink-0 flex flex-col h-full bg-transparent">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-border-default">
+      <div className="flex items-center justify-between px-3 py-2 border-b border-white/5 glass rounded-2xl mx-2 mt-2 shadow-sm shrink-0">
         <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
           {t("title")}
         </span>
@@ -129,8 +129,8 @@ export function DroneListPanel({ collapsed, onToggleCollapse }: DroneListPanelPr
       </div>
 
       {/* Search */}
-      <div className="px-3 py-2 border-b border-border-default">
-        <div className="flex items-center gap-2 px-2 py-1 bg-bg-primary border border-border-default">
+      <div className="px-2 py-2 shrink-0">
+        <div className="flex items-center gap-2 px-2 py-1.5 glass rounded-full shadow-inner">
           <Search size={12} className="text-text-tertiary shrink-0" />
           <input
             value={search}
@@ -142,7 +142,7 @@ export function DroneListPanel({ collapsed, onToggleCollapse }: DroneListPanelPr
       </div>
 
       {/* Drone list */}
-      <div className="flex-1 overflow-auto p-2 flex flex-col gap-2">
+      <div className="flex-1 overflow-auto p-2 flex flex-col gap-3">
         {filtered.map((drone) => (
           <DroneListItem
             key={drone.id}
@@ -160,8 +160,8 @@ export function DroneListPanel({ collapsed, onToggleCollapse }: DroneListPanelPr
       </div>
 
       {/* Footer */}
-      <div className="px-3 py-1.5 border-t border-border-default">
-        <span className="text-[10px] text-text-tertiary">
+      <div className="px-3 py-1.5 glass rounded-full mx-2 mb-2 shadow-sm text-center">
+        <span className="text-[10px] text-text-tertiary font-mono">
           {drones.length} {drones.length === 1 ? "drone" : "drones"}
         </span>
       </div>

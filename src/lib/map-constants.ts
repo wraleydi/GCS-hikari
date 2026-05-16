@@ -4,8 +4,8 @@
  * @license GPL-3.0-only
  */
 
-/** Default map center: Bangalore, India (HAL Airport area). */
-export const DEFAULT_CENTER: [number, number] = [12.95, 77.668];
+/** Default map center: Institut Teknologi Sumatera (ITERA), Lampung, Indonesia. */
+export const DEFAULT_CENTER: [number, number] = [-5.360091, 105.315441];
 
 /** Design-system color tokens used across map components. */
 export const MAP_COLORS = {

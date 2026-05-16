@@ -211,7 +211,7 @@ export function CompactInfoCards({ drone }: CompactInfoCardsProps) {
   }
 
   return (
-    <div className="bg-bg-secondary">
+    <div className="bg-transparent">
       {/* Health — READ-ONLY */}
       <Section title={t("health")}>
         <SensorHealthBar compact />

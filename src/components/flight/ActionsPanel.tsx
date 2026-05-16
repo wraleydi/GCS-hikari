@@ -71,7 +71,7 @@ export function ActionsPanel() {
 
   return (
     <>
-      <div className="px-3 pt-3 pb-1.5 border-t border-border-default bg-bg-secondary flex flex-col gap-1.5">
+      <div className="px-3 pt-3 pb-1.5 bg-transparent flex flex-col gap-1.5">
         {/* Loadout selector (battery + equipment fitted for this flight) */}
         <LoadoutSelector />
 

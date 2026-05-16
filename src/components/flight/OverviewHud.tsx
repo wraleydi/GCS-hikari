@@ -14,7 +14,6 @@ import {
   drawSpeedTape,
   drawAltTape,
   drawHeadingCompass,
-  drawBatteryHud,
   drawGpsAndMode,
   drawArmedStatus,
   drawSignalBars,
@@ -154,7 +153,6 @@ export function OverviewHud() {
     drawSpeedTape(ctx, cx - w * 0.25, cy, speedKph, h);
     drawAltTape(ctx, cx + w * 0.25, cy, alt, h);
     drawHeadingCompass(ctx, cx, 30, heading, w);
-    drawBatteryHud(ctx, cx, h - 45, batteryPct);
     drawGpsAndMode(ctx, 16, h - 20, satellites, mode);
     drawArmedStatus(ctx, cx, cy + 34, armed);
     drawSignalBars(ctx, w - 80, h - 20, 4);
@@ -179,11 +177,15 @@ export function OverviewHud() {
       onDoubleClick={handleToggleDetach}
       title={isDetached ? "Double-click to reattach" : "Double-click to detach into a new window"}
     >
-      <span className="absolute top-2 left-2 z-10 text-[9px] font-mono text-text-tertiary">
-        Attitude
-      </span>
+
       <span className="absolute top-2 right-2 z-10 text-[9px] font-mono text-text-tertiary">
         {isDetached ? "Detached" : "Double-click to detach"}
+      </span>
+      <span className="absolute bottom-[22%] left-[25%] -translate-x-1/2 z-10 text-[9px] font-bold text-gcs-hud-green uppercase tracking-wider">
+        Speed
+      </span>
+      <span className="absolute bottom-[22%] left-[75%] -translate-x-1/2 z-10 text-[9px] font-bold text-gcs-hud-green uppercase tracking-wider">
+        Alt
       </span>
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
     </div>

@@ -48,11 +48,11 @@ export interface DemoSite {
 }
 
 export const DEMO_SITES: DemoSite[] = [
-  { name: "Bangalore HAL", lat: 12.9501, lon: 77.6679 },
-  { name: "Mysuru farmland", lat: 12.3052, lon: 76.6553 },
-  { name: "Coorg forest", lat: 12.4244, lon: 75.7382 },
-  { name: "Chennai port", lat: 13.0954, lon: 80.292 },
-  { name: "Pune industrial", lat: 18.6298, lon: 73.7997 },
+  { name: "ITERA Main Campus", lat: -5.3600, lon: 105.3154 },
+  { name: "ITERA Academic Block", lat: -5.3585, lon: 105.3120 },
+  { name: "ITERA Forest Area", lat: -5.3650, lon: 105.3200 },
+  { name: "Jati Agung Hills", lat: -5.3750, lon: 105.3050 },
+  { name: "Way Hui Estate", lat: -5.3500, lon: 105.3300 },
 ];
 
 // ── Scenarios ───────────────────────────────────────────────

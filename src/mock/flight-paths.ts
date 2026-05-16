@@ -10,72 +10,57 @@ export interface PathWaypoint {
   speed: number; // m/s target ground speed
 }
 
-/**
- * Path 0: Alpha-1 : Security patrol loop (Bangalore, HAL area).
- */
 const PATROL_LOOP_A: PathWaypoint[] = [
-  { lat: 12.950, lon: 77.666, alt: 40, speed: 8 },
-  { lat: 12.952, lon: 77.668, alt: 45, speed: 8 },
-  { lat: 12.954, lon: 77.670, alt: 40, speed: 8 },
-  { lat: 12.953, lon: 77.673, alt: 45, speed: 8 },
-  { lat: 12.951, lon: 77.674, alt: 40, speed: 8 },
-  { lat: 12.949, lon: 77.672, alt: 45, speed: 8 },
-  { lat: 12.948, lon: 77.669, alt: 40, speed: 8 },
-  { lat: 12.949, lon: 77.667, alt: 45, speed: 8 },
+  { lat: -5.360, lon: 105.313, alt: 40, speed: 8 },
+  { lat: -5.358, lon: 105.315, alt: 45, speed: 8 },
+  { lat: -5.356, lon: 105.317, alt: 40, speed: 8 },
+  { lat: -5.357, lon: 105.320, alt: 45, speed: 8 },
+  { lat: -5.359, lon: 105.321, alt: 40, speed: 8 },
+  { lat: -5.361, lon: 105.319, alt: 45, speed: 8 },
+  { lat: -5.362, lon: 105.316, alt: 40, speed: 8 },
+  { lat: -5.361, lon: 105.314, alt: 45, speed: 8 },
 ];
 
-/**
- * Path 1: Bravo-2 : Survey grid pattern (Bangalore, Whitefield area).
- */
 const SURVEY_GRID_A: PathWaypoint[] = [
-  { lat: 12.955, lon: 77.673, alt: 80, speed: 5 },
-  { lat: 12.957, lon: 77.673, alt: 80, speed: 5 },
-  { lat: 12.957, lon: 77.676, alt: 80, speed: 5 },
-  { lat: 12.955, lon: 77.676, alt: 80, speed: 5 },
-  { lat: 12.955, lon: 77.679, alt: 80, speed: 5 },
-  { lat: 12.957, lon: 77.679, alt: 80, speed: 5 },
-  { lat: 12.957, lon: 77.682, alt: 80, speed: 5 },
-  { lat: 12.955, lon: 77.682, alt: 80, speed: 5 },
-  { lat: 12.953, lon: 77.682, alt: 80, speed: 5 },
-  { lat: 12.953, lon: 77.679, alt: 80, speed: 5 },
-  { lat: 12.953, lon: 77.676, alt: 80, speed: 5 },
-  { lat: 12.953, lon: 77.673, alt: 80, speed: 5 },
+  { lat: -5.355, lon: 105.320, alt: 80, speed: 5 },
+  { lat: -5.353, lon: 105.320, alt: 80, speed: 5 },
+  { lat: -5.353, lon: 105.323, alt: 80, speed: 5 },
+  { lat: -5.355, lon: 105.323, alt: 80, speed: 5 },
+  { lat: -5.355, lon: 105.326, alt: 80, speed: 5 },
+  { lat: -5.353, lon: 105.326, alt: 80, speed: 5 },
+  { lat: -5.353, lon: 105.329, alt: 80, speed: 5 },
+  { lat: -5.355, lon: 105.329, alt: 80, speed: 5 },
+  { lat: -5.357, lon: 105.329, alt: 80, speed: 5 },
+  { lat: -5.357, lon: 105.326, alt: 80, speed: 5 },
+  { lat: -5.357, lon: 105.323, alt: 80, speed: 5 },
+  { lat: -5.357, lon: 105.320, alt: 80, speed: 5 },
 ];
 
-/**
- * Path 2: Echo-5 : SAR search pattern (Bangalore, south of HAL).
- */
 const SAR_SEARCH_A: PathWaypoint[] = [
-  { lat: 12.940, lon: 77.683, alt: 60, speed: 10 },
-  { lat: 12.942, lon: 77.686, alt: 65, speed: 10 },
-  { lat: 12.944, lon: 77.683, alt: 60, speed: 10 },
-  { lat: 12.942, lon: 77.680, alt: 65, speed: 10 },
-  { lat: 12.940, lon: 77.677, alt: 60, speed: 10 },
-  { lat: 12.938, lon: 77.680, alt: 65, speed: 10 },
-  { lat: 12.938, lon: 77.686, alt: 60, speed: 10 },
-  { lat: 12.940, lon: 77.689, alt: 65, speed: 10 },
+  { lat: -5.370, lon: 105.330, alt: 60, speed: 10 },
+  { lat: -5.368, lon: 105.333, alt: 65, speed: 10 },
+  { lat: -5.366, lon: 105.330, alt: 60, speed: 10 },
+  { lat: -5.368, lon: 105.327, alt: 65, speed: 10 },
+  { lat: -5.370, lon: 105.324, alt: 60, speed: 10 },
+  { lat: -5.372, lon: 105.327, alt: 65, speed: 10 },
+  { lat: -5.372, lon: 105.333, alt: 60, speed: 10 },
+  { lat: -5.370, lon: 105.336, alt: 65, speed: 10 },
 ];
 
-/**
- * Path 3: Foxtrot : iNav quadcopter survey loop (SW Bangalore offset).
- */
 const INAV_QUAD_LOOP: PathWaypoint[] = [
-  { lat: 12.925, lon: 77.600, alt: 50, speed: 6 },
-  { lat: 12.927, lon: 77.603, alt: 55, speed: 6 },
-  { lat: 12.929, lon: 77.600, alt: 50, speed: 6 },
-  { lat: 12.927, lon: 77.597, alt: 55, speed: 6 },
-  { lat: 12.925, lon: 77.600, alt: 50, speed: 6 },
-  { lat: 12.923, lon: 77.603, alt: 55, speed: 6 },
+  { lat: -5.385, lon: 105.250, alt: 50, speed: 6 },
+  { lat: -5.383, lon: 105.253, alt: 55, speed: 6 },
+  { lat: -5.381, lon: 105.250, alt: 50, speed: 6 },
+  { lat: -5.383, lon: 105.247, alt: 55, speed: 6 },
+  { lat: -5.385, lon: 105.250, alt: 50, speed: 6 },
+  { lat: -5.387, lon: 105.253, alt: 55, speed: 6 },
 ];
 
-/**
- * Path 4: Golf : iNav fixed-wing circuit (SW Bangalore, wider loop).
- */
 const INAV_FW_CIRCUIT: PathWaypoint[] = [
-  { lat: 12.920, lon: 77.595, alt: 80, speed: 15 },
-  { lat: 12.924, lon: 77.600, alt: 85, speed: 15 },
-  { lat: 12.920, lon: 77.605, alt: 80, speed: 15 },
-  { lat: 12.916, lon: 77.600, alt: 85, speed: 15 },
+  { lat: -5.390, lon: 105.245, alt: 80, speed: 15 },
+  { lat: -5.386, lon: 105.250, alt: 85, speed: 15 },
+  { lat: -5.390, lon: 105.255, alt: 80, speed: 15 },
+  { lat: -5.394, lon: 105.250, alt: 85, speed: 15 },
 ];
 
 export const FLIGHT_PATHS: PathWaypoint[][] = [

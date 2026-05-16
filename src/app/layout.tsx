@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Geist } from "next/font/google";
 import { CommandShell } from "@/components/layout/CommandShell";
 import { ToastProvider } from "@/components/ui/toast";
 import { LocaleProvider } from "@/components/layout/LocaleProvider";
 import { Analytics } from "@/components/analytics/Analytics";
+import { cn } from "@/lib/utils";
 
 import ConvexClientProvider from "./ConvexClientProvider";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+
+const geistSans = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
+});
 
 // Force all pages to render dynamically (no static prerendering).
 // This app is a fully interactive GCS — every page needs client-side
@@ -16,11 +23,11 @@ import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "ADOS Mission Control",
+  title: "swarnakasamonitoring",
   description: "Open-source Ground Control Station by Altnautica",
   icons: {
-    icon: "/favicon.svg",
-    apple: "/apple-touch-icon.png",
+    icon: "/logo swarnakasa.png",
+    apple: "/logo swarnakasa.png",
   },
 };
 
@@ -38,7 +45,7 @@ export default function RootLayout({
   );
 
   const body = (
-    <html lang="en" className="dark">
+    <html lang="en" className={cn("dark", geistSans.variable)}>
       <body className="h-dvh overflow-hidden bg-bg-primary text-text-primary font-body">
         <ConvexClientProvider>
           {content}

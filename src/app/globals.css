@@ -38,24 +38,24 @@
   --color-gcs-armed: var(--gcs-armed);
   --color-gcs-disarmed: var(--gcs-disarmed);
   --font-display: "Space Grotesk", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-body: var(--font-geist-sans), "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 }
 
 :root {
   /* Background */
-  --alt-bg-primary: #000000;
-  --alt-bg-secondary: #0a0a0a;
-  --alt-bg-tertiary: #141414;
+  --alt-bg-primary: #020617; /* Darker navy */
+  --alt-bg-secondary: #0f172a; /* Lighter navy for panels */
+  --alt-bg-tertiary: #1e293b;
 
   /* Text */
   --alt-text-primary: #fafafa;
-  --alt-text-secondary: #a0a0a0;
-  --alt-text-tertiary: #666666;
+  --alt-text-secondary: #94a3b8;
+  --alt-text-tertiary: #64748b;
 
   /* Accent */
-  --alt-accent-primary: #3a82ff;
-  --alt-accent-primary-hover: #5b9aff;
+  --alt-accent-primary: #00d1ff;
+  --alt-accent-primary-hover: #33e0ff;
   --alt-accent-secondary: #dff140;
 
   /* Border */
@@ -534,6 +534,21 @@ html {
 
 body {
   height: 100dvh;
+  overflow: hidden;
+}
+
+/* Global rounded styles */
+button {
+  border-radius: 9999px !important; /* Oval buttons */
+}
+
+input, select, textarea {
+  border-radius: 12px !important;
+}
+
+/* Base panel rounding */
+.rounded-panel {
+  border-radius: 24px;
   overflow: hidden;
 }
 

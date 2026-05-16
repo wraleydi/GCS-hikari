@@ -44,14 +44,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex-1 flex h-full overflow-hidden">
+    <div className="flex-1 flex h-full overflow-hidden p-2 gap-2 bg-bg-primary">
       <CloudDroneBridge />
       {!immersiveMode && (
-        <DroneListPanel collapsed={panelCollapsed} onToggleCollapse={() => setPanelCollapsed((p) => !p)} />
+        <div className="flex shrink-0 rounded-panel border border-border-default bg-bg-secondary overflow-hidden">
+          <DroneListPanel collapsed={panelCollapsed} onToggleCollapse={() => setPanelCollapsed((p) => !p)} />
+        </div>
       )}
       {selectedDroneId ? (
-        <>
-          <DroneDetailPanel droneId={selectedDroneId} onClose={() => selectDrone(null)} />
+        <div className="flex-1 flex gap-2 overflow-hidden">
+          <div className="flex-1 flex rounded-panel border border-border-default bg-bg-secondary overflow-hidden">
+            <DroneDetailPanel droneId={selectedDroneId} onClose={() => selectDrone(null)} />
+          </div>
           {!immersiveMode && logsCollapsed && (
             <div className="w-10 shrink-0 flex flex-col h-full border-l border-border-default bg-bg-secondary">
               <button
@@ -85,9 +89,11 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
-        </>
+        </div>
       ) : (
-        <DashboardOverview />
+        <div className="flex-1 rounded-panel border border-border-default bg-bg-secondary overflow-hidden">
+          <DashboardOverview />
+        </div>
       )}
     </div>
   );

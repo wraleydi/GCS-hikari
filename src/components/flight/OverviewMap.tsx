@@ -116,12 +116,17 @@ function MapResizer() {
   const map = useMap();
 
   useEffect(() => {
+    if (!map) return;
     const container = map.getContainer();
+    if (!container) return;
+
     const observer = new ResizeObserver(() => {
-      map.invalidateSize();
+      if (map) map.invalidateSize();
     });
     observer.observe(container);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, [map]);
 
   return null;
@@ -132,8 +137,13 @@ function MapFollower({ position, follow }: { position: [number, number] | null; 
   const map = useMap();
 
   useEffect(() => {
+    if (!map) return;
     if (follow && position) {
-      map.setView(position, map.getZoom(), { animate: true, duration: 0.3 });
+      try {
+        map.setView(position, map.getZoom(), { animate: true, duration: 0.3 });
+      } catch (e) {
+        console.warn("MapFollower: failed to set view", e);
+      }
     }
   }, [map, position, follow]);
 
@@ -287,6 +297,7 @@ export function OverviewMap() {
       )}
 
       <MapContainer
+        key={selectedDroneId}
         center={dronePos ?? defaultCenter}
         zoom={17}
         className="w-full h-full"
@@ -403,7 +414,7 @@ export function OverviewMap() {
           }}
           className={`absolute top-2 right-2 z-[1000] flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-mono font-semibold border rounded backdrop-blur-md shadow-lg transition-colors ${
             isAutoMode
-              ? "border-status-warning text-status-warning bg-status-warning/10 hover:bg-status-warning/20"
+              ? "border-yellow-400 text-yellow-400 bg-yellow-400/10 hover:bg-yellow-400/20"
               : "border-status-success text-status-success bg-status-success/10 hover:bg-status-success/20"
           }`}
         >

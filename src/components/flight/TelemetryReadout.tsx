@@ -50,7 +50,7 @@ export function TelemetryReadout() {
   const fixType = gps?.fixType ?? 0;
 
   return (
-    <div className="bg-bg-secondary border-y border-border-default">
+    <div className="bg-transparent">
       {/* Primary flight metrics — 4 columns */}
       <div className="grid grid-cols-4 divide-x divide-border-default">
         <FlightCell label="ALT" value={`${alt.toFixed(1)}m`} />
