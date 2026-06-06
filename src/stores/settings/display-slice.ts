@@ -14,7 +14,7 @@ import {
 import type { SettingsSliceFactory, SettingsStoreState } from "./types";
 
 export const displayDefaults: Partial<SettingsStoreState> = {
-  mapTileSource: "satellite",
+  mapTileSource: "google_hybrid",
   units: "metric",
   bannerDismissed: false,
   bannerDismissedAt: null,

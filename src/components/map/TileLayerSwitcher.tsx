@@ -21,9 +21,34 @@ interface TileConfig {
   url: string;
   attribution: string;
   maxZoom: number;
+  subdomains?: string[];
 }
 
 const TILE_CONFIGS: Record<MapTileSource, TileConfig> = {
+  google_hybrid: {
+    url: "https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+    attribution: "&copy; Google Maps",
+    maxZoom: 20,
+    subdomains: ["mt0", "mt1", "mt2", "mt3"],
+  },
+  google_satellite: {
+    url: "https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+    attribution: "&copy; Google Maps",
+    maxZoom: 20,
+    subdomains: ["mt0", "mt1", "mt2", "mt3"],
+  },
+  google_roadmap: {
+    url: "https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+    attribution: "&copy; Google Maps",
+    maxZoom: 20,
+    subdomains: ["mt0", "mt1", "mt2", "mt3"],
+  },
+  google_terrain: {
+    url: "https://{s}.google.com/vt/lyrs=t&x={x}&y={y}&z={z}",
+    attribution: "&copy; Google Maps",
+    maxZoom: 20,
+    subdomains: ["mt0", "mt1", "mt2", "mt3"],
+  },
   dark: {
     url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
@@ -47,24 +72,37 @@ const TILE_CONFIGS: Record<MapTileSource, TileConfig> = {
 };
 
 const TILE_LABELS: Record<MapTileSource, string> = {
+  google_hybrid: "G.HYB",
+  google_satellite: "G.SAT",
+  google_roadmap: "G.ROAD",
+  google_terrain: "G.TERR",
   dark: "DARK",
   osm: "OSM",
-  satellite: "SAT",
+  satellite: "SAT (ESRI)",
   terrain: "TOPO",
 };
 
-const TILE_ORDER: MapTileSource[] = ["dark", "osm", "satellite", "terrain"];
+const TILE_ORDER: MapTileSource[] = [
+  "google_hybrid",
+  "google_satellite",
+  "google_roadmap",
+  "google_terrain",
+  "dark",
+  "osm",
+  "satellite",
+  "terrain",
+];
 
 /** TileLayer that uses setUrl() on source change instead of unmounting/remounting.
  *  Preserves loaded tiles during transition for smoother switching. */
-function ManagedTileLayer({ url, attribution, maxZoom }: { url: string; attribution: string; maxZoom: number }) {
+function ManagedTileLayer({ url, attribution, maxZoom, subdomains }: { url: string; attribution: string; maxZoom: number; subdomains?: string[] }) {
   const map = useMap();
   const layerRef = useRef<L.TileLayer | null>(null);
   const initialUrlRef = useRef(url);
 
   // Create layer once on mount
   useEffect(() => {
-    const layer = L.tileLayer(initialUrlRef.current, { attribution, maxZoom });
+    const layer = L.tileLayer(initialUrlRef.current, { attribution, maxZoom, subdomains });
     try {
       layer.addTo(map);
       layerRef.current = layer;
@@ -107,7 +145,7 @@ export function TileLayerSwitcher({ showControls = true }: TileLayerSwitcherProp
   const setShowNfz = useSettingsStore((s) => s.setShowNoFlyZones);
   const [showPicker, setShowPicker] = useState(false);
 
-  const config = TILE_CONFIGS[source] ?? TILE_CONFIGS.dark;
+  const config = TILE_CONFIGS[source] ?? TILE_CONFIGS.google_hybrid;
 
   const handleSelect = useCallback((s: MapTileSource) => {
     setSource(s);
@@ -121,12 +159,14 @@ export function TileLayerSwitcher({ showControls = true }: TileLayerSwitcherProp
           url={config.url}
           attribution={config.attribution}
           maxZoom={config.maxZoom}
+          subdomains={config.subdomains}
         />
       ) : (
         <ManagedTileLayer
           url={config.url}
           attribution={config.attribution}
           maxZoom={config.maxZoom}
+          subdomains={config.subdomains}
         />
       )}
 

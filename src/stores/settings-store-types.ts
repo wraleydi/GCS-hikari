@@ -12,7 +12,7 @@ import type { Jurisdiction } from "@/lib/jurisdiction";
 
 export type { Jurisdiction };
 
-export type MapTileSource = "osm" | "satellite" | "terrain" | "dark";
+export type MapTileSource = "osm" | "satellite" | "terrain" | "dark" | "google_satellite" | "google_hybrid" | "google_roadmap" | "google_terrain";
 export type UnitSystem = "metric" | "imperial";
 
 export type ThemeMode =

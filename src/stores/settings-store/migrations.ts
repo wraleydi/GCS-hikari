@@ -186,5 +186,11 @@ export function migrateSettings(
     // v33: theme broadcast at end of onboarding (default on).
     state.pushThemeToAgents = true;
   }
+  if (version < 34) {
+    // v34: upgrade default map to google_hybrid for better coverage
+    if (state.mapTileSource === "satellite") {
+      state.mapTileSource = "google_hybrid" as MapTileSource;
+    }
+  }
   return state as unknown as SettingsStoreState;
 }

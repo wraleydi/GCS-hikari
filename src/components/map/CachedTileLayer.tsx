@@ -19,6 +19,7 @@ interface CachedTileLayerProps {
   url: string;
   attribution?: string;
   maxZoom?: number;
+  subdomains?: string[];
 }
 
 /** Race a promise against a timeout. Resolves to null on timeout. */
@@ -92,7 +93,7 @@ class CachingTileLayer extends L.TileLayer {
   }
 }
 
-export function CachedTileLayer({ url, attribution, maxZoom = 20 }: CachedTileLayerProps) {
+export function CachedTileLayer({ url, attribution, maxZoom = 20, subdomains }: CachedTileLayerProps) {
   const map = useMap();
   const layerRef = useRef<L.TileLayer | null>(null);
 
@@ -100,6 +101,7 @@ export function CachedTileLayer({ url, attribution, maxZoom = 20 }: CachedTileLa
     const layer = new CachingTileLayer(url, {
       attribution: attribution ?? "",
       maxZoom,
+      subdomains,
     });
 
     layer.addTo(map);
@@ -111,7 +113,7 @@ export function CachedTileLayer({ url, attribution, maxZoom = 20 }: CachedTileLa
         layerRef.current = null;
       }
     };
-  }, [map, url, attribution, maxZoom]);
+  }, [map, url, attribution, maxZoom, subdomains]);
 
   return null;
 }
