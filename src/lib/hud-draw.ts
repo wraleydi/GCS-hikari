@@ -19,8 +19,8 @@ export const FONT = '"Geist", sans-serif';
 
 // ── Sky/Ground palette (Glass Cockpit) ──────────────────────────
 export const SKY_TOP = "#0a1428";
-export const SKY_HORIZON = "#1a4a7a";
-export const GROUND_HORIZON = "#3a4a2a";
+export const SKY_HORIZON = "#0f7eecff";
+export const GROUND_HORIZON = "#6fc518ff";
 export const GROUND_BOTTOM = "#1a2510";
 export const HORIZON_LINE = "rgba(255, 255, 255, 0.3)";
 

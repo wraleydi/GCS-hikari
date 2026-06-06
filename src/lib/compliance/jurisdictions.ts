@@ -103,7 +103,7 @@ const GENERIC: JurisdictionSpec = {
   displayName: "Generic (no jurisdiction)",
   countryIso3: "—",
   regulator: "—",
-  regulationRef: "ADOS Mission Control superset format",
+  regulationRef: "Swarnakasamonitoring superset format",
   requiredFields: [
     { kind: "record", key: "startTime" },
     { kind: "record", key: "endTime" },

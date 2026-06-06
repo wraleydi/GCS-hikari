@@ -209,7 +209,7 @@ export function CliPanel() {
       >
         {entries.length === 0 && (
           <div className="text-text-tertiary">
-            <p>ADOS Mission Control — FC Console</p>
+            <p>Swarnakasamonitoring — FC Console</p>
             <p className="mt-1">
               {connected
                 ? isBetaflight

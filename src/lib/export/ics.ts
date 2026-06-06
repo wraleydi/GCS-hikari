@@ -15,7 +15,7 @@ export function buildIcsCalendar(records: FlightRecord[]): string {
   const lines: string[] = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Altnautica//ADOS Mission Control//EN",
+    "PRODID:-//Altnautica//Swarnakasamonitoring//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "X-WR-CALNAME:ADOS Flight Log",

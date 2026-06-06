@@ -34,7 +34,7 @@ export async function exportBackup(includeRecordings = false): Promise<void> {
     JSON.stringify({
       version: 1,
       exportedAt: new Date().toISOString(),
-      app: "ADOS Mission Control",
+      app: "Swarnakasamonitoring",
       includesRecordings: includeRecordings,
     }, null, 2),
   );

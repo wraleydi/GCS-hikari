@@ -27,7 +27,7 @@
     },
     "disclaimer": {
       "title": "பறக்கும் முன்",
-      "subtitle": "ADOS Mission Control உண்மையான விமானங்களை கட்டுப்படுத்த முடியும். கீழே உள்ளவற்றை படித்து ஏற்கவும்.",
+      "subtitle": "Swarnakasamonitoring உண்மையான விமானங்களை கட்டுப்படுத்த முடியும். கீழே உள்ளவற்றை படித்து ஏற்கவும்.",
       "lawfulUse": {
         "heading": "சட்டபூர்வ பயன்பாடு மட்டும்",
         "body": "இந்த மென்பொருளை சட்டபூர்வமான நோக்கங்களுக்காக மட்டுமே பயன்படுத்துவதாக நீங்கள் ஒப்புக்கொள்கிறீர்கள். உங்கள் நாடு அல்லது பிராந்திய சட்டத்தால் தடைசெய்யப்பட்ட கண்காணிப்பு, தொந்தரவு, தனியுரிமை மீறல் அல்லது வேறு செயல்களுக்கு இதைப் பயன்படுத்தக்கூடாது."
@@ -56,7 +56,7 @@
       },
       "openSource": {
         "heading": "திறந்த மூல உரிமம்",
-        "body": "ADOS Mission Control, GNU General Public License v3.0 கீழ் உரிமம் பெற்றது. அந்த உரிமத்தின் விதிமுறைகளின் படி இந்த மென்பொருளை பயன்படுத்த, மாற்ற மற்றும் பகிர நீங்கள் சுதந்திரமானவர்கள்.",
+        "body": "Swarnakasamonitoring, GNU General Public License v3.0 கீழ் உரிமம் பெற்றது. அந்த உரிமத்தின் விதிமுறைகளின் படி இந்த மென்பொருளை பயன்படுத்த, மாற்ற மற்றும் பகிர நீங்கள் சுதந்திரமானவர்கள்.",
         "link": "முழு GPL-3.0 உரிமத்தை படிக்கவும்"
       },
       "acceptCheckbox": "மேலுள்ள நிபந்தனைகளை நான் படித்து ஏற்றுக்கொள்கிறேன். நான் பைலட் இன் கமாண்ட் என்றும் பாதுகாப்பான மற்றும் சட்டபூர்வ செயல்பாட்டிற்கான முழு பொறுப்பையும் ஏற்கிறேன் என்றும் புரிந்துகொள்கிறேன்.",
@@ -87,7 +87,7 @@
       "docsDescription": "Guides, API reference, and tutorials to get your drone flying.",
       "browseDocs": "Browse docs",
       "communityHeading": "Built in the open",
-      "communityDescription": "ADOS Mission Control is free, open-source, and community-driven. We build this in public and every contribution matters.",
+      "communityDescription": "Swarnakasamonitoring is free, open-source, and community-driven. We build this in public and every contribution matters.",
       "discordHeading": "Talk to us",
       "discordDescription": "Ask questions, share your setup, report bugs, or just hang out with other pilots and developers.",
       "githubHeading": "Help the project grow",
@@ -589,7 +589,7 @@
   },
   "emptyState": {
     "title": "ட்ரோன் இணைக்கப்படவில்லை",
-    "description": "ADOS Mission Control-ஐ தொடங்க USB அல்லது நெட்வொர்க் வழியாக ஃப்ளைட் கண்ட்ரோலரை இணைக்கவும்.",
+    "description": "Swarnakasamonitoring-ஐ தொடங்க USB அல்லது நெட்வொர்க் வழியாக ஃப்ளைட் கண்ட்ரோலரை இணைக்கவும்.",
     "connectDrone": "ட்ரோன் இணை",
     "commandPaletteHint": "கட்டளைப் பலகம் திறக்க"
   },

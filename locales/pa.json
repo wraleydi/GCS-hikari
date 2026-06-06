@@ -50,7 +50,7 @@
       "docsDescription": "Guides, API reference, and tutorials to get your drone flying.",
       "browseDocs": "Browse docs",
       "communityHeading": "Built in the open",
-      "communityDescription": "ADOS Mission Control is free, open-source, and community-driven. We build this in public and every contribution matters.",
+      "communityDescription": "Swarnakasamonitoring is free, open-source, and community-driven. We build this in public and every contribution matters.",
       "discordHeading": "Talk to us",
       "discordDescription": "Ask questions, share your setup, report bugs, or just hang out with other pilots and developers.",
       "githubHeading": "Help the project grow",
@@ -65,7 +65,7 @@
     },
     "disclaimer": {
       "title": "ਉਡਾਣ ਤੋਂ ਪਹਿਲਾਂ",
-      "subtitle": "ADOS Mission Control can control real aircraft. Please read and accept the following.",
+      "subtitle": "Swarnakasamonitoring can control real aircraft. Please read and accept the following.",
       "lawfulUse": {
         "heading": "ਸਿਰਫ਼ ਕਾਨੂੰਨੀ ਵਰਤੋਂ",
         "body": "You agree to use this software only for lawful purposes. You will not use it to conduct surveillance, harass individuals, violate privacy, or support any activity prohibited by law in your country or region."
@@ -94,7 +94,7 @@
       },
       "openSource": {
         "heading": "ਓਪਨ ਸੋਰਸ ਲਾਇਸੈਂਸ",
-        "body": "ADOS Mission Control is licensed under the GNU General Public License v3.0. You are free to use, modify, and distribute this software under the terms of that license.",
+        "body": "Swarnakasamonitoring is licensed under the GNU General Public License v3.0. You are free to use, modify, and distribute this software under the terms of that license.",
         "link": "ਪੂਰਾ GPL-3.0 ਲਾਇਸੈਂਸ ਪੜ੍ਹੋ"
       },
       "acceptCheckbox": "I have read and accept the terms above. I understand that I am the pilot in command and assume all responsibility for safe and lawful operation.",
@@ -589,7 +589,7 @@
   },
   "emptyState": {
     "title": "No Drones Connected",
-    "description": "Connect a flight controller via USB or network to get started with ADOS Mission Control.",
+    "description": "Connect a flight controller via USB or network to get started with Swarnakasamonitoring.",
     "connectDrone": "Connect Drone",
     "commandPaletteHint": "to open command palette"
   },

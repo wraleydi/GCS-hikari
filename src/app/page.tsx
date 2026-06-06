@@ -20,12 +20,14 @@ export default function DashboardPage() {
   const drones = useFleetStore((s) => s.drones);
   const immersiveMode = useUiStore((s) => s.immersiveMode);
   const exitImmersiveMode = useUiStore((s) => s.exitImmersiveMode);
-  const [panelCollapsed, setPanelCollapsed] = useState(false);
+  const [panelCollapsed, setPanelCollapsed] = useState(selectedDroneId !== null);
   const [logsCollapsed, setLogsCollapsed] = useState(false);
+  const [prevSelectedDroneId, setPrevSelectedDroneId] = useState(selectedDroneId);
 
-  useEffect(() => {
+  if (selectedDroneId !== prevSelectedDroneId) {
+    setPrevSelectedDroneId(selectedDroneId);
     setPanelCollapsed(selectedDroneId !== null);
-  }, [selectedDroneId]);
+  }
 
   // Exit immersive mode if drone is deselected
   useEffect(() => {

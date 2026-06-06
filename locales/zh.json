@@ -27,7 +27,7 @@
     },
     "disclaimer": {
       "title": "飞行前须知",
-      "subtitle": "ADOS Mission Control 可以控制真实飞行器。请阅读并接受以下内容。",
+      "subtitle": "Swarnakasamonitoring 可以控制真实飞行器。请阅读并接受以下内容。",
       "lawfulUse": {
         "heading": "仅限合法使用",
         "body": "您同意仅将本软件用于合法目的。您不得将其用于监视、骚扰他人、侵犯隐私，或支持您所在国家或地区法律禁止的任何活动。"
@@ -56,7 +56,7 @@
       },
       "openSource": {
         "heading": "开源许可证",
-        "body": "ADOS Mission Control 采用 GNU General Public License v3.0 许可。您可在该许可证条款下自由使用、修改和分发本软件。",
+        "body": "Swarnakasamonitoring 采用 GNU General Public License v3.0 许可。您可在该许可证条款下自由使用、修改和分发本软件。",
         "link": "阅读完整 GPL-3.0 许可证"
       },
       "acceptCheckbox": "我已阅读并接受上述条款。我理解我作为飞行指挥责任人，对安全且合法的运行承担全部责任。",
@@ -87,7 +87,7 @@
       "docsDescription": "Guides, API reference, and tutorials to get your drone flying.",
       "browseDocs": "Browse docs",
       "communityHeading": "Built in the open",
-      "communityDescription": "ADOS Mission Control is free, open-source, and community-driven. We build this in public and every contribution matters.",
+      "communityDescription": "Swarnakasamonitoring is free, open-source, and community-driven. We build this in public and every contribution matters.",
       "discordHeading": "Talk to us",
       "discordDescription": "Ask questions, share your setup, report bugs, or just hang out with other pilots and developers.",
       "githubHeading": "Help the project grow",

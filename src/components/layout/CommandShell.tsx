@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Settings, AlertTriangle, LogOut, CloudOff, Zap, Minimize2, X, Star, BookOpen } from "lucide-react";
+import { Settings, AlertTriangle, LogOut, CloudOff, Minimize2, X, Star, BookOpen } from "lucide-react";
 import { Tooltip } from "@/components/ui/tooltip";
 import { CommandNav } from "./CommandNav";
 import { DemoProvider } from "./DemoProvider";
@@ -224,23 +224,7 @@ function CommandShellInner({ children }: { children: React.ReactNode }) {
             </Tooltip>
           )}
 
-          {/* Cmd+K hint */}
-          <Tooltip content={t("commandPalette")} position="bottom">
-            <kbd className="text-[10px] text-text-tertiary border border-border-default px-1 py-0.5 font-mono hidden sm:inline">
-              ⌘K
-            </kbd>
-          </Tooltip>
 
-          {/* Flash Tool */}
-          <Tooltip content={t("flashTool")} position="bottom">
-            <Link
-              href="/config/firmware"
-              className="text-text-secondary hover:text-text-primary transition-colors"
-              aria-label={t("flashTool")}
-            >
-              <Zap size={16} />
-            </Link>
-          </Tooltip>
 
           {/* Settings */}
           <Tooltip content={t("settings")} position="bottom">

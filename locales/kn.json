@@ -50,7 +50,7 @@
       "docsDescription": "Guides, API reference, and tutorials to get your drone flying.",
       "browseDocs": "Browse docs",
       "communityHeading": "Built in the open",
-      "communityDescription": "ADOS Mission Control is free, open-source, and community-driven. We build this in public and every contribution matters.",
+      "communityDescription": "Swarnakasamonitoring is free, open-source, and community-driven. We build this in public and every contribution matters.",
       "discordHeading": "Talk to us",
       "discordDescription": "Ask questions, share your setup, report bugs, or just hang out with other pilots and developers.",
       "githubHeading": "Help the project grow",
@@ -65,7 +65,7 @@
     },
     "disclaimer": {
       "title": "ಹಾರಾಟಕ್ಕೆ ಮುನ್ನ",
-      "subtitle": "ADOS Mission Control ನಿಜವಾದ ವಿಮಾನಗಳನ್ನು ನಿಯಂತ್ರಿಸಬಹುದು. ದಯವಿಟ್ಟು ಕೆಳಗಿನವುಗಳನ್ನು ಓದಿ ಒಪ್ಪಿಕೊಳ್ಳಿ.",
+      "subtitle": "Swarnakasamonitoring ನಿಜವಾದ ವಿಮಾನಗಳನ್ನು ನಿಯಂತ್ರಿಸಬಹುದು. ದಯವಿಟ್ಟು ಕೆಳಗಿನವುಗಳನ್ನು ಓದಿ ಒಪ್ಪಿಕೊಳ್ಳಿ.",
       "lawfulUse": {
         "heading": "ಕಾನೂನುಬದ್ಧ ಬಳಕೆ ಮಾತ್ರ",
         "body": "ಈ ಸಾಫ್ಟ್‌ವೇರ್ ಅನ್ನು ಕಾನೂನುಬದ್ಧ ಉದ್ದೇಶಗಳಿಗೆ ಮಾತ್ರ ಬಳಸಲು ನೀವು ಒಪ್ಪುತ್ತೀರಿ. ಕಣ್ಗಾವಲು, ವ್ಯಕ್ತಿಗಳನ್ನು ಕಿರುಕುಳ, ಗೌಪ್ಯತೆ ಉಲ್ಲಂಘನೆ, ಅಥವಾ ನಿಮ್ಮ ದೇಶ ಅಥವಾ ಪ್ರದೇಶದ ಕಾನೂನಿನಿಂದ ನಿಷೇಧಿಸಲಾದ ಯಾವುದೇ ಚಟುವಟಿಕೆಗೆ ಬಳಸುವುದಿಲ್ಲ."
@@ -94,7 +94,7 @@
       },
       "openSource": {
         "heading": "ಓಪನ್ ಸೋರ್ಸ್ ಪರವಾನಗಿ",
-        "body": "ADOS Mission Control ಅನ್ನು GNU General Public License v3.0 ಅಡಿಯಲ್ಲಿ ಪರವಾನಗಿ ನೀಡಲಾಗಿದೆ.",
+        "body": "Swarnakasamonitoring ಅನ್ನು GNU General Public License v3.0 ಅಡಿಯಲ್ಲಿ ಪರವಾನಗಿ ನೀಡಲಾಗಿದೆ.",
         "link": "ಪೂರ್ಣ GPL-3.0 ಪರವಾನಗಿ ಓದಿ"
       },
       "acceptCheckbox": "ಮೇಲಿನ ನಿಯಮಗಳನ್ನು ಓದಿ ಒಪ್ಪಿಕೊಳ್ಳುತ್ತೇನೆ. ನಾನು ಪೈಲಟ್ ಇನ್ ಕಮಾಂಡ್ ಎಂದು ಅರ್ಥಮಾಡಿಕೊಳ್ಳುತ್ತೇನೆ.",
@@ -589,7 +589,7 @@
   },
   "emptyState": {
     "title": "No Drones Connected",
-    "description": "Connect a flight controller via USB or network to get started with ADOS Mission Control.",
+    "description": "Connect a flight controller via USB or network to get started with Swarnakasamonitoring.",
     "connectDrone": "Connect Drone",
     "commandPaletteHint": "to open command palette"
   },

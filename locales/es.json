@@ -27,7 +27,7 @@
     },
     "disclaimer": {
       "title": "Antes de volar",
-      "subtitle": "ADOS Mission Control puede controlar aeronaves reales. Lee y acepta lo siguiente.",
+      "subtitle": "Swarnakasamonitoring puede controlar aeronaves reales. Lee y acepta lo siguiente.",
       "lawfulUse": {
         "heading": "Solo uso legal",
         "body": "Aceptas usar este software solo con fines legales. No lo usarás para realizar vigilancia, acosar a personas, violar la privacidad ni apoyar actividades prohibidas por la ley en tu país o región."
@@ -56,7 +56,7 @@
       },
       "openSource": {
         "heading": "Licencia de código abierto",
-        "body": "ADOS Mission Control está licenciado bajo la GNU General Public License v3.0. Eres libre de usar, modificar y distribuir este software según los términos de esa licencia.",
+        "body": "Swarnakasamonitoring está licenciado bajo la GNU General Public License v3.0. Eres libre de usar, modificar y distribuir este software según los términos de esa licencia.",
         "link": "Leer la licencia GPL-3.0 completa"
       },
       "acceptCheckbox": "He leído y acepto los términos anteriores. Entiendo que soy el piloto al mando y asumo toda la responsabilidad de una operación segura y legal.",
@@ -87,7 +87,7 @@
       "docsDescription": "Guides, API reference, and tutorials to get your drone flying.",
       "browseDocs": "Browse docs",
       "communityHeading": "Built in the open",
-      "communityDescription": "ADOS Mission Control is free, open-source, and community-driven. We build this in public and every contribution matters.",
+      "communityDescription": "Swarnakasamonitoring is free, open-source, and community-driven. We build this in public and every contribution matters.",
       "discordHeading": "Talk to us",
       "discordDescription": "Ask questions, share your setup, report bugs, or just hang out with other pilots and developers.",
       "githubHeading": "Help the project grow",
@@ -589,7 +589,7 @@
   },
   "emptyState": {
     "title": "Ningún dron conectado",
-    "description": "Conecta un controlador de vuelo por USB o red para comenzar con ADOS Mission Control.",
+    "description": "Conecta un controlador de vuelo por USB o red para comenzar con Swarnakasamonitoring.",
     "connectDrone": "Conectar dron",
     "commandPaletteHint": "para abrir paleta de comandos"
   },
